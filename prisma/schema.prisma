@@ -1,0 +1,439 @@
+// NeverShort database schema. Shared file: created by Person 1, changes go through Person 2.
+//
+// Rules (AGENTS.md section 9):
+// - Every table carries a storeId. Each visitor has their own copy of the demo store, and
+//   deleting a Store row deletes the whole copy (onDelete: Cascade).
+// - Money is integer cents (Int). Business dates are 'YYYY-MM-DD' strings in the store's time zone.
+// - Timestamps (DateTime) are for audit trails only.
+// Connection URLs live in prisma.config.ts (CLI) and lib/shared/db.ts (app).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Store (one row per visitor copy)
+// ---------------------------------------------------------------------------
+
+model Store {
+  id                    String                @id // 'st_' + 12 chars; this is the storeId
+  name                  String
+  currency              String                @default("USD")
+  timezone              String                @default("America/New_York")
+  minimumBalanceCents   Int
+  tightMarginCents      Int
+  openingBalanceCents   Int // balance at the start of openingBalanceOn
+  openingBalanceOn      String // 'YYYY-MM-DD', first day of the simulated history
+  whatYouSell           String
+  supplierPaymentMethod SupplierPaymentMethod @default(PAYPAL_PAYOUTS)
+  busySeasons           String[]
+  demoRunId             String // changes on every reset; part of every idempotency key
+  createdAt             DateTime              @default(now())
+  lastResetAt           DateTime              @default(now())
+  lastSeenAt            DateTime              @default(now())
+
+  products      Product[]
+  customers     Customer[]
+  orders        Order[]
+  orderItems    OrderItem[]
+  ledgerEntries LedgerEntry[]
+  payees        Payee[]
+  dues          Due[]
+  proposals     Proposal[]
+  receipts      Receipt[]
+  receiptEvents ReceiptEvent[]
+  outbox        OutboxMessage[]
+  setAsides     SetAside[]
+  gapLoans      GapLoan[]
+  riskFlags     RiskFlag[]
+  webhookEvents WebhookEvent[]
+
+  @@index([lastSeenAt])
+}
+
+enum SupplierPaymentMethod {
+  PAYPAL_PAYOUTS
+  BANK_TRANSFER
+  CARD
+}
+
+// ---------------------------------------------------------------------------
+// Catalogue, customers, orders
+// ---------------------------------------------------------------------------
+
+model Product {
+  id          String  @id
+  storeId     String
+  sku         String
+  name        String
+  description String
+  priceCents  Int
+  costCents   Int
+  active      Boolean @default(true)
+
+  store      Store       @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+
+  @@unique([storeId, sku])
+  @@index([storeId])
+}
+
+model Customer {
+  id             String  @id
+  storeId        String
+  name           String
+  email          String
+  contactConsent Boolean // Guard rule 2: only contact customers who allowed it
+  firstSeenOn    String // 'YYYY-MM-DD'
+
+  store  Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  orders Order[]
+
+  @@index([storeId])
+}
+
+enum OrderStatus {
+  ABANDONED // checkout started, never paid
+  FAILED // payment attempt failed
+  PENDING // approved, waiting for capture: counts as expected money
+  CAPTURED // paid
+  REFUNDED
+}
+
+model Order {
+  id              String      @id
+  storeId         String
+  number          Int // shown to people: "Order #1042"
+  customerId      String
+  status          OrderStatus
+  placedOn        String // 'YYYY-MM-DD'
+  placedAt        DateTime
+  totalCents      Int
+  feeCents        Int? // PayPal fee, once captured
+  netCents        Int? // what actually arrived, once captured
+  failedAttempts  Int         @default(0)
+  riskHold        Boolean     @default(false)
+  paypalOrderId   String?
+  paypalCaptureId String?
+  simulated       Boolean     @default(false)
+
+  store         Store           @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  customer      Customer        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  items         OrderItem[]
+  ledgerEntries LedgerEntry[]
+  riskFlags     RiskFlag[]
+  outbox        OutboxMessage[]
+
+  @@unique([storeId, number])
+  @@index([storeId, status])
+  @@index([storeId, placedOn])
+}
+
+model OrderItem {
+  id             String @id
+  storeId        String
+  orderId        String
+  productId      String
+  quantity       Int
+  unitPriceCents Int
+
+  store   Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+  @@index([orderId])
+}
+
+// ---------------------------------------------------------------------------
+// Money that already moved (history) and money that will move (dues)
+// ---------------------------------------------------------------------------
+
+enum Direction {
+  IN
+  OUT
+}
+
+enum LedgerCategory {
+  SALE // net of PayPal fee
+  SUPPLIER
+  BILL
+  OWNER_TRANSFER // owner's transfer from PayPal to their bank
+  LOAN_REPAYMENT
+  REFUND
+  GAP_LOAN // simulated
+}
+
+model LedgerEntry {
+  id          String         @id
+  storeId     String
+  occurredOn  String // 'YYYY-MM-DD'
+  direction   Direction
+  amountCents Int // always positive; direction gives the sign
+  category    LedgerCategory
+  description String
+  payeeId     String?
+  orderId     String?
+  paypalRef   String?
+  simulated   Boolean        @default(false)
+
+  store Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  payee Payee? @relation(fields: [payeeId], references: [id], onDelete: Cascade)
+  order Order? @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([storeId, occurredOn])
+}
+
+enum PayeeKind {
+  SUPPLIER
+  BILL
+  OWNER_TRANSFER
+  LOAN
+}
+
+enum PayeeStatus {
+  DETECTED // found from history; the owner has not confirmed yet
+  CONFIRMED
+  DISMISSED
+}
+
+enum Cadence {
+  EVERY_N_DAYS
+  MONTHLY
+  EVERY_N_WEEKS
+}
+
+model Payee {
+  id                 String      @id
+  storeId            String
+  name               String
+  label              String // how it reads in a sentence: "the supplier order", "rent"
+  kind               PayeeKind
+  status             PayeeStatus
+  typicalAmountCents Int
+  cadence            Cadence
+  intervalDays       Int? // EVERY_N_DAYS
+  intervalWeeks      Int? // EVERY_N_WEEKS
+  weekday            Int? // EVERY_N_WEEKS: 0 = Sunday
+  dayOfMonth         Int? // MONTHLY
+  paypalEmail        String? // for Payouts (PAY_SUPPLIER)
+
+  store         Store         @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  dues          Due[]
+  ledgerEntries LedgerEntry[]
+
+  @@index([storeId])
+}
+
+enum DueStatus {
+  SCHEDULED
+  PAID
+  MOVED
+  CANCELLED
+}
+
+model Due {
+  id          String    @id
+  storeId     String
+  payeeId     String
+  dueOn       String // 'YYYY-MM-DD'
+  amountCents Int
+  status      DueStatus @default(SCHEDULED)
+  movedFromOn String? // set when a MOVE_PAYMENT ran (simulated)
+  simulated   Boolean   @default(false)
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  payee Payee @relation(fields: [payeeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId, dueOn])
+}
+
+// ---------------------------------------------------------------------------
+// Proposals, Guard receipts (append-only) and what the executor did
+// ---------------------------------------------------------------------------
+
+enum ActionType {
+  SEND_REMINDER
+  SET_ASIDE
+  MOVE_PAYMENT
+  GAP_LOAN
+  PAY_SUPPLIER
+  REFUND
+  HOLD_ORDER
+}
+
+enum ProposalStatus {
+  PROPOSED
+  APPROVED
+  ESCALATED
+  BLOCKED
+  OWNER_APPROVED
+  OWNER_REJECTED
+  EXECUTED
+  FAILED
+}
+
+model Proposal {
+  id             String         @id @default(cuid())
+  storeId        String
+  type           ActionType
+  targetKind     String // ORDER | DUE | PAYEE | STORE
+  targetId       String
+  targetLabel    String
+  amountCents    Int
+  params         Json // ActionParamsMap[type] from types/
+  proposedBy     String // "OWNER" or "AGENT:RECOVERY" etc.
+  idempotencyKey String         @unique // <demo run id>:<action type>:<target id>:<sequence>
+  sequence       Int
+  draftText      String?
+  status         ProposalStatus @default(PROPOSED)
+  demoDate       String
+  createdAt      DateTime       @default(now())
+
+  store    Store           @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  receipts Receipt[]
+  outbox   OutboxMessage[]
+  setAside SetAside[]
+  gapLoan  GapLoan[]
+
+  @@index([storeId, status])
+}
+
+enum Decision {
+  APPROVE
+  ESCALATE
+  BLOCK
+}
+
+model Receipt {
+  id               String   @id @default(cuid())
+  storeId          String
+  number           Int // receipt No. shown on the thermal receipt
+  proposalId       String
+  decision         Decision
+  headlineRule     String?
+  headlineReason   String
+  rules            Json // RuleResult[]: all 8 rules with PASS / FAIL / N/A and a reason
+  paypalIdsChecked String[]
+  demoDate         String
+  createdAt        DateTime @default(now())
+
+  store    Store          @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  proposal Proposal       @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  events   ReceiptEvent[]
+
+  @@unique([storeId, number])
+  @@index([storeId, createdAt])
+}
+
+model ReceiptEvent {
+  id        String   @id @default(cuid())
+  storeId   String
+  receiptId String
+  kind      String // DECIDED | OWNER_APPROVED | OWNER_REJECTED | RECHECK_BLOCKED | EXECUTED | EXECUTION_FAILED
+  detail    String
+  paypalIds String[]
+  demoDate  String
+  createdAt DateTime @default(now())
+
+  store   Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  receipt Receipt @relation(fields: [receiptId], references: [id], onDelete: Cascade)
+
+  @@index([storeId, receiptId])
+}
+
+model OutboxMessage {
+  id            String   @id @default(cuid())
+  storeId       String
+  proposalId    String
+  orderId       String
+  to            String
+  subject       String
+  body          String
+  checkoutUrl   String
+  paypalOrderId String?
+  simulated     Boolean  @default(true) // reminders are never really emailed
+  sentAt        DateTime @default(now())
+
+  store    Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  order    Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+}
+
+model SetAside {
+  id               String   @id @default(cuid())
+  storeId          String
+  proposalId       String
+  dailyAmountCents Int
+  startOn          String
+  endOn            String
+  forDate          String
+  active           Boolean  @default(true)
+  createdAt        DateTime @default(now())
+
+  store    Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+}
+
+model GapLoan {
+  id          String   @id @default(cuid())
+  storeId     String
+  proposalId  String
+  amountCents Int
+  feeCents    Int
+  receivedOn  String
+  repayOn     String
+  simulated   Boolean  @default(true) // gap loans are always simulated
+  createdAt   DateTime @default(now())
+
+  store    Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+}
+
+// ---------------------------------------------------------------------------
+// Risk and PayPal webhooks
+// ---------------------------------------------------------------------------
+
+enum RiskFlagKind {
+  UNUSUAL_AMOUNT
+  NEW_BUYER_BIG_ORDER
+  REPEATED_FAILED_ATTEMPTS
+}
+
+model RiskFlag {
+  id        String       @id @default(cuid())
+  storeId   String
+  orderId   String
+  kind      RiskFlagKind
+  detail    String
+  createdAt DateTime     @default(now())
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+}
+
+model WebhookEvent {
+  id         String   @id // PayPal's event id: a repeat delivery is ignored
+  storeId    String // from the order's custom_id; events for unknown stores are not stored
+  eventType  String
+  resourceId String
+  receivedAt DateTime @default(now())
+  payload    Json
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+}

@@ -1,0 +1,197 @@
+@import "tailwindcss";
+
+/*
+ * NeverShort design tokens (AGENTS.md section 7). Owner: Person 1.
+ * Tailwind's default palette is cleared, so only these colours exist: a class like `bg-blue-500`
+ * produces nothing. Meaning colours are fills and marks, never small text on white.
+ */
+@theme {
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  --color-paper: #ffffff;
+  --color-ink: #14201b;
+  /* Ink tint for secondary text: 6.5:1 on white, 5.9:1 on surface. */
+  --color-ink-muted: #56605b;
+  /* Ink tint for hairlines and dividers only. */
+  --color-line: #dce1dd;
+  --color-brand: #0e3b2c;
+  --color-surface: #f3f5f2;
+
+  --color-green: #1e9e5e;
+  --color-amber: #f2a93b;
+  --color-red: #e5484d;
+
+  --radius-chip: 3px;
+  --radius-control: 10px;
+  --radius-tile: 12px;
+  --radius-card: 20px;
+
+  --ease-land: cubic-bezier(0.2, 0.9, 0.25, 1);
+
+  /* Fraunces, slightly softened: calm rather than sharp. */
+  --font-serif--font-variation-settings: "SOFT" 50;
+}
+
+@theme inline {
+  --font-serif: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, "SF Mono", monospace;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--color-surface);
+    color: var(--color-ink);
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* --- Money strip: a tile turns green when its day is fixed ------------------------ */
+.strip-block {
+  transition: background-color 700ms var(--ease-land);
+}
+
+/* --- Thermal receipt: zig-zag top and bottom edges ---------------------------------- */
+.receipt-paper {
+  --zig: 12px;
+  background: var(--color-paper);
+  -webkit-mask:
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / var(--zig) 51% repeat-x,
+    conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / var(--zig) 51% repeat-x;
+  mask:
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / var(--zig) 51% repeat-x,
+    conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / var(--zig) 51% repeat-x;
+}
+.receipt-shadow {
+  filter: drop-shadow(0 1px 1px rgb(20 32 27 / 0.14)) drop-shadow(0 8px 18px rgb(20 32 27 / 0.08));
+}
+
+/* --- The BLOCKED stamp lands --------------------------------------------------------- */
+@keyframes stamp-land {
+  0% {
+    opacity: 0;
+    transform: rotate(-14deg) scale(1.9);
+  }
+  55% {
+    opacity: 1;
+    transform: rotate(-14deg) scale(0.94);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(-14deg) scale(1);
+  }
+}
+.stamp {
+  transform: rotate(-14deg);
+}
+.stamp-animate {
+  animation: stamp-land 420ms var(--ease-land) both;
+}
+
+/* --- The headline sentence settles when it changes ---------------------------------- */
+@keyframes settle {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.headline-settle {
+  animation: settle 500ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .strip-block {
+    transition: none;
+  }
+  .stamp-animate,
+  .headline-settle {
+    animation: none;
+  }
+}
+
+/* --- /design/backgrounds explorations only (bgx-*) --------------------------------------- */
+@keyframes bgx-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes bgx-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(3.4);
+    opacity: 0;
+  }
+}
+@keyframes bgx-drift {
+  to {
+    transform: translateX(-1200px);
+  }
+}
+.bgx-spin {
+  animation: bgx-spin 5s linear infinite;
+}
+.bgx-ping {
+  animation: bgx-ping 1.8s ease-out infinite;
+}
+.bgx-drift {
+  animation: bgx-drift 22s linear infinite;
+}
+.bgx-drift-slow {
+  animation: bgx-drift 34s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bgx-spin,
+  .bgx-ping,
+  .bgx-drift,
+  .bgx-drift-slow {
+    animation: none;
+  }
+}
+
+@keyframes bgx-ticker {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.bgx-ticker {
+  animation: bgx-ticker 60s linear infinite;
+}
+.bgx-ticker-slow {
+  animation: bgx-ticker 90s linear infinite;
+}
+.bgx-ticker-rev {
+  animation: bgx-ticker 75s linear infinite reverse;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bgx-ticker,
+  .bgx-ticker-slow,
+  .bgx-ticker-rev {
+    animation: none;
+  }
+}
