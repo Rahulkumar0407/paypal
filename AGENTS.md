@@ -26,7 +26,7 @@ Tasks, owners, decisions and status live in `PLAN.md`.
 2. **Pick one task.** Open `PLAN.md`, find the current task, and work on that task only. If it depends on an item
    under "Decisions pending" in `PLAN.md`, stop and ask.
 3. **Check versions before writing code.** Read `package.json` and use the docs for the installed major version.
-   Next.js, Tailwind, Prisma, the Vercel AI SDK and AG Grid have all shipped breaking major versions recently.
+   Next.js, Tailwind, Prisma, the AI SDK and AG Grid have all shipped breaking major versions recently.
    Do not write their APIs from memory.
 
 ---
@@ -194,7 +194,7 @@ never edited in. A receipt holds:
 
 - Everything in section 3 applies.
 - **One file.** All AI setup lives in `lib/ai/model.ts`. It reads `AI_MODEL` and builds the provider with
-  `@ai-sdk/google` (Vercel AI SDK). Switching to OpenRouter (`@openrouter/ai-sdk-provider`) must mean editing only
+  `@ai-sdk/google` (the AI SDK, package `ai`). Switching to OpenRouter (`@openrouter/ai-sdk-provider`) must mean editing only
   that file. No other file imports a provider package.
 - **Model.** Use a model that supports tool calling and structured output. The chosen default goes in
   `.env.example` and the README.
@@ -214,6 +214,9 @@ never edited in. A receipt holds:
 ## 6. PayPal rules
 
 - **Sandbox only.** `lib/paypal` refuses any base URL other than `https://api-m.sandbox.paypal.com`.
+- **Runs without keys.** With no sandbox keys the app still works: pages show "PayPal isn't set up yet"
+  (`components/app/PayPalStatus.tsx`), checkout is switched off, and nothing calls PayPal. `PAYPAL_FAKE=1` keeps
+  the fake PayPal mode for tests and offline demos; it is refused in production.
 - **APIs:** Orders v2 (create, get, capture), Webhooks with signature verification, Payments (refund),
   Payouts (paying the supplier).
 - **One file.** All PayPal HTTP calls live in `lib/paypal/client.ts`: the official SDK or a small typed REST
@@ -265,7 +268,11 @@ The metaphor lives in the words and the colours, never in sun or cloud icons. No
    inside a deep green note engraved like real currency: a fine lathe tint, a rope border with a 14 in each corner,
    NEVERSHORT at the top, "This forecast is good for fourteen days" at the bottom, a rosette medallion, the Margin
    Guard seal, red serials and signatures. Use `BanknotePanel` from `components/ui/Banknote.tsx`; never redraw it.
-   It is the home screen only: every other page stays white. Precise, symmetric engraving only: no organic swirls.
+   The full note is for the home screen only. Precise, symmetric engraving only: no organic swirls.
+6. **Banknote paper** (every owner page). The background is `PaperBackdrop` (`components/ui/Paper.tsx`, set in
+   the app shell): the surface tone with a faint lathe engraving, one rosette watermark and a few security fibres.
+   Content sits on white cards (`Card`) above it; page sentences end with the engraved `RopeRule`. Receipts print on
+   a deep green counter. Don't put text straight onto the paper except page sentences and section headings.
 
 ### Colours
 
@@ -344,9 +351,11 @@ Every screen and every module component has a real empty state, loading state an
   - The Prisma client is generated into `generated/prisma` (gitignored). Import it from
     `@/generated/prisma/client` only in `lib/shared/db.ts` and inside `lib/` modules; never edit `generated/`.
   - Migrations run with `prisma migrate deploy` on deploy. Never run `prisma migrate reset` against Supabase.
-  - A daily keep-alive calls `/api/health`, which queries the database, so Supabase doesn't pause the project.
+  - Region: Supabase in Paris (`eu-west-3`).
+  - A free uptime pinger opens `/api/health` every 10 minutes. That keeps Render awake and stops Supabase pausing
+    the project. `/api/health` stays fast: one `SELECT 1`, nothing else, never cached.
 - **PayPal:** sandbox only (section 6).
-- **AI:** Vercel AI SDK with Google Gemini (`@ai-sdk/google`), model from `AI_MODEL` (section 5).
+- **AI:** AI SDK (package `ai`) with Google Gemini (`@ai-sdk/google`), model from `AI_MODEL` (section 5).
 - **Tables and charts:** AG Grid Community for tables, AG Charts Community for the forecast chart. Both are
   hackathon sponsors (AG Grid has the biggest sponsor prize), so use them meaningfully and style them in our
   design. Never import `ag-grid-enterprise`, `ag-charts-enterprise` or enterprise-only features.
@@ -355,8 +364,8 @@ Every screen and every module component has a real empty state, loading state an
 - **Heavy libraries stay off the phone.** AG Grid, AG Charts and Bryntum are laptop-only: load them with dynamic
   import on their own routes, never on phone screens.
 - **Tests:** Vitest for unit tests, Playwright for the end-to-end demo test.
-- **Hosting:** Render web service (moved to a paid plan before judging, so it never sleeps). Database on Supabase
-  (above).
+- **Hosting:** Render web service in Frankfurt (moved to a paid plan before judging, so it never sleeps). Database
+  on Supabase in Paris (above). Until the Render link exists, `APP_URL` is `http://localhost:3000`.
 - **Package manager:** npm.
 
 ---
@@ -389,7 +398,7 @@ Every screen and every module component has a real empty state, loading state an
 DATABASE_URL=                   # Supabase pooled connection (app at runtime)
 DIRECT_URL=                     # Supabase direct connection (migrations)
 DEMO_TODAY=2026-11-05           # the fixed "today" for the demo (Thu 5 Nov 2026)
-APP_URL=                        # public base URL: PayPal return/cancel URLs and reminder links
+APP_URL=http://localhost:3000   # public base URL; on Render: https://<service>.onrender.com once it exists
 
 PAYPAL_CLIENT_ID=               # sandbox app
 PAYPAL_CLIENT_SECRET=           # sandbox app
@@ -410,7 +419,7 @@ OPENROUTER_API_KEY=             # only if we switch provider
 | Owner | Folders and files |
 |-------|-------------------|
 | **P1 (Diwakar)** | `app/` (pages, layouts, global styles and design tokens, `app/(owner)/demo/`, `app/design/`, `app/api/health/`, any API route not listed below), except the paths owned by others. `components/` except the folders owned by others (this includes `components/ui/` and `components/app/`). `public/` (PWA manifest, icons, service worker). `proxy.ts` (sets the visitor cookie). |
-| **P2** | `lib/paypal/`, `lib/guard/`, `lib/store/` (catalogue, orders, settings reads), `components/calendar/` (laptop calendar: Bryntum or our own), `app/store/` (buyer-facing store and checkout pages), `app/api/paypal/`, `app/api/guard/`, `README.md`, `.github/` (CI and the daily keep-alive). Merges into `main`. |
+| **P2** | `lib/paypal/`, `lib/guard/`, `lib/store/` (catalogue, orders, settings reads), `components/calendar/` (laptop calendar: Bryntum or our own), `app/store/` (buyer-facing store and checkout pages), `app/api/paypal/`, `app/api/guard/`, `README.md`, `.github/` (CI). Merges into `main`. |
 | **P3** | `lib/forecast/` (incl. payment detection and fix-the-gap maths), `lib/recovery/`, `lib/demo/` (seed, per-visitor copies, reset), `app/api/forecast/`, `app/api/recovery/`, `app/api/demo/`, `tests/e2e/`, `playwright.config.ts`, `DEMO.md`. |
 | **P4** | `lib/ai/`, `lib/risk/` (risk check and extras), `components/dashboard/` (AG Grid), `components/charts/` (AG Charts), `components/ask/` (chat UI), `app/api/ai/`, `app/api/risk/`. |
 | **Shared** | `types/`, `prisma/` (`prisma/seed.ts` only calls `lib/demo`), `lib/shared/` (db client, clock, dates, money, env, visitor cookie), `package.json`, `package-lock.json`, `.env.example`, root config files (`tsconfig.json`, `next.config.ts`, `eslint.config.mjs`, `vitest.config.mts`, `prisma.config.ts`), `LICENSE`, `CONTRIBUTING.md`, `.gitignore`, `.nvmrc`. P1 creates them in the foundation; after that, changes go through P2. |

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Button, Card, ErrorState, PageSentence } from "@/components/ui";
+import { PayPalStatus, paypalSetup } from "@/components/app/PayPalStatus";
 import { getDemoStoreStatus, getVisitorStoreId } from "@/lib/demo";
 import { isDatabaseConfigured } from "@/lib/shared/db";
 import { formatDayWithYear } from "@/lib/shared/dates";
@@ -38,7 +39,7 @@ export default async function DemoPage({ searchParams }: { searchParams: Promise
       <PageSentence>This is your own copy of Loop Audio. Reset it whenever you like and the story starts again.</PageSentence>
 
       {params.reset === "done" ? (
-        <p role="status" className="rounded-control bg-surface px-4 py-3 text-[15px] text-ink">
+        <p role="status" className="rounded-control bg-paper px-4 py-3 text-[15px] text-ink ring-1 ring-ink/[0.06]">
           Reset done. Your copy is back to the start of the story.
         </p>
       ) : null}
@@ -65,15 +66,18 @@ export default async function DemoPage({ searchParams }: { searchParams: Promise
           </Card>
           {problem ? <ErrorState title="The demo database isn't ready." body={problem} retryHref="/demo" /> : null}
 
-          <Card tone="outline">
-            <h2 className="text-[17px] leading-6 font-semibold text-ink">Sandbox buyer login</h2>
-            <p className="mt-1 text-[15px] leading-6 text-ink-muted">
-              Added with the PayPal checkout task. Use it to pay a reminder as the buyer: sandbox money only, nothing real moves.
-            </p>
-          </Card>
+          <PayPalStatus />
+          {paypalSetup() === "sandbox" ? (
+            <Card tone="outline">
+              <h2 className="text-[17px] leading-6 font-semibold text-ink">Sandbox buyer login</h2>
+              <p className="mt-1 text-[15px] leading-6 text-ink-muted">
+                Added with the PayPal checkout task. Use it to pay a reminder as the buyer: sandbox money only, nothing real moves.
+              </p>
+            </Card>
+          ) : null}
         </div>
 
-        <section aria-labelledby="story-title">
+        <section aria-labelledby="story-title" className="rounded-card bg-paper p-5 ring-1 ring-ink/[0.06] lg:p-6">
           <h2 id="story-title" className="text-[20px] leading-7 font-semibold text-ink">
             The demo story, in order
           </h2>

@@ -7,7 +7,7 @@ approves, escalates or blocks every action that touches money, and prints a rece
 Built for the PayPal AI Hackathon 2026. Demo store: Loop Audio, a small headphone shop. All history is simulated,
 and payments use the PayPal sandbox.
 
-> TODO(Person 2, P2-4): the full README: architecture, PayPal sandbox setup, "Built with", what's simulated, and the
+> TODO(Person 2, P2-4): the full README: architecture, PayPal sandbox setup, what's simulated, and the
 > AI section from `lib/ai/README.md`. The quick start below is enough to run the foundation.
 
 ## Quick start
@@ -28,6 +28,43 @@ npm run dev             # http://localhost:3000
 | `/demo` | Demo controls: your own copy of the store and its reset |
 | `/store` | The buyer's side: the Loop Audio shop |
 | `/design` | The design system, with every element on fake data |
+
+## Hosting
+
+- **App:** Render web service in Frankfurt. The public link goes in `APP_URL` once it exists (until then
+  `APP_URL=http://localhost:3000`).
+- **Database:** Supabase Postgres in Paris (`eu-west-3`). The app uses the pooled URL; migrations use the direct URL.
+- **Health check and uptime:** a free uptime pinger opens `GET /api/health` every 10 minutes. That keeps the Render
+  service awake and stops Supabase pausing the project. The route runs one `SELECT 1`, is never cached, and answers
+  `200 {"ok":true,...}` or `503` when the database is missing or unreachable. It also answers `HEAD`.
+
+## PayPal without keys
+
+The sandbox app isn't created yet, and the app runs without it: with the `PAYPAL_*` keys empty, `/demo` says
+"PayPal isn't set up yet", checkout is switched off and nothing calls PayPal. `PAYPAL_FAKE=1` turns on the fake
+PayPal mode used by tests (refused in production).
+
+## Built with
+
+**AI tools used to build it**
+
+| Tool | Maker | Used for |
+|------|-------|----------|
+| Claude Code | Anthropic | Person 1's coding agent: foundation, design system, owner screens, docs |
+| Gemini | Google | Coding agent, and the runtime model behind the AI features (through the AI SDK, `@ai-sdk/google`) |
+| _To add_ | | Each teammate adds the agent they use here |
+
+**Inside the app at runtime:** Google Gemini through the AI SDK (package `ai`, `@ai-sdk/google`), for finding
+patterns, drafting reminders and the Ask chat. AI never calculates money and never calls PayPal (see `AGENTS.md`).
+
+**Stack and services**
+
+- PayPal sandbox: Orders v2, Webhooks, Payments (refunds), Payouts
+- Next.js 16, React 19, TypeScript 6, Tailwind CSS 4
+- Prisma 7 with Supabase Postgres; hosted on Render
+- AG Grid Community and AG Charts Community (planned for the laptop dashboard and forecast chart)
+- zod 4, Vitest 5, Playwright, ESLint 9
+- Fonts: Fraunces, Inter, JetBrains Mono
 
 ## Checks
 

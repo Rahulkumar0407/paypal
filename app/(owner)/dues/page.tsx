@@ -1,55 +1,67 @@
 import type { Metadata } from "next";
-import { PageSentence, EmptyState } from "@/components/ui";
-import { DueList } from "@/components/app/DueList";
+import { EmptyState, ErrorState, PageSentence } from "@/components/ui";
 import { DetectedPayees } from "@/components/app/DetectedPayees";
+import { DuesFilter } from "@/components/app/DuesFilter";
+import { duesInForecast } from "@/components/app/due-state";
 import { getVisitorStoreId } from "@/lib/demo";
-import { getDues, getRecurringPayees } from "@/lib/forecast";
-import { addDays, compareDates } from "@/lib/shared/dates";
-import { today } from "@/lib/shared/clock";
+import { getDues, getForecast, getRecurringPayees } from "@/lib/forecast";
 import { formatShortfall } from "@/lib/shared/money";
 
 export const metadata: Metadata = { title: "Dues" };
 
 const COUNT_WORD = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
 
-export default async function DuesPage() {
+async function load() {
   const storeId = await getVisitorStoreId();
-  const [dues, payees] = await Promise.all([getDues(storeId), getRecurringPayees(storeId)]);
-  const horizon = addDays(today(), 13);
-  const sorted = [...dues].sort((a, b) => compareDates(a.dueOn, b.dueOn));
-  const soon = sorted.filter((d) => d.dueOn <= horizon);
-  const later = sorted.filter((d) => d.dueOn > horizon);
-  const firstShort = soon.find((d) => d.readyCents < d.amountCents);
-  const detected = payees.filter((p) => p.status === "DETECTED");
-  const count = COUNT_WORD[soon.length] ?? String(soon.length);
+  try {
+    const [forecast, dues, payees] = await Promise.all([getForecast(storeId), getDues(storeId), getRecurringPayees(storeId)]);
+    return { forecast, dues, payees };
+  } catch (error) {
+    console.error("[dues] could not load:", error instanceof Error ? error.message : error);
+    return null;
+  }
+}
+
+/** Every payment due in the next 14 days, filterable by Covered / Tight / Short. */
+export default async function DuesPage() {
+  const data = await load();
+  if (!data) {
+    return (
+      <div className="space-y-10">
+        <PageSentence>Your dues for the next two weeks.</PageSentence>
+        <ErrorState
+          title="Couldn't load your dues."
+          body="Your money hasn't moved: nothing is paid unless the Guard approves it. Try again in a minute."
+          retryHref="/dues"
+        />
+      </div>
+    );
+  }
+
+  const items = duesInForecast(data.dues, data.forecast);
+  const firstShort = items.find((i) => i.state === "short");
+  const detected = data.payees.filter((p) => p.status === "DETECTED");
+  const count = COUNT_WORD[items.length] ?? String(items.length);
 
   return (
     <div className="space-y-12">
       <PageSentence>
-        {count} payment{soon.length === 1 ? "" : "s"} in the next two weeks.{" "}
+        {count} payment{items.length === 1 ? "" : "s"} in the next two weeks.{" "}
         {firstShort
-          ? `${firstShort.label.charAt(0).toUpperCase()}${firstShort.label.slice(1)} is ${formatShortfall(firstShort.amountCents - firstShort.readyCents)} short.`
-          : "Every one is ready."}
+          ? `${firstShort.due.label.charAt(0).toUpperCase()}${firstShort.due.label.slice(1)} is ${formatShortfall(
+              firstShort.due.amountCents - firstShort.due.readyCents,
+            )} short.`
+          : items.length > 0
+            ? "Every one is ready."
+            : ""}
       </PageSentence>
 
       <div className="grid gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-14">
-        <section aria-labelledby="soon-title">
-          <h2 id="soon-title" className="text-[20px] leading-7 font-semibold text-ink">
-            Coming up
+        <section aria-labelledby="dues-list-title" className="rounded-card bg-paper p-5 ring-1 ring-ink/[0.06] lg:p-6">
+          <h2 id="dues-list-title" className="mb-3 text-[20px] leading-7 font-semibold text-ink">
+            Next 14 days
           </h2>
-          {soon.length > 0 ? (
-            <DueList dues={soon} />
-          ) : (
-            <div className="mt-3">
-              <EmptyState title="Nothing due in the next two weeks." body="Bills and supplier orders show up here as soon as they're found in your payments." />
-            </div>
-          )}
-          {later.length > 0 ? (
-            <>
-              <h2 className="mt-10 text-[20px] leading-7 font-semibold text-ink">Later</h2>
-              <DueList dues={later} />
-            </>
-          ) : null}
+          <DuesFilter items={items} />
         </section>
 
         <section aria-labelledby="detected-title" className="space-y-3">

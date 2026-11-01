@@ -23,6 +23,6 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Pages and API routes; not static files, images or the PayPal webhook (PayPal has no cookie).
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.svg|api/paypal/webhook|.*\\.(?:png|jpg|svg|ico|webmanifest)$).*)"],
+  // Pages and API routes; not static files, images, the PayPal webhook or the health check (no visitor there).
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.svg|api/paypal/webhook|api/health|.*\\.(?:png|jpg|svg|ico|webmanifest)$).*)"],
 };

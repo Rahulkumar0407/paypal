@@ -30,10 +30,20 @@ export function MoneyStrip({ days, caption = true, inverse = false }: { days: Fo
 }
 
 export function StripTile({ day, inverse = false }: { day: ForecastDay; inverse?: boolean }) {
-  const condition = day.state === "short" ? `${formatShortfall(day.shortByCents)} short` : DAY_WORD[day.state];
   return (
     <li className="w-[88px] shrink-0 snap-start lg:w-auto">
-      <p className={`text-[13px] leading-5 whitespace-nowrap ${inverse ? "text-white/75" : "text-ink-muted"}`}>
+      <StripTileFace day={day} inverse={inverse} />
+    </li>
+  );
+}
+
+/** The inside of a tile: day, coloured block with the closing balance, condition word. Reused by tappable strips. */
+export function StripTileFace({ day, inverse = false, selected = false }: { day: ForecastDay; inverse?: boolean; selected?: boolean }) {
+  const condition = day.state === "short" ? `${formatShortfall(day.shortByCents)} short` : DAY_WORD[day.state];
+  const ring = selected ? (inverse ? "ring-2 ring-white ring-offset-2 ring-offset-brand" : "ring-2 ring-ink ring-offset-2") : "";
+  return (
+    <>
+      <p className={`text-[13px] leading-5 whitespace-nowrap ${inverse ? "text-white/80" : "text-ink-muted"} ${selected ? "font-semibold" : ""}`}>
         {day.isToday ? (
           <span className={`font-semibold ${inverse ? "text-white" : "text-ink"}`}>Today</span>
         ) : (
@@ -43,7 +53,7 @@ export function StripTile({ day, inverse = false }: { day: ForecastDay; inverse?
         )}
       </p>
       <div
-        className={`strip-block mt-1 flex h-[68px] items-end rounded-tile px-2.5 pb-2 lg:h-[84px] lg:px-3 lg:pb-2.5 ${DAY_FILL[day.state]}`}
+        className={`strip-block mt-1 flex h-[68px] items-end rounded-tile px-2.5 pb-2 lg:h-[84px] lg:px-3 lg:pb-2.5 ${DAY_FILL[day.state]} ${ring}`}
       >
         <span className="font-serif text-[21px] leading-none font-bold tracking-[-0.02em] whitespace-nowrap text-ink tabular lg:text-[27px] lg:font-semibold">
           {formatDollars(day.closingCents)}
@@ -51,11 +61,11 @@ export function StripTile({ day, inverse = false }: { day: ForecastDay; inverse?
       </div>
       <p
         className={`mt-1.5 text-[13px] leading-4 whitespace-nowrap ${
-          inverse ? (day.state === "covered" ? "text-white/75" : "font-semibold text-white") : day.state === "covered" ? "text-ink-muted" : "font-semibold text-ink"
+          inverse ? (day.state === "covered" ? "text-white/80" : "font-semibold text-white") : day.state === "covered" ? "text-ink-muted" : "font-semibold text-ink"
         }`}
       >
         {condition}
       </p>
-    </li>
+    </>
   );
 }

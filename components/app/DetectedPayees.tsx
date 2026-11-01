@@ -21,13 +21,13 @@ export function DetectedPayees({ payees }: { payees: RecurringPayee[] }) {
             <p className="mt-1 text-[17px] leading-6 text-ink">{p.summary}</p>
             {answer ? (
               <p role="status" className="mt-3 text-[15px] text-ink">
-                {answer === "yes" ? "Confirmed. It's in your forecast." : "Noted. We'll leave it out until you add it yourself."}
+                {answer === "yes" ? "Confirmed. It's in every forecast from now on." : "Got it. We won't treat it as a regular payment."}
               </p>
             ) : (
               <div className="mt-3 flex gap-2">
-                <Button onClick={() => setAnswers((a) => ({ ...a, [p.id]: "yes" }))}>Yes, that&apos;s right</Button>
+                <Button onClick={() => setAnswers((a) => ({ ...a, [p.id]: "yes" }))}>Confirm</Button>
                 <Button variant="secondary" onClick={() => setAnswers((a) => ({ ...a, [p.id]: "no" }))}>
-                  Not quite
+                  Not regular
                 </Button>
               </div>
             )}

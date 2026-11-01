@@ -13,7 +13,7 @@ export function FixOptions({ fixes }: { fixes: FixOption[] }) {
   return (
     <ol className="space-y-3">
       {fixes.map((fix) => (
-        <li key={fix.id} className="rounded-tile bg-paper p-4 ring-1 ring-line ring-inset">
+        <li key={fix.id} className="rounded-tile bg-surface p-4">
           <div className="flex items-start justify-between gap-3">
             <p className="text-[16px] leading-6 font-semibold text-ink">{fix.title}</p>
             {fix.simulated ? <SimulatedTag className="mt-1 shrink-0" /> : null}

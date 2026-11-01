@@ -24,7 +24,7 @@ export default async function ReceiptsPage() {
       </div>
 
       {receipts.length > 0 ? (
-        <ol className="grid justify-items-center gap-10 rounded-card bg-surface px-4 py-10 sm:px-8 md:grid-cols-2 2xl:grid-cols-3">
+        <ol className="grid justify-items-center gap-10 rounded-card bg-brand px-4 py-10 sm:px-8 md:grid-cols-2 2xl:grid-cols-3">
           {receipts.map((r) => (
             <li key={r.id} id={r.id} className="flex w-full scroll-mt-24 justify-center">
               <Receipt receipt={r} />

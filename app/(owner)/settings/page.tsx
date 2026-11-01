@@ -24,7 +24,7 @@ export default async function SettingsPage() {
     <div className="max-w-[640px] space-y-10">
       <PageSentence>A few answers about {s.name}, so the forecast fits the shop.</PageSentence>
 
-      <form className="space-y-8" aria-describedby="settings-note">
+      <form className="space-y-8 rounded-card bg-paper p-5 ring-1 ring-ink/[0.06] lg:p-8" aria-describedby="settings-note">
         <div>
           <label htmlFor="sell" className={label}>
             What you sell

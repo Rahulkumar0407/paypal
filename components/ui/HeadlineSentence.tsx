@@ -1,4 +1,5 @@
 import type { Headline } from "@/types";
+import { RopeRule } from "./Paper";
 
 /**
  * Signature element 1: the forecast read aloud. One plain sentence in a large serif.
@@ -33,6 +34,7 @@ export function PageSentence({ children, inverse = false }: { children: React.Re
       className={`max-w-[26ch] font-serif text-[1.875rem] leading-[1.12] tracking-[-0.018em] text-pretty lg:text-[2.6rem] lg:leading-[1.08] ${inverse ? "text-white" : "text-ink"}`}
     >
       {children}
+      <RopeRule className="mt-5" />
     </h1>
   );
 }

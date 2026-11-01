@@ -32,7 +32,7 @@ Agents: if your task is listed under "Blocks", stop and ask. Do not guess.
 | D3 | Bryntum is a sponsor with its own prize, but optional: the last task, and only with a hackathon licence. Without one, we build the laptop calendar ourselves. AG Grid and AG Charts: our choice, Community editions (AG Grid has the biggest sponsor prize). |
 | D4 | Reminders go to a simulated outbox labelled "Simulated", showing the message and the live PayPal sandbox checkout link. The judge clicks it and pays as the sandbox buyer. |
 | D5 | Each visitor gets their own copy of Loop Audio, with its own reset. |
-| D6 | Database: Supabase Postgres. Prisma uses the pooled URL for the app and the direct URL for migrations. A daily keep-alive stops Supabase pausing the project. Web service: Render, moved to a paid plan before judging (T-3). |
+| D6 | Database: Supabase Postgres. Prisma uses the pooled URL for the app and the direct URL for migrations. Supabase in Paris (`eu-west-3`). A free uptime pinger opens `/api/health` every 10 minutes, which keeps Render awake and stops Supabase pausing the project. Web service: Render in Frankfurt, moved to a paid plan before judging (T-3). |
 | D7 | Money in counts what actually arrives after PayPal's fee. The seed is tuned so the story numbers still work. |
 | D8 | Official rules confirmed (top of `AGENTS.md`). No specific PayPal product is required. "AI never calls PayPal" stays. The Agent Toolkit is optional: only as a library behind `lib/paypal`, called by the Guard's executor, and only if it fits. |
 | D9 | P1 uses Claude Code. `GEMINI.md` points to `AGENTS.md`. |
@@ -92,7 +92,7 @@ from P2, P3 and P4._
   `lib/demo` stub).
 - `/api/health`, which runs a real database query.
 - Placeholder pages.
-- A Render web service (free plan for now) in a region close to the Supabase project.
+- A Render web service (free plan for now) in Frankfurt, close to the Supabase project in Paris.
 
 **Done when:**
 - the Render URL loads every placeholder page with fake data, on a phone and on a laptop;
@@ -212,7 +212,7 @@ And on Render:
 
 ### [ ] P2-4 README (Tue 10 Nov)
 - Setup, env keys, run, test, deploy.
-- Supabase setup (pooled and direct URLs) and the keep-alive.
+- Supabase setup (pooled and direct URLs) and the uptime pinger on `/api/health`.
 - PayPal sandbox setup (app, buyer account, webhook registration).
 - Architecture, what's simulated, a link to `DEMO.md`, and P4's AI section.
 - A "Built with" section that explains every tool and how we use PayPal and AI (a judging requirement).
@@ -221,14 +221,14 @@ And on Render:
 - a teammate follows it on a clean clone and reaches a running app with the demo seed, without asking anyone;
 - "Built with" covers every tool in `package.json` that matters.
 
-### [ ] P2-5 CI, keep-alive and daily merging (daily from Mon 2 Nov)
+### [ ] P2-5 CI, uptime pinger and daily merging (daily from Mon 2 Nov)
 - A GitHub Actions workflow runs `npm run check` on every PR.
-- A scheduled daily workflow calls `<APP_URL>/api/health` (keeps Supabase awake).
+- A free uptime pinger opens `<APP_URL>/api/health` every 10 minutes (keeps Render awake and Supabase from pausing).
 - P2 merges into `main` daily.
 
 **Done when:**
 - PR checks run on every PR;
-- the keep-alive has succeeded once by manual trigger and once on its schedule.
+- the uptime pinger shows the health check passing for a full day.
 
 And each day:
 - CI is green on `main`;
@@ -401,7 +401,7 @@ midday or written down.
 
 ### [ ] T-3 Keep the app running through judging (until judging ends; owner: name needed, D10)
 - Move the Render web service to a paid plan before judging starts (by Mon 30 Nov) so it never sleeps.
-- Confirm the Supabase keep-alive (P2-5) keeps running.
+- Confirm the uptime pinger (P2-5) keeps passing.
 
 **Done when:**
 - Render shows a paid plan;

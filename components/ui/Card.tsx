@@ -1,4 +1,4 @@
-/** One idea per card. Surface card by default; `outline` for cards that sit on surface. No shadows. */
+/** One idea per card: white on the banknote paper. `outline` adds a firmer hairline. No shadows. */
 export function Card({
   children,
   tone = "surface",
@@ -10,7 +10,7 @@ export function Card({
   className?: string;
   as?: "section" | "div" | "article" | "li";
 }) {
-  const toneClass = tone === "surface" ? "bg-surface" : "bg-paper ring-1 ring-line ring-inset";
+  const toneClass = tone === "surface" ? "bg-paper ring-1 ring-ink/[0.06]" : "bg-paper ring-1 ring-line ring-inset";
   return <Tag className={`rounded-card p-5 lg:p-6 ${toneClass} ${className}`}>{children}</Tag>;
 }
 

@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { formatDayWithYear } from "@/lib/shared/dates";
+import { PaperBackdrop } from "@/components/ui/Paper";
 import { BottomNav, SideNav } from "./NavLinks";
 
 /** The owner's app frame: demo banner, laptop sidebar, phone tab bar. */
 export function AppShell({ today, storeName, children }: { today: string; storeName: string; children: React.ReactNode }) {
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[236px_minmax(0,1fr)]">
-      <aside className="sticky top-0 hidden h-dvh flex-col border-r border-line px-4 py-7 lg:flex">
+      <PaperBackdrop />
+      <aside className="sticky top-0 hidden h-dvh flex-col border-r border-line bg-paper px-4 py-7 lg:flex">
         <Link href="/" className="px-3">
           <span className="block font-serif text-[28px] leading-none text-ink">NeverShort</span>
           <span className="mt-1.5 block text-[14px] text-ink-muted">{storeName}</span>

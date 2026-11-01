@@ -1,6 +1,8 @@
 /** NeverShort design system (Person 1). See components/ui/README.md and the /design page. */
 export { HeadlineSentence, PageSentence } from "./HeadlineSentence";
-export { MoneyStrip, StripTile } from "./MoneyStrip";
+export { MoneyStrip, StripTile, StripTileFace } from "./MoneyStrip";
+export { StatusChip } from "./StatusChip";
+export { PaperBackdrop, RopeRule } from "./Paper";
 export { RefereeCard } from "./RefereeCard";
 export { Receipt } from "./Receipt";
 export { BanknotePanel, BanknoteArt, NOTE_ROOM } from "./Banknote";

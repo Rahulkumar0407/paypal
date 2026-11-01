@@ -25,7 +25,7 @@ export default async function DashboardPage() {
       </Card>
 
       <div className="grid gap-12 2xl:grid-cols-[minmax(0,8fr)_minmax(0,4fr)]">
-        <section aria-labelledby="orders-title">
+        <section aria-labelledby="orders-title" className="rounded-card bg-paper p-5 ring-1 ring-ink/[0.06] lg:p-6">
           <h2 id="orders-title" className="mb-3 text-[20px] leading-7 font-semibold text-ink">
             Recent orders
           </h2>

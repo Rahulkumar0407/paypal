@@ -15,6 +15,7 @@ import {
   Receipt,
   RefereeCard,
   SimulatedTag,
+  StatusChip,
 } from "@/components/ui";
 import { ScreenPreview, StampReplay, StripFixDemo } from "@/components/app/design/DesignDemos";
 import { buildHeadline } from "@/lib/forecast";
@@ -60,6 +61,11 @@ export default function DesignPage() {
 
         <Section title="The headline sentence" note="One plain sentence in Fraunces, built by code templates so the demo replays word for word. Pure ink: no coloured words.">
           <div className="space-y-10">
+            <div className="flex flex-wrap gap-3">
+              <StatusChip state="short">Short on Thu 12 Nov</StatusChip>
+              <StatusChip state="tight">Tight on Fri 13 Nov</StatusChip>
+              <StatusChip state="covered">Covered for the next two weeks</StatusChip>
+            </div>
             <HeadlineSentence headline={buildHeadline(mockForecast)} as="p" />
             <HeadlineSentence headline={tightExample} as="p" />
             <HeadlineSentence headline={buildHeadline(mockForecastFixed)} as="p" />

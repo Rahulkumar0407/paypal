@@ -11,7 +11,7 @@ export default function MorePage() {
     <div className="space-y-8">
       <PageSentence>Everything else.</PageSentence>
       {[SECONDARY_NAV, UTILITY_NAV].map((group, i) => (
-        <ul key={i} className="divide-y divide-line border-y border-line">
+        <ul key={i} className="divide-y divide-line rounded-card bg-paper px-5 ring-1 ring-ink/[0.06]">
           {group.map((item) => (
             <li key={item.href}>
               <Link href={item.href} className="flex min-h-14 items-center text-[17px] text-ink">

@@ -35,6 +35,13 @@ npm run dev             # http://localhost:3000
 
 Without a database the app still runs on the stubs' fake data, and `/demo` says the database isn't connected.
 
+**Use your own dev database.** Each developer creates their own free Supabase project (or runs `npx prisma dev`
+for a local Postgres) and puts its URLs in their own `.env`. Never point your `.env` at the shared database the
+hosted app uses: `npm run db:reset` deletes every demo copy in the database it runs against.
+
+**PayPal keys are optional.** Until Person 2 creates the sandbox app, leave the `PAYPAL_*` keys empty. The app
+runs, `/demo` says "PayPal isn't set up yet", and checkout is switched off. Tests use `PAYPAL_FAKE=1`.
+
 ## Replacing a stub
 
 Every module in `lib/` starts as a stub that returns fake data from `mocks/` and is marked `TODO(Person N)`.

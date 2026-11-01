@@ -12,7 +12,7 @@ const pt = (x: number, y: number) => `${x.toFixed(1)},${y.toFixed(1)}`;
 // a symmetric rosette medallion, a serrated seal, serials, plaques and signatures.
 
 /** A woven guilloché ring: `copies` interlaced k-petal curves around a base radius. Regular and symmetric. */
-function guillocheRing(cx: number, cy: number, base: number, amp: number, k: number, copies: number): string[] {
+export function guillocheRing(cx: number, cy: number, base: number, amp: number, k: number, copies: number): string[] {
   return Array.from({ length: copies }, (_, j) => {
     const shift = (j / copies) * ((Math.PI * 2) / k);
     const p: string[] = [];
