@@ -6,7 +6,7 @@ export interface NavItem {
 /** Owner navigation. Phone shows the first four plus More; the laptop sidebar shows all. */
 export const PRIMARY_NAV: NavItem[] = [
   { href: "/", label: "Today" },
-  { href: "/dues", label: "Dues" },
+  { href: "/dues", label: "To pay" },
   { href: "/approvals", label: "Approvals" },
   { href: "/ask", label: "Ask" },
 ];
@@ -18,8 +18,8 @@ export const SECONDARY_NAV: NavItem[] = [
 ];
 
 export const UTILITY_NAV: NavItem[] = [
-  { href: "/demo", label: "Demo controls" },
-  { href: "/store", label: "Open the store" },
+  { href: "/demo", label: "Demo guide" },
+  { href: "/store", label: "Open the shop" },
   { href: "/design", label: "Design system" },
 ];
 

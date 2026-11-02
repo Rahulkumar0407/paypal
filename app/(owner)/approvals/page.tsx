@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Card, EmptyState, PageSentence, SimulatedTag } from "@/components/ui";
+import { Card, EmptyState, ErrorState, PageSentence, SimulatedTag } from "@/components/ui";
 import { InboxList } from "@/components/app/InboxList";
 import { getVisitorStoreId } from "@/lib/demo";
 import { listInbox } from "@/lib/guard";
 import { listOutbox } from "@/lib/recovery";
 import { paypalSetup } from "@/components/app/PayPalStatus";
+import { decideEscalation } from "./actions";
 
 export const metadata: Metadata = { title: "Approvals" };
 
@@ -13,7 +14,23 @@ const COUNT_WORD = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven",
 
 export default async function ApprovalsPage() {
   const storeId = await getVisitorStoreId();
-  const [inbox, outbox] = await Promise.all([listInbox(storeId), listOutbox(storeId)]);
+  const loaded = await Promise.all([listInbox(storeId), listOutbox(storeId)]).catch((error: unknown) => {
+    console.error("[approvals] could not load the inbox:", error instanceof Error ? error.message : error);
+    return null;
+  });
+  if (!loaded) {
+    return (
+      <div className="space-y-8">
+        <PageSentence>Your approvals.</PageSentence>
+        <ErrorState
+          title="Couldn't load your approvals."
+          body="Nothing waiting for you has happened: those only go ahead after you approve them. Try again in a minute."
+          retryHref="/approvals"
+        />
+      </div>
+    );
+  }
+  const [inbox, outbox] = loaded;
   const waiting = inbox.filter((i) => i.status === "WAITING");
   const decided = inbox.filter((i) => i.status !== "WAITING");
 
@@ -21,9 +38,13 @@ export default async function ApprovalsPage() {
     <div className="space-y-12">
       <PageSentence>
         {waiting.length === 0
-          ? "Nothing is waiting for you. The Guard handled everything else."
-          : `${COUNT_WORD[waiting.length] ?? waiting.length} decision${waiting.length === 1 ? " is" : "s are"} waiting for you. Everything else, the Guard decided.`}
+          ? "Nothing needs your OK right now. The safety check handled everything else."
+          : `${COUNT_WORD[waiting.length] ?? waiting.length} ${waiting.length === 1 ? "thing needs" : "things need"} your OK. The safety check handled the rest.`}
       </PageSentence>
+      <p className="-mt-6 max-w-[62ch] text-[16px] leading-7 text-ink-muted">
+        NeverShort never moves money on its own. Every suggestion goes through the Margin Guard, a set of fixed safety rules:
+        small, safe things go ahead, bigger ones wait here for you, and risky ones are stopped.
+      </p>
 
       <div className="grid gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-14">
         <div className="space-y-10">
@@ -32,10 +53,10 @@ export default async function ApprovalsPage() {
               Waiting for you
             </h2>
             {waiting.length > 0 ? (
-              <InboxList items={waiting} />
+              <InboxList items={waiting} decide={decideEscalation} />
             ) : (
               <div className="mt-3">
-                <EmptyState title="All clear." body="When the Guard escalates something, like a gap loan or a payment over $100, it waits here for your OK." />
+                <EmptyState title="All clear." body="Anything bigger, like a loan or a payment over $100, waits here for your OK before it happens." />
               </div>
             )}
           </section>
@@ -43,9 +64,9 @@ export default async function ApprovalsPage() {
           <section aria-labelledby="decided-title" className="rounded-card bg-paper p-5 ring-1 ring-ink/[0.06] lg:p-6">
             <div className="flex items-baseline justify-between gap-4">
               <h2 id="decided-title" className="text-[20px] leading-7 font-semibold text-ink">
-                Decided by the Guard
+                Already decided
               </h2>
-              <Link href="/receipts" className="text-[15px] text-ink underline decoration-ink/30 underline-offset-4 hover:decoration-ink">
+              <Link href="/receipts" className="shrink-0 text-[15px] whitespace-nowrap text-ink underline decoration-ink/30 underline-offset-4 hover:decoration-ink">
                 Every receipt
               </Link>
             </div>
@@ -53,7 +74,7 @@ export default async function ApprovalsPage() {
               <InboxList items={decided} />
             ) : (
               <div className="mt-3">
-                <EmptyState title="No decisions yet." body="Every proposal from the agents, and every fix you pick, gets a receipt here." />
+                <EmptyState title="No decisions yet." body="Every suggestion, and every fix you pick, gets a receipt here." />
               </div>
             )}
           </section>
@@ -62,12 +83,12 @@ export default async function ApprovalsPage() {
         <section aria-labelledby="outbox-title" className="space-y-3">
           <div className="flex items-center gap-2">
             <h2 id="outbox-title" className="text-[20px] leading-7 font-semibold text-ink">
-              Outbox
+              Sent reminders
             </h2>
             <SimulatedTag />
           </div>
           <p className="text-[15px] leading-6 text-ink-muted">
-            Approved reminders land here instead of a real inbox. Open the link to pay as the sandbox buyer.
+            Reminders land here instead of a real email inbox, so you can see exactly what the customer gets. Open the link to pay as the test buyer.
           </p>
           {outbox.length > 0 ? (
             outbox.map((m) => (
@@ -92,7 +113,7 @@ export default async function ApprovalsPage() {
               </Card>
             ))
           ) : (
-            <EmptyState title="No reminders sent yet." body="When the Guard approves a reminder, the message and its PayPal link appear here." />
+            <EmptyState title="No reminders sent yet." body="When a reminder is approved, the message and its PayPal link appear here." />
           )}
         </section>
       </div>

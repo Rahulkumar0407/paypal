@@ -24,8 +24,11 @@ npm run dev             # http://localhost:3000
 | Page | What it shows |
 |------|---------------|
 | `/` | The forecast sentence, the 14-day money strip, ways to fix a gap, the money calendar |
-| `/dues`, `/approvals`, `/receipts`, `/ask`, `/dashboard`, `/settings` | The owner's app |
-| `/demo` | Demo controls: your own copy of the store and its reset |
+| `/fix` | Fix the gap: up to three fixes, each sent to the Margin Guard, with the decision as a referee card |
+| `/approvals` | Escalations waiting for the owner (Approve / Decline), recent decisions, the simulated outbox |
+| `/receipts`, `/receipts/<id>` | Every Guard decision, newest first, filterable; one receipt printed in full |
+| `/dues`, `/ask`, `/dashboard`, `/settings` | The rest of the owner's app (settings is the short setup form) |
+| `/demo` | The demo guide: the six story steps, the sandbox buyer login, and a reset for your own copy |
 | `/store` | The buyer's side: the Loop Audio shop |
 | `/design` | The design system, with every element on fake data |
 
@@ -37,6 +40,9 @@ npm run dev             # http://localhost:3000
 - **Health check and uptime:** a free uptime pinger opens `GET /api/health` every 10 minutes. That keeps the Render
   service awake and stops Supabase pausing the project. The route runs one `SELECT 1`, is never cached, and answers
   `200 {"ok":true,...}` or `503` when the database is missing or unreachable. It also answers `HEAD`.
+
+The app installs to a phone's home screen (manifest, icons, full-screen on iPhone). Its service worker only shows an
+offline page; it never caches pages or data, so a reset always shows fresh numbers.
 
 ## PayPal without keys
 

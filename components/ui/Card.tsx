@@ -23,9 +23,18 @@ export function CardTitle({ children, className = "" }: { children: React.ReactN
 export function SimulatedTag({ className = "" }: { className?: string }) {
   return (
     <span
-      className={`inline-flex items-center rounded-chip border border-dashed border-ink-muted/70 px-1.5 py-px text-[12px] leading-4 font-medium text-ink-muted ${className}`}
+      className={`inline-flex items-center rounded-chip border border-dashed whitespace-nowrap border-ink-muted/70 px-1.5 py-px text-[12px] leading-4 font-medium text-ink-muted ${className}`}
     >
       Simulated
+    </span>
+  );
+}
+
+/** A label that says something runs on the real PayPal sandbox: real sandbox payments, no real money. */
+export function SandboxTag({ className = "" }: { className?: string }) {
+  return (
+    <span className={`inline-flex items-center rounded-chip border border-brand whitespace-nowrap px-1.5 py-px text-[12px] leading-4 font-medium text-brand ${className}`}>
+      PayPal test mode
     </span>
   );
 }

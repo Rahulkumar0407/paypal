@@ -15,8 +15,8 @@ export function paypalSetup(): PayPalSetup {
 
 const COPY: Record<PayPalSetup, { title: string; body: string; mark: string }> = {
   sandbox: {
-    title: "PayPal sandbox is connected.",
-    body: "Checkouts and reminders use real sandbox payments. No real money moves.",
+    title: "PayPal test mode is connected.",
+    body: "Checkouts use real PayPal with test money. No real money moves.",
     mark: "bg-green",
   },
   fake: {
@@ -26,7 +26,7 @@ const COPY: Record<PayPalSetup, { title: string; body: string; mark: string }> =
   },
   "not-configured": {
     title: "PayPal isn't set up yet.",
-    body: "The sandbox keys aren't in place, so checkout is switched off and payment data here is sample data. Everything else works.",
+    body: "PayPal's test keys aren't added yet, so checkout is switched off and payments here are sample data. Everything else works.",
     mark: "bg-amber",
   },
 };

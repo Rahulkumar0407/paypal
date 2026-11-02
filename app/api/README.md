@@ -6,7 +6,7 @@ store id with `getVisitorStoreId()` (lib/demo), call the module, return JSON.
 | Route | Owner | Now |
 |-------|-------|-----|
 | `GET /api/health` | Person 1 | Real: one `SELECT 1`. The uptime pinger opens it every 10 minutes (keeps Render awake, Supabase from pausing). Also answers HEAD |
-| `POST /api/demo/reset` | Person 3 | Real: resets the calling visitor's copy, redirects to `/demo` |
+| `POST /api/demo/reset` | Person 3 | Real: resets the calling visitor's copy, redirects to `/demo`. The `/demo` page itself resets through a server action that calls the same `resetStore` |
 | `GET /api/forecast` | Person 3 | Stub data |
 | `GET /api/recovery` | Person 3 | Stub data |
 | `GET` / `POST /api/guard` | Person 2 | GET stub data; POST returns 501 until P2-3 |

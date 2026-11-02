@@ -1,5 +1,5 @@
 import type { Forecast, FixOption, RecoveryCandidate, Alert, RecurringPayee, Due } from "@/types";
-import { BanknotePanel, ButtonLink, Card, CardTitle, EmptyState, HeadlineSentence, NOTE_ROOM, StatusChip, buttonClasses } from "@/components/ui";
+import { BanknotePanel, ButtonLink, Card, CardTitle, EmptyState, HeadlineSentence, NOTE_ROOM, StatusChip } from "@/components/ui";
 import { ChartSlot } from "@/components/app/ChartSlot";
 import { DetectedPayees } from "@/components/app/DetectedPayees";
 import { FixOptions } from "@/components/app/FixOptions";
@@ -53,7 +53,7 @@ export default async function HomePage() {
         <div role="alert" className="max-w-[560px] rounded-[14px] bg-brand p-6 ring-1 ring-white/25">
           <p className="font-serif text-[1.9rem] leading-tight text-white">Couldn&apos;t work out your forecast.</p>
           <p className="mt-3 text-[16px] leading-7 text-white/85">
-            Your money hasn&apos;t moved: nothing is paid or sent unless the Guard approves it. Try again in a minute.
+            Your money hasn&apos;t moved: nothing is paid or sent without passing NeverShort&apos;s safety check. Try again in a minute.
           </p>
           <div className="mt-5">
             <ButtonLink href="/" variant="secondary">
@@ -94,9 +94,9 @@ export default async function HomePage() {
             )}
             <HeadlineSentence headline={headline} inverse />
             {gap ? (
-              <a href="#fix-the-gap" className={buttonClasses("secondary", "min-h-12 px-5 text-[16px] font-semibold")}>
+              <ButtonLink href="/fix" variant="secondary" className="min-h-12 px-5 text-[16px] font-semibold">
                 Fix the gap on {formatDay(gap.date)}
-              </a>
+              </ButtonLink>
             ) : null}
           </div>
 
@@ -125,7 +125,7 @@ export default async function HomePage() {
                 Coming up
               </h2>
               <ButtonLink href="/dues" variant="quiet">
-                See all dues
+                See everything to pay
               </ButtonLink>
             </div>
             <p className="text-[15px] text-ink-muted">Payments in the next two weeks, and how much of each is ready.</p>
@@ -147,8 +147,13 @@ export default async function HomePage() {
                 <CardTitle>
                   {fixes.length === 3 ? "Three" : fixes.length === 2 ? "Two" : "One"} ways to cover {formatDay(gap.date)}
                 </CardTitle>
-                <p className="mt-1 mb-4 text-[15px] leading-6 text-ink-muted">Pick one. The Margin Guard checks it before anything moves.</p>
+                <p className="mt-1 mb-4 text-[15px] leading-6 text-ink-muted">Pick one. NeverShort&apos;s safety check looks at it before anything happens.</p>
                 <FixOptions fixes={fixes} />
+                <div className="mt-4">
+                  <ButtonLink href="/fix" variant="secondary">
+                    Compare the fixes
+                  </ButtonLink>
+                </div>
               </Card>
             </section>
           ) : null}
@@ -161,10 +166,10 @@ export default async function HomePage() {
 
           {recoverable ? (
             <Card>
-              <p className="text-[13px] text-ink-muted">Found in abandoned checkouts</p>
+              <p className="text-[13px] text-ink-muted">Found in unfinished checkouts</p>
               <p className="mt-1 text-[17px] leading-6 text-ink">
-                {recoverable.customerName} left {formatDollars(recoverable.amountCents)} in the cart on {formatDay(recoverable.lastActivityOn)}. A
-                reminder with a fresh PayPal link is ready for the Guard.
+                {recoverable.customerName} left {formatDollars(recoverable.amountCents)} in the cart on {formatDay(recoverable.lastActivityOn)}. We
+                drafted a reminder with a new PayPal payment link; it gets a quick safety check before it&apos;s sent.
               </p>
               <div className="mt-4">
                 <ButtonLink href="/approvals" variant="secondary">

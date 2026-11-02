@@ -9,11 +9,11 @@ import { ACTION_WORD } from "./meaning";
  * that lands when the decision is BLOCK. The only place in the app that uses mono or capitals.
  */
 
-const DECISION_LINE = { APPROVE: "APPROVED", ESCALATE: "ESCALATED", BLOCK: "BLOCKED" } as const;
+const DECISION_LINE = { APPROVE: "APPROVED", ESCALATE: "NEEDS YOUR OK", BLOCK: "BLOCKED" } as const;
 
 function proposerName(p: Proposer): string {
   if (p.kind === "OWNER") return "You";
-  return { RECOVERY: "Recovery agent", RISK: "Risk check", ASK: "Ask" }[p.agent];
+  return { RECOVERY: "Reminder helper", RISK: "Risky-order check", ASK: "Ask" }[p.agent];
 }
 
 function timeOf(iso: string): string {
@@ -120,11 +120,11 @@ export function Receipt({
             </div>
           ) : null}
           <div>
-            <dt className="inline">Key </dt>
+            <dt className="inline">Ref </dt>
             <dd className="inline break-all">{proposal.idempotencyKey}</dd>
           </div>
         </dl>
-        <p className="mt-4 text-center text-ink-muted">No money moves without the Guard.</p>
+        <p className="mt-4 text-center text-ink-muted">No money moves without the Margin Guard.</p>
       </div>
 
       {blocked ? (

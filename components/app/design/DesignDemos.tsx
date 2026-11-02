@@ -52,7 +52,7 @@ const SCREENS = [
   { path: "/ask", label: "Ask" },
   { path: "/dashboard", label: "Dashboard" },
   { path: "/settings", label: "Settings" },
-  { path: "/demo", label: "Demo controls" },
+  { path: "/demo", label: "Demo guide" },
   { path: "/store", label: "Store" },
 ];
 

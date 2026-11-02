@@ -28,10 +28,10 @@ export default async function DuesPage() {
   if (!data) {
     return (
       <div className="space-y-10">
-        <PageSentence>Your dues for the next two weeks.</PageSentence>
+        <PageSentence>What you have to pay in the next two weeks.</PageSentence>
         <ErrorState
-          title="Couldn't load your dues."
-          body="Your money hasn't moved: nothing is paid unless the Guard approves it. Try again in a minute."
+          title="Couldn't load what you have to pay."
+          body="Your money hasn't moved: nothing is paid without passing NeverShort's safety check. Try again in a minute."
           retryHref="/dues"
         />
       </div>

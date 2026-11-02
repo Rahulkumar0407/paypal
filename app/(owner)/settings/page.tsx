@@ -1,89 +1,87 @@
 import type { Metadata } from "next";
-import { Button, PageSentence } from "@/components/ui";
+import type { Forecast, StoreSettings } from "@/types";
+import { Card, CardTitle, ErrorState, PageSentence } from "@/components/ui";
+import { DAY_FILL } from "@/components/ui/meaning";
+import { SettingsForm } from "@/components/app/SettingsForm";
 import { getVisitorStoreId } from "@/lib/demo";
+import { getForecast } from "@/lib/forecast";
 import { getStoreSettings } from "@/lib/store";
+import { formatDay } from "@/lib/shared/dates";
+import { formatDollars, formatShortfall } from "@/lib/shared/money";
+import { checkSettings } from "./actions";
 
 export const metadata: Metadata = { title: "Settings" };
 
-const METHODS = [
-  { value: "PAYPAL_PAYOUTS", label: "PayPal (Payouts)" },
-  { value: "BANK_TRANSFER", label: "Bank transfer" },
-  { value: "CARD", label: "Card" },
-] as const;
-
-const field = "mt-1.5 block w-full min-h-12 rounded-control bg-paper px-4 text-[16px] text-ink ring-1 ring-line ring-inset focus:ring-2 focus:ring-brand focus:outline-none";
-const label = "block text-[15px] font-semibold text-ink";
-const hint = "mt-1 block text-[14px] leading-5 text-ink-muted";
-
-/** The short setup form. TODO(Person 4, P4-4): save these answers (lib/store) and use them in alerts. */
-export default async function SettingsPage() {
+async function load(): Promise<{ settings: StoreSettings; forecast: Forecast | null } | null> {
   const storeId = await getVisitorStoreId();
-  const s = await getStoreSettings(storeId);
+  try {
+    const [settings, forecast] = await Promise.all([getStoreSettings(storeId), getForecast(storeId).catch(() => null)]);
+    return { settings, forecast };
+  } catch (error) {
+    console.error("[settings] could not load:", error instanceof Error ? error.message : error);
+    return null;
+  }
+}
+
+/** The short setup form, with a card that shows what the safety line means for the next two weeks. */
+export default async function SettingsPage() {
+  const data = await load();
+  if (!data) {
+    return (
+      <div className="space-y-8">
+        <PageSentence>A few answers about your shop.</PageSentence>
+        <ErrorState title="Couldn't load your answers." body="Nothing has changed. Try again in a minute." retryHref="/settings" />
+      </div>
+    );
+  }
+
+  const { settings, forecast } = data;
+  return (
+    <div className="space-y-10">
+      <PageSentence>A few answers about {settings.name}, so the forecast fits the shop.</PageSentence>
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)] lg:items-start lg:gap-12">
+        <SettingsForm settings={settings} action={checkSettings} />
+        <aside className="space-y-5 lg:sticky lg:top-8">
+          <SafetyLine settings={settings} forecast={forecast} />
+        </aside>
+      </div>
+    </div>
+  );
+}
+
+function SafetyLine({ settings, forecast }: { settings: StoreSettings; forecast: Forecast | null }) {
+  const min = formatDollars(settings.minimumBalanceCents);
+  const tightUpTo = formatDollars(settings.minimumBalanceCents + settings.tightMarginCents);
+  const gap = forecast?.firstShortfall ?? null;
+  const counts = forecast
+    ? (["covered", "tight", "short"] as const).map((s) => [s, forecast.days.filter((d) => d.state === s).length] as const)
+    : [];
 
   return (
-    <div className="max-w-[640px] space-y-10">
-      <PageSentence>A few answers about {s.name}, so the forecast fits the shop.</PageSentence>
+    <Card>
+      <CardTitle>What this means right now</CardTitle>
+      <ul className="mt-3 space-y-2 text-[15px] leading-6 text-ink">
+        <Line state="short">Below {min}: short</Line>
+        <Line state="tight">
+          {min} to {tightUpTo}: tight
+        </Line>
+        <Line state="covered">Above {tightUpTo}: covered</Line>
+      </ul>
+      {forecast ? (
+        <p className="mt-4 border-t border-line pt-4 text-[15px] leading-6 text-ink-muted">
+          Over the next 14 days that gives {counts.map(([s, n]) => `${n} ${s}`).join(", ")}.
+          {gap ? ` The first short day is ${formatDay(gap.date)}, ${formatShortfall(gap.amountCents)} under your minimum.` : ""}
+        </p>
+      ) : null}
+    </Card>
+  );
+}
 
-      <form className="space-y-8 rounded-card bg-paper p-5 ring-1 ring-ink/[0.06] lg:p-8" aria-describedby="settings-note">
-        <div>
-          <label htmlFor="sell" className={label}>
-            What you sell
-          </label>
-          <input id="sell" name="whatYouSell" defaultValue={s.whatYouSell} className={field} />
-        </div>
-
-        <fieldset>
-          <legend className={label}>How you pay suppliers</legend>
-          <div className="mt-2 grid gap-2 sm:grid-cols-3">
-            {METHODS.map((m) => (
-              <label key={m.value} className="flex min-h-12 items-center gap-3 rounded-control bg-paper px-4 text-[15px] text-ink ring-1 ring-line ring-inset has-[:checked]:ring-2 has-[:checked]:ring-brand">
-                <input type="radio" name="supplierPaymentMethod" value={m.value} defaultChecked={s.supplierPaymentMethod === m.value} className="accent-[var(--color-brand)]" />
-                {m.label}
-              </label>
-            ))}
-          </div>
-        </fieldset>
-
-        <div>
-          <label htmlFor="seasons" className={label}>
-            Busy seasons
-          </label>
-          <span className={hint}>One per line. The forecast expects more sales then.</span>
-          <textarea id="seasons" name="busySeasons" rows={3} defaultValue={s.busySeasons.join("\n")} className={`${field} py-3 leading-6`} />
-        </div>
-
-        <div className="grid gap-6 sm:grid-cols-2">
-          <div>
-            <label htmlFor="minimum" className={label}>
-              Your minimum balance
-            </label>
-            <span className={hint}>A day below this shows as short.</span>
-            <div className="relative">
-              <span className="pointer-events-none absolute top-1/2 left-4 mt-[3px] -translate-y-1/2 text-ink-muted">$</span>
-              <input id="minimum" name="minimum" inputMode="decimal" defaultValue={(s.minimumBalanceCents / 100).toFixed(0)} className={`${field} pl-8 tabular`} />
-            </div>
-          </div>
-          <div>
-            <label htmlFor="margin" className={label}>
-              Tight margin
-            </label>
-            <span className={hint}>Within this much of your minimum, a day shows as tight.</span>
-            <div className="relative">
-              <span className="pointer-events-none absolute top-1/2 left-4 mt-[3px] -translate-y-1/2 text-ink-muted">$</span>
-              <input id="margin" name="margin" inputMode="decimal" defaultValue={(s.tightMarginCents / 100).toFixed(0)} className={`${field} pl-8 tabular`} />
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-4 border-t border-line pt-6">
-          <Button type="submit" disabled>
-            Save answers
-          </Button>
-          <p id="settings-note" className="text-[14px] text-ink-muted">
-            Saving arrives with the setup form task. These are the demo store&apos;s answers.
-          </p>
-        </div>
-      </form>
-    </div>
+function Line({ state, children }: { state: "covered" | "tight" | "short"; children: React.ReactNode }) {
+  return (
+    <li className="flex items-center gap-2.5">
+      <span aria-hidden className={`inline-block size-2.5 shrink-0 rounded-[3px] ${DAY_FILL[state]}`} />
+      <span className="tabular">{children}</span>
+    </li>
   );
 }

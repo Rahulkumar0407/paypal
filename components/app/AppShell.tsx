@@ -37,14 +37,14 @@ export function AppShell({ today, storeName, children }: { today: string; storeN
 
 export function DemoBanner({ today }: { today: string }) {
   return (
-    <div className="bg-brand px-5 py-2 text-[13px] leading-5 text-white lg:px-12">
+    <div className="bg-brand px-5 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-2 text-[13px] leading-5 text-white lg:px-12">
       <p className="mx-auto flex max-w-[1160px] flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
         <span>
-          Demo store on {formatDayWithYear(today)}.
-          <span className="hidden sm:inline"> Sales history is simulated; payments use the PayPal sandbox.</span>
+          Demo shop. In this demo, today is {formatDayWithYear(today)}.
+          <span className="hidden sm:inline"> Past sales are made up; payments use PayPal&apos;s test mode.</span>
         </span>
         <Link href="/demo" className="font-medium underline decoration-white/40 underline-offset-4 hover:decoration-white">
-          Demo controls
+          Demo guide
         </Link>
       </p>
     </div>

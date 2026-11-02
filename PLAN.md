@@ -7,7 +7,7 @@
   judging ends.
 - **Judged on:** Technological Implementation, Design, Potential Impact, Innovation/Idea, Presentation.
 - **Rules:** `AGENTS.md`. One task at a time. A task is done only when its "Done when" test has been **run and
-  passed**, and the result is posted in the PR.
+  passed**, and the result is posted in the PR or the commit message.
 
 Status: `[ ]` not started, `[~]` in progress, `[x]` done (test run and passed).
 
@@ -59,9 +59,10 @@ sandbox app and webhook (P2), the demo numbers (P3), the Gemini key and model ch
 
 ## Person 1 (Diwakar): app, components, PWA, demo page
 
-### [~] P1-1 Setup (Sun 1 to Mon 2 Nov)
-_Status 1 Nov: everything built and checked locally (`npm run check` passes; `.env` is ignored; the lib/ai to
-lib/paypal import fails lint). Left: commit, push to a public GitHub repo, confirm "MIT license" in About._
+### [x] P1-1 Setup (Sun 1 to Mon 2 Nov)
+_Status 2 Nov: done. Checked on a fresh clone on a second laptop: the repo is public and GitHub detects the MIT
+licence; `npm ci && npm run check` pass; `npm run dev` serves `/`; `.env` is ignored; a lib/ai file importing
+lib/paypal fails lint._
 - Push this repo (it already holds `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `PLAN.md`) to a public GitHub repo.
 - Add MIT `LICENSE` and `.gitignore`.
 - Scaffold Next.js App Router with TypeScript strict and Tailwind.
@@ -79,8 +80,8 @@ lib/paypal import fails lint). Left: commit, push to a public GitHub repo, confi
 _Status 1 Nov: built and tested against a local Postgres: migration applies; `db:reset` twice gives identical
 data (753 rows, new run id); two browsers get two store ids and their own copies; resetting one copy leaves the
 other alone; `/api/health` queries the database; `npm run build` and `npm start` work. The seed is the full
-simulated history, not a placeholder (P3 tunes it). Left: Supabase project, Render deploy, and the types/ sign-off
-from P2, P3 and P4._
+simulated history, not a placeholder (P3 tunes it). Status 2 Nov: the Supabase project is connected (`/api/health`
+reports the database OK). The Render deploy moved to P2 (P2-5). Left: the types/ sign-off from P2, P3 and P4._
 - Folders per `AGENTS.md` section 10.
 - A Supabase project, and a Prisma schema (store-scoped) using the pooled URL at runtime and the direct URL for
   migrations, plus the first migration.
@@ -92,10 +93,10 @@ from P2, P3 and P4._
   `lib/demo` stub).
 - `/api/health`, which runs a real database query.
 - Placeholder pages.
-- A Render web service (free plan for now) in Frankfurt, close to the Supabase project in Paris.
+- The Render web service moved to P2 (task P2-5).
 
 **Done when:**
-- the Render URL loads every placeholder page with fake data, on a phone and on a laptop;
+- the Render URL loads every placeholder page with fake data, on a phone and on a laptop (once P2 has deployed it);
 - `/api/health` returns OK after a real database query;
 - migrations run over the direct URL and the app runs over the pooled URL;
 - two different browsers get two different `storeId`s;
@@ -103,7 +104,7 @@ from P2, P3 and P4._
 - P2, P3 and P4 have each approved the `types/` shapes for their module in the PR.
 
 ### [~] P1-3 Design system and `/design` (Tue 3 to Wed 4 Nov)
-_Status 1 Nov: built early with the foundation. Instrument Serif chosen; the palette is locked in
+_Status 1 Nov: built early with the foundation. Fraunces chosen (Instrument Serif was tried first); the palette is locked in
 `app/globals.css`; `/design` shows every element and the real screens at 390px and 1280px; contrast was
 calculated for every pairing. Left: the team's review of the look, and a check with reduced motion switched on in
 a real browser._
@@ -122,7 +123,13 @@ a real browser._
 
 And no meaning colour is used as small text on white (checked with a contrast tool).
 
-### [ ] P1-4 Screens: phone first, finished on laptop (Wed 4 to Sat 7 Nov)
+### [~] P1-4 Screens: phone first, finished on laptop (Wed 4 to Sat 7 Nov)
+_Status 2 Nov: built on the module stubs, each at 390px and 1440px with empty, loading and error states: Home, Dues,
+Fix the gap (`/fix`, sends a fix to the Guard and shows the referee card), Approvals (Approve / Decline and what
+happened), Receipts (newest first, filter, single receipt view) and the Settings form. Still fake: Guard decisions
+and fixes come from mocks and nothing is saved yet. Needs P3-2 (move the fix-to-proposal code from
+`app/(owner)/fix/actions.ts` into lib/forecast), P2-3 (saved receipts and inbox) and a `saveStoreSettings` in
+lib/store. Left: story steps 1 and 5 on the real modules, then the Done-when checks._
 - Home: headline, strip, next dues with how much is ready.
 - Money calendar, at both widths. This is the required laptop calendar; P2-6 is an optional extra.
 - Detected payments ("We think Volta is paid ~$300 every 10 days", confirm once).
@@ -138,7 +145,12 @@ And no meaning colour is used as small text on white (checked with a contrast to
 - every screen has empty, loading and error states;
 - story steps 1 and 5 can be clicked through on a phone and on a laptop.
 
-### [ ] P1-5 PWA and demo control page (Sun 8 Nov)
+### [~] P1-5 PWA and demo guide (Sun 8 Nov)
+_Status 2 Nov: built early. `/demo` has the intro, the six story steps (what to do, what you'll see, a link, and a
+Simulated / PayPal sandbox label), the sandbox buyer login placeholder (`SANDBOX_BUYER`, TODO Person 2) and a reset
+that confirms in place (tested against Supabase). PWA: manifest, banknote-medallion icons, full-screen on iPhone, and
+a service worker that only serves an offline page. Checked on a local production build. Left: install on the Render
+URL, the buyer login from P2, and the cold teammate test._
 - Manifest, icons, and a service worker that never caches API or data responses.
 - `/demo` shows the demo date and a "Reset my copy" button. It walks through the 6 story steps, shows the sandbox
   buyer login, and links to the store page and the outbox.
@@ -160,7 +172,7 @@ the same care as the phone.
 
 ---
 
-## Person 2: PayPal, Margin Guard, README, CI, merging
+## Person 2: PayPal, Margin Guard, Render deploy, README, CI
 
 ### [ ] P2-1 PayPal client, checkout and store page (Mon 2 to Wed 4 Nov)
 - `lib/paypal/client.ts`: OAuth, Orders v2 (create, get, capture), refund, Payouts, webhook signature verification.
@@ -221,12 +233,15 @@ And on Render:
 - a teammate follows it on a clean clone and reaches a running app with the demo seed, without asking anyone;
 - "Built with" covers every tool in `package.json` that matters.
 
-### [ ] P2-5 CI, uptime pinger and daily merging (daily from Mon 2 Nov)
+### [ ] P2-5 Render deploy, CI and uptime pinger (deploy first, then daily from Mon 2 Nov)
+- A Render web service (free plan for now) in Frankfurt, close to the Supabase project in Paris. It deploys `main`,
+  runs `prisma migrate deploy`, and has every key from `.env.example`. Set `APP_URL` to its link once it exists.
 - A GitHub Actions workflow runs `npm run check` on every PR.
 - A free uptime pinger opens `<APP_URL>/api/health` every 10 minutes (keeps Render awake and Supabase from pausing).
-- P2 merges into `main` daily.
+- Anyone may push to `main` when it doesn't conflict and `npm run check` passes (AGENTS.md section 11); P2 reviews PRs when asked.
 
 **Done when:**
+- the Render URL loads every page on a phone and on a laptop, and `/api/health` reports the database OK;
 - PR checks run on every PR;
 - the uptime pinger shows the health check passing for a full day.
 

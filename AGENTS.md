@@ -104,7 +104,8 @@ If time allows: reconciliation of orders against PayPal payments.
   identically every time. It never touches other visitors' copies.
 - **Webhooks find the right copy.** PayPal orders carry the visitor's `storeId` in `custom_id`, so a webhook
   updates the right copy.
-- **Demo page.** The demo control page (`/demo`) shows the demo date and has the reset button.
+- **Demo page.** The demo guide (`/demo`) walks judges through the six story steps (each marked Simulated or PayPal
+  sandbox), shows the sandbox buyer login and the demo date, and has the reset button.
 
 ---
 
@@ -260,7 +261,7 @@ The metaphor lives in the words and the colours, never in sun or cloud icons. No
 2. **14-day money strip.** One tile per day, coloured by how the day looks (green = covered, amber = tight,
    red = short), showing the date and the day's balance. It is the visual heart of the app and changes colour live
    when a gap is fixed.
-3. **Referee cards.** Every Margin Guard decision shows a small tilted card chip (green Approved, amber Escalated,
+3. **Referee cards.** Every Margin Guard decision shows a small tilted card chip (green Approved, amber Needs your OK,
    red Blocked), like a football referee's card.
 4. **Receipts.** Each Guard decision prints as a thermal shop receipt: monospace text, dashed dividers, zig-zag top
    and bottom edges, PASS/FAIL per rule, a BLOCKED stamp when blocked.
@@ -293,7 +294,7 @@ The metaphor lives in the words and the colours, never in sun or cloud icons. No
   only 4.3:1, so text on a red fill must be large (24px+, or 19px+ bold). Small text goes on white or surface with
   a coloured mark beside it.
 - **Colour is never the only signal.** Every coloured tile, chip and card also carries a word: Covered, Tight,
-  Short, Approved, Escalated, Blocked.
+  Short, Approved, Needs your OK, Blocked.
 
 ### Type
 
@@ -419,7 +420,7 @@ OPENROUTER_API_KEY=             # only if we switch provider
 | Owner | Folders and files |
 |-------|-------------------|
 | **P1 (Diwakar)** | `app/` (pages, layouts, global styles and design tokens, `app/(owner)/demo/`, `app/design/`, `app/api/health/`, any API route not listed below), except the paths owned by others. `components/` except the folders owned by others (this includes `components/ui/` and `components/app/`). `public/` (PWA manifest, icons, service worker). `proxy.ts` (sets the visitor cookie). |
-| **P2** | `lib/paypal/`, `lib/guard/`, `lib/store/` (catalogue, orders, settings reads), `components/calendar/` (laptop calendar: Bryntum or our own), `app/store/` (buyer-facing store and checkout pages), `app/api/paypal/`, `app/api/guard/`, `README.md`, `.github/` (CI). Merges into `main`. |
+| **P2** | `lib/paypal/`, `lib/guard/`, `lib/store/` (catalogue, orders, settings reads), `components/calendar/` (laptop calendar: Bryntum or our own), `app/store/` (buyer-facing store and checkout pages), `app/api/paypal/`, `app/api/guard/`, `README.md`, `.github/` (CI), the Render deploy. Reviews PRs into `main` when asked. |
 | **P3** | `lib/forecast/` (incl. payment detection and fix-the-gap maths), `lib/recovery/`, `lib/demo/` (seed, per-visitor copies, reset), `app/api/forecast/`, `app/api/recovery/`, `app/api/demo/`, `tests/e2e/`, `playwright.config.ts`, `DEMO.md`. |
 | **P4** | `lib/ai/`, `lib/risk/` (risk check and extras), `components/dashboard/` (AG Grid), `components/charts/` (AG Charts), `components/ask/` (chat UI), `app/api/ai/`, `app/api/risk/`. |
 | **Shared** | `types/`, `prisma/` (`prisma/seed.ts` only calls `lib/demo`), `lib/shared/` (db client, clock, dates, money, env, visitor cookie), `package.json`, `package-lock.json`, `.env.example`, root config files (`tsconfig.json`, `next.config.ts`, `eslint.config.mjs`, `vitest.config.mts`, `prisma.config.ts`), `LICENSE`, `CONTRIBUTING.md`, `.gitignore`, `.nvmrc`. P1 creates them in the foundation; after that, changes go through P2. |
@@ -447,8 +448,11 @@ OPENROUTER_API_KEY=             # only if we switch provider
   3. give exact steps to test it by hand: URL, what to click, what to expect, with amounts;
   4. stop and wait.
 - **Never claim something works without running it.** If you could not run something, say so plainly.
-- **Git.** One branch per task, named `p<person>/<task-id>-<short-name>` (for example `p3/P3-1-forecast`). Open a
-  PR to `main`; P2 merges daily. Never push to `main` directly. `main` must always pass `npm run check` and deploy.
+- **Git.** Anyone may push straight to `main` when their work is ready, as long as it doesn't conflict: first pull
+  the latest `main` (if that brings a conflict in someone else's files, stop and ask their owner rather than
+  resolving it yourself), then run `npm run check`, and push only if it passes. `main` must always pass `npm run check` and deploy. A branch
+  (`p<person>/<task-id>-<short-name>`, for example `p3/P3-1-forecast`) and a PR are still welcome for bigger or
+  risky changes, or when you want a review.
 - **No co-authors, ever.** Never add `Co-authored-by` trailers, "Generated with" lines or any other AI or tool
   attribution to commit messages or PR descriptions in this project.
 

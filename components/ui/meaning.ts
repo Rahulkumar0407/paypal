@@ -25,7 +25,7 @@ export const DECISION_FILL: Record<Decision, string> = {
 
 export const DECISION_WORD: Record<Decision, string> = {
   APPROVE: "Approved",
-  ESCALATE: "Escalated",
+  ESCALATE: "Needs your OK",
   BLOCK: "Blocked",
 };
 
@@ -34,7 +34,7 @@ export const ACTION_WORD: Record<string, string> = {
   SEND_REMINDER: "Send reminder",
   SET_ASIDE: "Set aside",
   MOVE_PAYMENT: "Move payment",
-  GAP_LOAN: "Gap loan",
+  GAP_LOAN: "Short-term loan",
   PAY_SUPPLIER: "Pay supplier",
   REFUND: "Refund",
   HOLD_ORDER: "Hold order",
