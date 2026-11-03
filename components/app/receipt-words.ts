@@ -16,12 +16,43 @@ export function filterFrom(value: string | string[] | undefined): FilterKey {
   return FILTERS.some((f) => f.key === v) ? (v as FilterKey) : "all";
 }
 
-/** Newest first: by decision time, then by receipt number. */
+/** Newest first. Receipt numbers only ever go up, so they order receipts even across real days on the fixed demo date. */
 export function newestFirst(receipts: Receipt[]): Receipt[] {
-  return [...receipts].sort((a, b) => {
-    const at = Date.parse(b.decision.decidedAt) - Date.parse(a.decision.decidedAt);
-    return at !== 0 && !Number.isNaN(at) ? at : b.number - a.number;
-  });
+  return [...receipts].sort((a, b) => b.number - a.number);
+}
+
+/** What happened after the decision, in one plain line. Null while nothing has (an escalation waiting, a block). */
+export function outcomeLine(receipt: Receipt): string | null {
+  const last = receipt.events.at(-1);
+  const owner = receipt.decision.decision === "ESCALATE";
+  switch (last?.kind) {
+    case "EXECUTED":
+      return owner ? `You approved it, and it's done. ${last.detail}` : `Done. ${last.detail}`;
+    case "OWNER_REJECTED":
+      return "You declined it, so nothing was done.";
+    case "RECHECK_BLOCKED":
+      return `You approved it, but the last safety check stopped it. ${last.detail}`;
+    case "EXECUTION_FAILED":
+      return `It didn't go through. ${last.detail}`;
+    default:
+      return null;
+  }
+}
+
+/** The receipt page's sentence: where the decision stands now. */
+export function standingSentence(receipt: Receipt): string {
+  switch (receipt.events.at(-1)?.kind) {
+    case "EXECUTED":
+      return receipt.decision.decision === "ESCALATE" ? "You approved this, and it's done." : "The safety check said yes, and it's done.";
+    case "OWNER_REJECTED":
+      return "You declined this. Nothing was done.";
+    case "RECHECK_BLOCKED":
+      return "You approved this, but the safety check stopped it.";
+    case "EXECUTION_FAILED":
+      return "This was approved, but it didn't go through.";
+    default:
+      return { APPROVE: "The safety check said yes.", ESCALATE: "This needs your OK.", BLOCK: "The safety check stopped this." }[receipt.decision.decision];
+  }
 }
 
 export function receiptNo(receipt: Receipt): string {

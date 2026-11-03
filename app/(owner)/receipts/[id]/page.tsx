@@ -3,19 +3,13 @@ import Link from "next/link";
 import type { Receipt as ReceiptData, ReceiptEventKind } from "@/types";
 import { ButtonLink, Card, CardTitle, EmptyState, ErrorState, PageSentence, Receipt, RefereeCard } from "@/components/ui";
 import { ACTION_WORD } from "@/components/ui/meaning";
-import { clockTime, proposerName, receiptNo } from "@/components/app/receipt-words";
+import { clockTime, proposerName, receiptNo, standingSentence } from "@/components/app/receipt-words";
 import { getVisitorStoreId } from "@/lib/demo";
 import { getReceipt, listInbox } from "@/lib/guard";
 import { formatDay } from "@/lib/shared/dates";
 import { formatCents } from "@/lib/shared/money";
 
 export const metadata: Metadata = { title: "Receipt" };
-
-const SENTENCE = {
-  APPROVE: "The safety check said yes.",
-  ESCALATE: "This needs your OK.",
-  BLOCK: "The safety check stopped this.",
-} as const;
 
 const EVENT_WORD: Record<ReceiptEventKind, string> = {
   DECIDED: "Safety check ran",
@@ -65,7 +59,7 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
     <div className="space-y-8 lg:space-y-10">
       <div className="space-y-4">
         <BackLink />
-        <PageSentence>{SENTENCE[decision.decision]}</PageSentence>
+        <PageSentence>{standingSentence(receipt)}</PageSentence>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:items-start lg:gap-12">

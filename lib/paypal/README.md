@@ -8,5 +8,6 @@ something sends `PayPal-Request-Id`. ESLint only lets `lib/guard`, `app/api/payp
 **Must export (from `index.ts`):** `createOrder`, `getOrder`, `captureOrder` (returns gross, fee, net),
 `refundCapture`, `createPayout`, `verifyWebhookSignature`, `PAYPAL_SANDBOX_BASE`.
 
-**Now:** stubs with fake PayPal ids and no network calls, marked `TODO(Person 2)`. Add the fake mode
-(`PAYPAL_FAKE=1`, refused in production) here for the e2e test.
+**Now:** stubs with no network calls. Since P1-7 the fake ids are made from the idempotency key, so every action
+gets its own PayPal id; `getOrder` always says CREATED. P1-9 makes it real and adds the fake mode
+(`PAYPAL_FAKE=1`, refused in production) for the e2e test.

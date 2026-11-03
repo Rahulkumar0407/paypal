@@ -66,6 +66,14 @@ export function now(): Date {
   return zonedInstant(today(), localTime);
 }
 
+/**
+ * A real instant shown on the demo date: the demo date with the real time of day, as the store's clock read it.
+ * Receipts keep real timestamps (audit trail) and show them on the demo date.
+ */
+export function atDemoDate(instant: Date, demoDate: IsoDate, timeZone: string = STORE_TIME_ZONE): IsoDateTime {
+  return toZonedIso(zonedInstant(demoDate, toZonedIso(instant, timeZone).slice(11, 19), timeZone), timeZone);
+}
+
 /** Demo "now" as an ISO string with the store's offset. */
 export function nowIso(): IsoDateTime {
   return toZonedIso(now());

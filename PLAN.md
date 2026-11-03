@@ -200,7 +200,12 @@ and the exact answer to "Can I afford a $200 order on Monday?" (Mon 9 Nov). And 
 - a sparse-history fixture gives low confidence;
 - removing a due moves or clears the shortfall.
 
-### [ ] P1-7 Margin Guard, receipts, executor, tests (was P2-3; Thu 5 Nov)
+### [x] P1-7 Margin Guard, receipts, executor, tests (was P2-3; Thu 5 Nov)
+_Status 3 Nov: done. The 8 rules, the decision, append-only receipts, the executor for all 7 actions and the inbox
+are real (lib/guard, 46 unit tests: every rule passing and failing, the demo's step 2, 4 and 5 decisions, repeats
+blocked, a gap loan always escalated, an approved escalation blocked at run time). Fix the gap, Approvals and
+Receipts show real decisions at 390px and 1440px. Steps 2 and 4 can be clicked in the app once the Recovery agent
+(P1-8) and checkout (P1-9) exist; their decisions are unit-tested now._
 All per `AGENTS.md` section 4:
 - pure rules, the context loader, and the decision;
 - append-only receipts;

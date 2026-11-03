@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Receipt as ReceiptData } from "@/types";
 import { EmptyState, ErrorState, PageSentence, Receipt, RefereeCard } from "@/components/ui";
 import { ACTION_WORD, DECISION_FILL } from "@/components/ui/meaning";
-import { FILTERS, clockTime, filterFrom, newestFirst, receiptNo } from "@/components/app/receipt-words";
+import { FILTERS, clockTime, filterFrom, newestFirst, outcomeLine, receiptNo } from "@/components/app/receipt-words";
 import { getVisitorStoreId } from "@/lib/demo";
 import { listReceipts } from "@/lib/guard";
 import { formatDay } from "@/lib/shared/dates";
@@ -125,6 +125,7 @@ function ReceiptRow({ receipt }: { receipt: ReceiptData }) {
           {ACTION_WORD[proposal.type]}: {proposal.target.label}
         </span>
         <span className="mt-0.5 block text-[15px] leading-6 text-ink-muted">{decision.headlineReason}</span>
+        {outcomeLine(receipt) ? <span className="mt-1 block text-[15px] leading-6 text-ink">{outcomeLine(receipt)}</span> : null}
         <span className="mt-0.5 block text-[13px] leading-5 text-ink-muted">
           {receiptNo(receipt)}, {formatDay(decision.demoDate)} at {clockTime(decision.decidedAt)}
         </span>

@@ -94,8 +94,11 @@ export async function dismissRecurringPayee(storeId: StoreId, payeeId: string): 
 /** Up to three ways to close the first shortfall. */
 export async function getFixOptions(storeId: StoreId): Promise<FixOption[]> {
   // TODO(Person 1, P1-8): set-aside within the 30% cap, move a payment, simulated gap loan, from the real forecast.
-  void storeId;
-  return mockFixes;
+  // Until then the sample fixes are used, with "move a payment" pointed at the real supplier payment on that day.
+  const dues = await getDues(storeId);
+  return mockFixes.map((fix) =>
+    fix.kind === "MOVE_PAYMENT" ? { ...fix, dueId: dues.find((d) => d.dueOn === fix.forDate && d.kind === "SUPPLIER")?.id ?? fix.dueId } : fix,
+  );
 }
 
 /** The forecast as it would be if this action ran. The Guard uses it for rule 6. Throws if the action names a payment that isn't there. */

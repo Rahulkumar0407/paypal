@@ -1,71 +1,73 @@
 /**
- * lib/guard: the Margin Guard, receipts and the executor. Owner: Person 2.
- * Plain TypeScript, no AI, fully unit-tested (AGENTS.md section 4).
- * Foundation stubs by Person 1 return FAKE decisions from mocks/. Replace each TODO.
+ * lib/guard: the Margin Guard, receipts, the approval inbox and the executor. Owner: Person 1.
+ * Plain TypeScript, no AI (AGENTS.md section 4). Nothing happens to money without passing through here.
+ *
+ *   rules.ts     the 8 rules and the decision (pure)
+ *   flow.ts      submit / approve / reject: the order of events (no database)
+ *   context.ts   gathers the facts the rules need (read-only, fails closed)
+ *   executor.ts  the only code that carries out actions
+ *   repo.ts      receipts in the database (append-only)
  */
-import type { ActionProposal, GuardDecision, InboxItem, Receipt, StoreId } from "@/types";
-import {
-  mockApproveReminder,
-  mockApproveSetAside,
-  mockBlockSecondReminder,
-  mockEscalateGapLoan,
-  mockEscalateHold,
-  mockEscalatePaySupplier,
-  mockInbox,
-  mockReceipts,
-} from "@/mocks/guard";
+import type { ActionProposal, ActionType, GuardDecision, InboxItem, Receipt, StoreId } from "@/types";
+import { nowIso, today } from "@/lib/shared/clock";
+import { getDb, isDatabaseConfigured } from "@/lib/shared/db";
+import { contextLoader } from "./context";
+import { createExecutor } from "./executor";
+import { createGuard, type Guard } from "./flow";
+import { nextKeyWith, prismaGuardRepo } from "./repo";
 
-/** Run the 8 rules on a proposal. Pure decision; saves nothing. */
+export { GuardError } from "./flow";
+
+let guard: Guard | null = null;
+
+function realGuard(): Guard {
+  if (!guard) {
+    const db = getDb();
+    guard = createGuard({
+      repo: prismaGuardRepo(db),
+      facts: contextLoader(db),
+      execute: createExecutor(db),
+      clock: () => ({ at: nowIso(), demoDate: today() }),
+    });
+  }
+  return guard;
+}
+
+/** Run the 8 rules on a proposal. Saves nothing and runs nothing. */
 export async function evaluateProposal(proposal: ActionProposal): Promise<GuardDecision> {
-  // TODO(Person 2): context loader + pure rules + BLOCK > ESCALATE > APPROVE (P2-3).
-  const byType: Record<ActionProposal["type"], GuardDecision> = {
-    SEND_REMINDER: proposal.sequence > 1 ? mockBlockSecondReminder : mockApproveReminder,
-    SET_ASIDE: mockApproveSetAside,
-    MOVE_PAYMENT: mockEscalateGapLoan,
-    GAP_LOAN: mockEscalateGapLoan,
-    PAY_SUPPLIER: mockEscalatePaySupplier,
-    REFUND: mockEscalateGapLoan,
-    HOLD_ORDER: mockEscalateHold,
-  };
-  return { ...byType[proposal.type], proposalId: proposal.id };
+  return realGuard().evaluate(proposal);
 }
 
 /** Decide, save the receipt, and run the executor if approved. The only way an action happens. */
 export async function submitProposal(proposal: ActionProposal): Promise<Receipt> {
-  // TODO(Person 2): save Proposal + Receipt, then execute on APPROVE (P2-3).
-  const decision = await evaluateProposal(proposal);
-  const template = mockReceipts.find((r) => r.decision.decision === decision.decision) ?? mockReceipts[0]!;
-  return { ...template, storeId: proposal.storeId, proposal, decision };
+  return realGuard().submit(proposal);
 }
 
-/** Escalations waiting for the owner, then recent decisions. */
+/** Escalations waiting for the owner, then every other decision, newest first. Empty without a database. */
 export async function listInbox(storeId: StoreId): Promise<InboxItem[]> {
-  // TODO(Person 2): read Receipt rows with their latest event.
-  void storeId;
-  return mockInbox;
+  return isDatabaseConfigured() ? realGuard().inbox(storeId) : [];
 }
 
+/** Every receipt, newest first. Empty without a database. */
 export async function listReceipts(storeId: StoreId): Promise<Receipt[]> {
-  // TODO(Person 2): newest first.
-  void storeId;
-  return mockReceipts;
+  return isDatabaseConfigured() ? prismaGuardRepo(getDb()).listReceipts(storeId) : [];
 }
 
 export async function getReceipt(storeId: StoreId, receiptId: string): Promise<Receipt | null> {
-  // TODO(Person 2)
-  void storeId;
-  return mockReceipts.find((r) => r.id === receiptId) ?? null;
+  return isDatabaseConfigured() ? prismaGuardRepo(getDb()).getReceipt(storeId, receiptId) : null;
 }
 
-/** The owner approves an ESCALATE. BLOCK rules are re-checked before anything runs. */
+/** The owner approves an ESCALATE. The BLOCK rules are re-checked before anything runs. Throws GuardError if already decided. */
 export async function approveEscalation(storeId: StoreId, receiptId: string): Promise<Receipt> {
-  // TODO(Person 2): append OWNER_APPROVED, re-check BLOCK rules, execute (P2-3).
-  const receipt = (await getReceipt(storeId, receiptId)) ?? mockReceipts[0]!;
-  return receipt;
+  return realGuard().approve(storeId, receiptId);
 }
 
+/** The owner declines an ESCALATE. Throws GuardError if already decided. */
 export async function rejectEscalation(storeId: StoreId, receiptId: string): Promise<Receipt> {
-  // TODO(Person 2): append OWNER_REJECTED.
-  const receipt = (await getReceipt(storeId, receiptId)) ?? mockReceipts[0]!;
-  return receipt;
+  return realGuard().reject(storeId, receiptId);
+}
+
+/** The idempotency key and sequence for a new proposal: `<demo run id>:<action type>:<target id>:<sequence>`. */
+export async function nextProposalKey(storeId: StoreId, type: ActionType, targetId: string): Promise<{ idempotencyKey: string; sequence: number }> {
+  return nextKeyWith(getDb(), storeId, type, targetId);
 }

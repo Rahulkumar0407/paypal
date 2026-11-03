@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import type { Decision } from "@/types";
 import { getVisitorStoreId } from "@/lib/demo";
-import { approveEscalation, listInbox, rejectEscalation } from "@/lib/guard";
+import { approveEscalation, GuardError, listInbox, rejectEscalation } from "@/lib/guard";
 
 export type InboxOutcome =
   | { ok: true; receiptId: string; choice: "approve" | "decline"; decision: Decision | null; message: string }
@@ -28,7 +28,7 @@ export async function decideEscalation(receiptId: string, choice: "approve" | "d
     }
     const receipt =
       parsed.data.choice === "approve" ? await approveEscalation(storeId, parsed.data.receiptId) : await rejectEscalation(storeId, parsed.data.receiptId);
-    for (const path of ["/", "/approvals", "/receipts"]) revalidatePath(path);
+    for (const path of ["/", "/fix", "/dues", "/approvals", "/receipts", "/dashboard"]) revalidatePath(path);
 
     const last = receipt.events.at(-1);
     switch (last?.kind) {
@@ -47,6 +47,7 @@ export async function decideEscalation(receiptId: string, choice: "approve" | "d
     }
   } catch (error) {
     console.error("[approvals] could not record the choice:", error instanceof Error ? error.message : error);
+    if (error instanceof GuardError) return { ok: false, receiptId, message: error.message };
     return { ok: false, receiptId, message: "Couldn't run the safety check. Nothing has moved. Try again in a minute." };
   }
 }

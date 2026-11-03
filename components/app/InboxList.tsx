@@ -8,6 +8,7 @@ import { formatDay } from "@/lib/shared/dates";
 import { Button } from "@/components/ui/Button";
 import { RefereeCard } from "@/components/ui/RefereeCard";
 import { ACTION_WORD } from "@/components/ui/meaning";
+import { outcomeLine } from "./receipt-words";
 
 type Outcome =
   | { ok: true; receiptId: string; choice: "approve" | "decline"; decision: Decision | null; message: string }
@@ -64,6 +65,7 @@ export function InboxList({ items, decide }: { items: InboxItem[]; decide?: Deci
               {waiting ? "Waiting because: " : ""}
               {decision.headlineReason}
             </p>
+            {!waiting && !done && outcomeLine(receipt) ? <p className="mt-1 text-[15px] leading-6 text-ink">{outcomeLine(receipt)}</p> : null}
             <p className="mt-0.5 text-[13px] leading-5 text-ink-muted">
               Proposed by {proposerWord(proposal.proposedBy)} on {formatDay(proposal.demoDate)}
             </p>

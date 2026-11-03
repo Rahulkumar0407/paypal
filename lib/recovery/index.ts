@@ -6,7 +6,9 @@
  */
 import type { ActionProposal, OutboxMessage, RecoveryCandidate, StoreId } from "@/types";
 import { mockReminderProposal } from "@/mocks/guard";
-import { mockOutbox, mockRecoveryCandidates } from "@/mocks/recovery";
+import { mockRecoveryCandidates } from "@/mocks/recovery";
+import { atDemoDate } from "@/lib/shared/clock";
+import { getDb, isDatabaseConfigured } from "@/lib/shared/db";
 
 /** Abandoned or failed checkouts worth a reminder. Deterministic query, no AI. */
 export async function findRecoveryCandidates(storeId: StoreId): Promise<RecoveryCandidate[]> {
@@ -21,9 +23,21 @@ export async function proposeReminder(storeId: StoreId, orderId: string): Promis
   return { ...mockReminderProposal, storeId, target: { ...mockReminderProposal.target, id: orderId } };
 }
 
-/** Reminders placed in the simulated outbox after the Guard approved them. */
+/** Reminders the Guard's executor placed in the simulated outbox, newest first. */
 export async function listOutbox(storeId: StoreId): Promise<OutboxMessage[]> {
-  // TODO(Person 3): read OutboxMessage rows.
-  void storeId;
-  return mockOutbox;
+  if (!isDatabaseConfigured()) return [];
+  const rows = await getDb().outboxMessage.findMany({ where: { storeId }, include: { proposal: { select: { demoDate: true } } }, orderBy: { sentAt: "desc" } });
+  return rows.map((m) => ({
+    id: m.id,
+    storeId: m.storeId,
+    proposalId: m.proposalId,
+    orderId: m.orderId,
+    to: m.to,
+    subject: m.subject,
+    body: m.body,
+    checkoutUrl: m.checkoutUrl,
+    paypalOrderId: m.paypalOrderId,
+    sentAt: atDemoDate(m.sentAt, m.proposal.demoDate),
+    simulated: true,
+  }));
 }

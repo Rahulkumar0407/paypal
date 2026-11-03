@@ -2,13 +2,13 @@ import { NextResponse } from "next/server";
 import { getVisitorStoreId } from "@/lib/demo";
 import { listInbox } from "@/lib/guard";
 
-/** Owner: Person 2. The approval inbox (stub data until P2-3). */
+/** The visitor's approval inbox: escalations waiting for them, then every other decision. */
 export async function GET() {
   const storeId = await getVisitorStoreId();
   return NextResponse.json({ inbox: await listInbox(storeId) });
 }
 
-/** TODO(Person 2, P2-3): validate an ActionProposal with zod, then submitProposal(). */
+/** Proposals are made on the server by NeverShort's own screens and agents (never from a browser), so there is no POST. */
 export async function POST() {
-  return NextResponse.json({ error: "Submitting proposals arrives with the Margin Guard (task P2-3)." }, { status: 501 });
+  return NextResponse.json({ error: "Proposals come from NeverShort's own screens, not this API." }, { status: 405 });
 }
