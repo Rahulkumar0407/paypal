@@ -1,6 +1,6 @@
 /**
- * lib/demo: the demo store, one private copy per visitor, and reset. Owner: Person 3.
- * Foundation version by Person 1: copies and reset work; Person 3 tunes the seed numbers (P3-0).
+ * lib/demo: the demo store, one private copy per visitor, and reset. Owner: Person 1.
+ * Copies and reset work since the foundation; the seed numbers were tuned for the real forecast in P1-6 (DEMO.md).
  */
 import { cookies } from "next/headers";
 import type { DemoStoreStatus, StoreId } from "@/types";

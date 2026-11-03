@@ -14,8 +14,7 @@ import {
   Ridgelines,
   TickerTape,
 } from "@/components/app/design/Backdrops";
-import { buildHeadline } from "@/lib/forecast";
-import { mockForecast } from "@/mocks/forecast";
+import { buildHeadline, previewDemoForecast } from "@/lib/forecast";
 
 export const metadata: Metadata = { title: "Background ideas" };
 
@@ -24,11 +23,12 @@ export const metadata: Metadata = { title: "Background ideas" };
  * until the team picks one. Owner: Person 1.
  */
 export default function BackgroundsPage() {
-  const headline = buildHeadline(mockForecast);
+  const forecast = previewDemoForecast();
+  const headline = buildHeadline(forecast);
   const content = (inverse: boolean, extra = "") => (
     <div className={`relative mx-auto max-w-[1160px] space-y-8 px-5 py-16 lg:px-12 lg:py-24 ${extra}`}>
       <HeadlineSentence headline={headline} as="p" inverse={inverse} />
-      <MoneyStrip days={mockForecast.days} inverse={inverse} />
+      <MoneyStrip days={forecast.days} inverse={inverse} />
     </div>
   );
 
@@ -61,7 +61,7 @@ export default function BackgroundsPage() {
       </Option>
 
       <Option letter="A3" title="Forecast rosette" why="The security rosette is your forecast. It has fourteen lobes, one per day clockwise from today, each as full as that day's balance. Thursday's lobe caves in, engraved in red.">
-        <ForecastRosette forecast={mockForecast} />
+        <ForecastRosette forecast={forecast} />
         {content(true)}
       </Option>
 
@@ -71,42 +71,42 @@ export default function BackgroundsPage() {
       </Option>
 
       <Option letter="A5" title="Engraved vignette" why="Every banknote has a little engraved scene. Ours is your next fourteen days: hills where the money is, and Thursday's valley flooding red below your minimum.">
-        <EngravedVignette forecast={mockForecast} />
+        <EngravedVignette forecast={forecast} />
         {content(true)}
       </Option>
 
       <Group title="Something new" />
 
       <Option letter="G" title="Ticker tape" why="Market tickers scrolling past on a slant, quoting your days like stocks: green when they're covered, amber when tight, and Thursday in red, down, $90 short.">
-        <TickerTape forecast={mockForecast} />
+        <TickerTape forecast={forecast} />
         {content(true)}
       </Option>
 
       <Group title="Earlier directions" />
 
       <Option letter="B" title="Ridgelines" why="The next two weeks as a mountain range, thirty ridges deep. Every ridge follows your balance, so Thursday's gap cuts one red valley straight through the range.">
-        <Ridgelines forecast={mockForecast} />
+        <Ridgelines forecast={forecast} />
         {content(true, "pb-[460px] lg:pb-[470px]")}
       </Option>
 
       <Option letter="C" title="Radar" why="A weather radar sweeping your fortnight. Each day is a blip spiralling out from today; the short day is the red echo that keeps pinging.">
-        <Radar forecast={mockForecast} />
+        <Radar forecast={forecast} />
         {content(true)}
       </Option>
 
       <Option letter="D" title="Low tide" why="Your money as water, gently moving. The dashed red line is your minimum; on Thursday the tide goes out below it. Liquidity, literally.">
         <div aria-hidden className="absolute inset-0 bg-surface" />
-        <LowTide forecast={mockForecast} />
+        <LowTide forecast={forecast} />
         {content(false, "pb-[330px] lg:pb-[340px]")}
       </Option>
 
       <Option letter="E" title="Halftone" why="A newspaper print of the fortnight: bigger dots where there's more money, and the short day printed in red ink. Editorial and graphic.">
-        <Halftone forecast={mockForecast} />
+        <Halftone forecast={forecast} />
         {content(false, "pb-[380px] lg:pb-[440px]")}
       </Option>
 
       <Option letter="F" title="Night map" why="The weather map at night: calm high pressure over your best day, a tight red low closing in near Thursday's gap.">
-        <NightMap forecast={mockForecast} />
+        <NightMap forecast={forecast} />
         {content(true)}
       </Option>
     </div>

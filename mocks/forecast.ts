@@ -2,8 +2,9 @@ import type { Cents, Due, Forecast, ForecastDay, IsoDate, PayeeKind, RecurringPa
 import { eachDay, weekdayIndex } from "@/lib/shared/dates";
 
 /**
- * FAKE forecast data for the stubs and the /design page. Not the real forecast (that is
- * lib/forecast, Person 3). Built from a few constants so the demo story numbers hold:
+ * FAKE forecast data for the stubs that still need one (fix-the-gap options until P1-8, Ask until P1-10)
+ * and their tests. The real forecast is lib/forecast; /design shows that one. Built from a few constants
+ * so the demo story numbers hold, the same as the real forecast's:
  * - today Thu 5 Nov 2026, minimum balance $100, "tight" within $50 of it;
  * - Thu 12 Nov: Volta's $300 order and $1,200 rent land together, leaving $10, which is $90 short;
  * - after the $72 recovered payment ($69 after PayPal's fee) and a set-aside of $11 a day,

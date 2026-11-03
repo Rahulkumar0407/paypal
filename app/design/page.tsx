@@ -18,8 +18,7 @@ import {
   StatusChip,
 } from "@/components/ui";
 import { ScreenPreview, StampReplay, StripFixDemo } from "@/components/app/design/DesignDemos";
-import { buildHeadline } from "@/lib/forecast";
-import { buildMockForecast, mockForecast, mockForecastFixed } from "@/mocks/forecast";
+import { buildHeadline, previewDemoForecast } from "@/lib/forecast";
 import { mockReceiptGapLoanEscalated, mockReceiptReminderApproved, mockReceiptReminderBlocked } from "@/mocks/guard";
 
 export const metadata: Metadata = { title: "Design system" };
@@ -35,9 +34,15 @@ const COLOURS = [
   { name: "Red", token: "red", hex: "#E5484D", use: "Short, blocked. A fill: text on it must be 24px+ (ink is 4.3:1).", swatch: "bg-red" },
 ];
 
-/** The design system, with fake data, for the team to judge the look before features are built. Owner: Person 1. */
+/**
+ * The design system. The forecast is the real one, worked out in memory from the demo store's simulated history;
+ * the receipts are samples until the Margin Guard is built. Owner: Person 1.
+ */
 export default function DesignPage() {
-  const tightExample = buildHeadline(buildMockForecast({ extraIn: { "2026-11-05": 12_000 } }));
+  const story = previewDemoForecast();
+  const fixed = previewDemoForecast({ recovered: true, setAsideDailyCents: 1_100 });
+  // A set-aside of $19 a day only just covers Thu 12 Nov, so the day reads tight.
+  const tightExample = buildHeadline(previewDemoForecast({ setAsideDailyCents: 1_900 }));
 
   return (
     <div className="min-h-dvh bg-paper">
@@ -55,7 +60,7 @@ export default function DesignPage() {
           <h1 className="font-serif text-[2.5rem] leading-[1.06] text-ink lg:text-[3.5rem]">Money weather for a small shop.</h1>
           <p className="text-[17px] leading-7 text-ink-muted">
             A calm, honest forecast the owner checks every morning. Four signature pieces carry the product; everything else stays
-            quiet. All data on this page is fake, from mocks/.
+            quiet. The forecast here is the real one, worked out from the demo store&apos;s simulated history; the receipts are samples.
           </p>
         </section>
 
@@ -66,9 +71,9 @@ export default function DesignPage() {
               <StatusChip state="tight">Tight on Fri 13 Nov</StatusChip>
               <StatusChip state="covered">Covered for the next two weeks</StatusChip>
             </div>
-            <HeadlineSentence headline={buildHeadline(mockForecast)} as="p" />
+            <HeadlineSentence headline={buildHeadline(story)} as="p" />
             <HeadlineSentence headline={tightExample} as="p" />
-            <HeadlineSentence headline={buildHeadline(mockForecastFixed)} as="p" />
+            <HeadlineSentence headline={buildHeadline(fixed)} as="p" />
           </div>
         </Section>
 
@@ -77,10 +82,10 @@ export default function DesignPage() {
           note="Read like a weather row: the day, a coloured block with the closing balance, the condition. Green covered, amber tight, red short. When a gap is fixed, the tile turns green and the sentence updates. That's one of only two animations."
         >
           <StripFixDemo
-            before={mockForecast}
-            after={mockForecastFixed}
-            headlineBefore={buildHeadline(mockForecast)}
-            headlineAfter={buildHeadline(mockForecastFixed)}
+            before={story}
+            after={fixed}
+            headlineBefore={buildHeadline(story)}
+            headlineAfter={buildHeadline(fixed)}
           />
         </Section>
 
@@ -137,7 +142,7 @@ export default function DesignPage() {
         <Section title="Money amounts" note="Whole dollars in sentences and tiles, with shortfalls rounded up so a gap is never understated. Exact cents on receipts and tables.">
           <div className="flex flex-wrap items-end gap-x-12 gap-y-6">
             <div>
-              <BigAmount cents={159_000} />
+              <BigAmount cents={story.days[0]!.openingCents} />
               <p className="mt-2 text-[14px] text-ink-muted">Big amount, serif</p>
             </div>
             <div className="space-y-1 text-[16px] text-ink">

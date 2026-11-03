@@ -8,26 +8,31 @@ import { createRandom } from "./prng";
 /**
  * Builds one complete copy of the Loop Audio demo store as plain rows. Pure and deterministic:
  * the same storeId and date always give exactly the same rows (only demoRunId differs).
- * Everything here is SIMULATED. Person 3 tunes the numbers in task P3-0 (see DEMO.md).
+ * Everything here is SIMULATED. The numbers are tuned so the real forecast (lib/forecast) tells the demo story;
+ * DEMO.md has the hand calculation and lib/forecast/demo-story.test.ts checks it.
  */
 
-export const DEMO_SEED_VERSION = 1;
+export const DEMO_SEED_VERSION = 2;
 const RANDOM_SEED = 20261105;
 
 export const DEMO_STORE_SETTINGS = {
   name: "Loop Audio",
   minimumBalanceCents: 10_000, // $100
   tightMarginCents: 5_000, // tight = within $50 above the minimum
-  /** Balance at the start of DEMO_TODAY. The opening balance is worked back from this. */
-  balanceAtStartOfTodayCents: 159_000, // $1,590
+  /**
+   * Balance at the start of DEMO_TODAY. The opening balance 90 days ago is worked back from this.
+   * Tuned so Thu 12 Nov closes at exactly $10.00, which is $90 short of the $100 minimum (DEMO.md).
+   */
+  balanceAtStartOfTodayCents: 198_756, // $1,987.56
   historyDays: 90,
   futureDays: 35,
   whatYouSell: "Headphones, earbuds and spare parts, sold online across the US.",
   busySeasons: ["Late November (Black Friday)", "December holidays", "Back to school (late August)"],
 } as const;
 
-/** Orders per weekday (0 = Sunday) before random variation. */
-const ORDERS_PER_WEEKDAY = [2, 2, 2, 2, 2, 3, 3] as const;
+/** Orders per weekday (0 = Sunday). About one day in three has one more or one fewer. */
+const ORDERS_PER_WEEKDAY = [3, 2, 2, 2, 3, 4, 4] as const;
+const ORDER_COUNT_WOBBLE = 0.3;
 
 /** PayPal standard checkout fee in the US: 3.49% + $0.49. Person 2 confirms against a real sandbox capture. */
 export function paypalFeeCents(grossCents: Cents): Cents {
@@ -58,19 +63,27 @@ interface PayeePlan {
   weekday?: number;
   dayOfMonth?: number;
   paypalEmail?: string;
-  /** Amount variation either side, in cents, for past payments. */
-  jitterCents: number;
+  /** Past payments differ from the typical amount by these whole dollars, in turn. Their median is 0, so the
+   *  typical amount detection finds is exactly the plan's. */
+  pastJitterDollars: readonly number[];
   category: "SUPPLIER" | "BILL" | "OWNER_TRANSFER" | "LOAN_REPAYMENT";
 }
 
+const FIXED = [0] as const;
+
+/**
+ * Who the shop pays. CONFIRMED payees (the bills) have their future dues written here. DETECTED payees (Volta and
+ * the owner's own transfers) only have history: lib/forecast finds their pattern and projects their next payments,
+ * and writes their dues when the owner confirms them.
+ */
 const PAYEES: readonly PayeePlan[] = [
-  { key: "volta", name: "Volta Audio Parts", label: "the supplier order", kind: "SUPPLIER", status: "DETECTED", typicalAmountCents: 30_000, cadence: "EVERY_N_DAYS", intervalDays: 10, paypalEmail: "orders@volta-audio-parts.example", jitterCents: 1_800, category: "SUPPLIER" },
-  { key: "rent", name: "Rent", label: "rent", kind: "BILL", status: "CONFIRMED", typicalAmountCents: 120_000, cadence: "MONTHLY", dayOfMonth: 12, jitterCents: 0, category: "BILL" },
-  { key: "software", name: "Store software", label: "the store software bill", kind: "BILL", status: "CONFIRMED", typicalAmountCents: 9_900, cadence: "MONTHLY", dayOfMonth: 13, jitterCents: 0, category: "BILL" },
-  { key: "internet", name: "Internet", label: "the internet bill", kind: "BILL", status: "CONFIRMED", typicalAmountCents: 6_000, cadence: "MONTHLY", dayOfMonth: 3, jitterCents: 0, category: "BILL" },
-  { key: "shipping", name: "Shipping supplies", label: "the shipping supplies bill", kind: "BILL", status: "CONFIRMED", typicalAmountCents: 24_000, cadence: "MONTHLY", dayOfMonth: 30, jitterCents: 0, category: "BILL" },
-  { key: "loan", name: "Equipment loan", label: "the loan repayment", kind: "LOAN", status: "CONFIRMED", typicalAmountCents: 15_000, cadence: "MONTHLY", dayOfMonth: 25, jitterCents: 0, category: "LOAN_REPAYMENT" },
-  { key: "owner", name: "Transfer to your bank", label: "your transfer to the bank", kind: "OWNER_TRANSFER", status: "DETECTED", typicalAmountCents: 170_000, cadence: "EVERY_N_WEEKS", intervalWeeks: 2, weekday: 1, jitterCents: 5_000, category: "OWNER_TRANSFER" },
+  { key: "volta", name: "Volta Audio Parts", label: "the supplier order", kind: "SUPPLIER", status: "DETECTED", typicalAmountCents: 30_000, cadence: "EVERY_N_DAYS", intervalDays: 10, paypalEmail: "orders@volta-audio-parts.example", pastJitterDollars: [4, -6, 12, 0, -9, 7, 0, -3, 5], category: "SUPPLIER" },
+  { key: "rent", name: "Rent", label: "rent", kind: "BILL", status: "CONFIRMED", typicalAmountCents: 120_000, cadence: "MONTHLY", dayOfMonth: 12, pastJitterDollars: FIXED, category: "BILL" },
+  { key: "software", name: "Store software", label: "the store software bill", kind: "BILL", status: "CONFIRMED", typicalAmountCents: 9_900, cadence: "MONTHLY", dayOfMonth: 13, pastJitterDollars: FIXED, category: "BILL" },
+  { key: "internet", name: "Internet", label: "the internet bill", kind: "BILL", status: "CONFIRMED", typicalAmountCents: 6_000, cadence: "MONTHLY", dayOfMonth: 3, pastJitterDollars: FIXED, category: "BILL" },
+  { key: "shipping", name: "Shipping supplies", label: "the shipping supplies bill", kind: "BILL", status: "CONFIRMED", typicalAmountCents: 24_000, cadence: "MONTHLY", dayOfMonth: 30, pastJitterDollars: FIXED, category: "BILL" },
+  { key: "loan", name: "Equipment loan", label: "the loan repayment", kind: "LOAN", status: "CONFIRMED", typicalAmountCents: 15_000, cadence: "MONTHLY", dayOfMonth: 25, pastJitterDollars: FIXED, category: "LOAN_REPAYMENT" },
+  { key: "owner", name: "Transfer to your bank", label: "your transfer to the bank", kind: "OWNER_TRANSFER", status: "DETECTED", typicalAmountCents: 250_000, cadence: "EVERY_N_WEEKS", intervalWeeks: 2, weekday: 1, pastJitterDollars: [30, -20, 0, 45, 0, -35], category: "OWNER_TRANSFER" },
 ];
 
 /** Dates a payee is paid in [from, to], anchored so the story lines up (Volta and rent on Thu 12 Nov). */
@@ -196,7 +209,8 @@ export function buildDemoSeed(storeId: StoreId, today: IsoDate, demoRunId: strin
   };
 
   for (const date of eachDay(historyStart, DEMO_STORE_SETTINGS.historyDays)) {
-    const count = Math.max(0, ORDERS_PER_WEEKDAY[weekdayIndex(date)]! + random.int(-1, 1));
+    const wobble = random.next() < ORDER_COUNT_WOBBLE ? (random.next() < 0.5 ? -1 : 1) : 0;
+    const count = Math.max(0, ORDERS_PER_WEEKDAY[weekdayIndex(date)]! + wobble);
     for (let i = 0; i < count; i++) {
       const customerIndex = random.int(0, DEMO_CUSTOMER_NAMES.length - 1);
       if (!firstSeen.has(customerIndex)) firstSeen.set(customerIndex, date);
@@ -251,27 +265,22 @@ export function buildDemoSeed(storeId: StoreId, today: IsoDate, demoRunId: strin
   }));
 
   const dues: Prisma.DueCreateManyInput[] = [];
-  const ownerPlan = PAYEES.find((p) => p.kind === "OWNER_TRANSFER")!;
-  const wantedTransfers: { date: IsoDate; amountCents: Cents }[] = [];
   for (const plan of PAYEES) {
-    for (const date of scheduleFor(plan, today, historyStart, yesterday)) {
-      const jitter = plan.jitterCents === 0 ? 0 : random.int(-plan.jitterCents / 100, plan.jitterCents / 100) * 100;
-      if (plan === ownerPlan) {
-        wantedTransfers.push({ date, amountCents: plan.typicalAmountCents + jitter });
-        continue;
-      }
+    scheduleFor(plan, today, historyStart, yesterday).forEach((date, i) => {
+      const owner = plan.kind === "OWNER_TRANSFER";
       ledgerEntries.push({
         id: id("led", `${plan.key}_${date}`),
         storeId,
         occurredOn: date,
         direction: "OUT",
-        amountCents: plan.typicalAmountCents + jitter,
+        amountCents: plan.typicalAmountCents + plan.pastJitterDollars[i % plan.pastJitterDollars.length]! * 100,
         category: plan.category,
-        description: plan.name,
+        description: owner ? "Transfer from PayPal to your bank" : plan.name,
         payeeId: id("payee", plan.key),
         simulated: true,
       });
-    }
+    });
+    if (plan.status !== "CONFIRMED") continue;
     for (const date of scheduleFor(plan, today, today, lastFutureDay)) {
       dues.push({
         id: id("due", `${plan.key}_${date}`),
@@ -285,29 +294,10 @@ export function buildDemoSeed(storeId: StoreId, today: IsoDate, demoRunId: strin
     }
   }
 
-  // --- Owner's transfers and the opening balance --------------------------------
-  // A sensible owner never transfers money the next few days' bills need, so each simulated
-  // transfer is capped to leave the minimum balance plus the next 4 days of known payments.
-  // The opening balance is then solved so the balance at the start of today is exactly the target.
-  const { openingBalanceCents, transfers } = solveOpeningBalance(
-    ledgerEntries,
-    wantedTransfers,
-    eachDay(historyStart, DEMO_STORE_SETTINGS.historyDays),
-    DEMO_STORE_SETTINGS.balanceAtStartOfTodayCents,
-  );
-  for (const t of transfers) {
-    ledgerEntries.push({
-      id: id("led", `${ownerPlan.key}_${t.date}`),
-      storeId,
-      occurredOn: t.date,
-      direction: "OUT",
-      amountCents: t.amountCents,
-      category: ownerPlan.category,
-      description: "Transfer from PayPal to your bank",
-      payeeId: id("payee", ownerPlan.key),
-      simulated: true,
-    });
-  }
+  // --- The opening balance ---------------------------------------------------------
+  // Worked back from the balance wanted at the start of today, so the story's numbers hold exactly.
+  const historyNet = ledgerEntries.reduce((sum, e) => sum + (e.direction === "IN" ? e.amountCents : -e.amountCents), 0);
+  const openingBalanceCents = DEMO_STORE_SETTINGS.balanceAtStartOfTodayCents - historyNet;
 
   ledgerEntries.sort((a, b) => (a.occurredOn < b.occurredOn ? -1 : a.occurredOn > b.occurredOn ? 1 : a.id.localeCompare(b.id)));
 
@@ -327,52 +317,4 @@ export function buildDemoSeed(storeId: StoreId, today: IsoDate, demoRunId: strin
   };
 
   return { store, products, customers, payees, orders, orderItems, ledgerEntries, dues };
-}
-
-/** Day-by-day history simulation used to place the owner's transfers and find the opening balance. */
-function solveOpeningBalance(
-  entries: readonly Prisma.LedgerEntryCreateManyInput[],
-  wanted: readonly { date: IsoDate; amountCents: Cents }[],
-  days: readonly IsoDate[],
-  target: Cents,
-): { openingBalanceCents: Cents; transfers: { date: IsoDate; amountCents: Cents }[] } {
-  const netByDay = new Map<IsoDate, Cents>();
-  const outByDay = new Map<IsoDate, Cents>();
-  for (const e of entries) {
-    netByDay.set(e.occurredOn, (netByDay.get(e.occurredOn) ?? 0) + (e.direction === "IN" ? e.amountCents : -e.amountCents));
-    if (e.direction === "OUT") outByDay.set(e.occurredOn, (outByDay.get(e.occurredOn) ?? 0) + e.amountCents);
-  }
-  const wantedOn = new Map(wanted.map((w) => [w.date, w.amountCents]));
-
-  const run = (opening: Cents) => {
-    let balance = opening;
-    let skipped = 0; // what the owner held back earlier and takes at the next transfer
-    const transfers: { date: IsoDate; amountCents: Cents }[] = [];
-    days.forEach((date, i) => {
-      const want = wantedOn.get(date);
-      if (want !== undefined) {
-        const upcoming = days.slice(i, i + 4).reduce((sum, d) => sum + (outByDay.get(d) ?? 0), 0);
-        const room = balance - DEMO_STORE_SETTINGS.minimumBalanceCents - upcoming;
-        const amount = Math.max(0, Math.min(want + skipped, room));
-        skipped = want + skipped - amount;
-        if (amount > 0) transfers.push({ date, amountCents: amount });
-        balance -= amount;
-      }
-      balance += netByDay.get(date) ?? 0;
-    });
-    return { end: balance, transfers };
-  };
-
-  // The end balance never falls as the opening balance rises (a capped transfer absorbs the extra cent,
-  // an uncapped one passes it through), so a binary search finds the opening that hits the target exactly.
-  let low = 0;
-  let high = 10_000_000;
-  while (low < high) {
-    const mid = Math.floor((low + high) / 2);
-    if (run(mid).end >= target) high = mid;
-    else low = mid + 1;
-  }
-  const { end, transfers } = run(low);
-  if (end !== target) throw new Error(`Demo seed: cannot reach a balance of ${target} cents today (got ${end}).`);
-  return { openingBalanceCents: low, transfers };
 }

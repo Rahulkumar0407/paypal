@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { addDays, weekdayIndex } from "@/lib/shared/dates";
-import { buildDemoSeed, paypalFeeCents } from "./seed";
+import { buildDemoSeed, DEMO_STORE_SETTINGS, paypalFeeCents } from "./seed";
 import { DEMO_CATALOG } from "./catalog";
 import { mockProducts } from "@/mocks/store";
 
@@ -46,16 +46,18 @@ describe("buildDemoSeed", () => {
     for (const o of captured) expect(o.netCents).toBe(o.totalCents - paypalFeeCents(o.totalCents));
   });
 
-  it("pays Volta Audio Parts about $300 every 10 days, next on Thu 12 Nov with rent", () => {
+  it("paid Volta Audio Parts about $300 every 10 days, last on Mon 2 Nov, so the next lands with rent on Thu 12 Nov", () => {
     const { ledgerEntries, dues } = build();
     const volta = ledgerEntries.filter((e) => e.payeeId?.endsWith("_payee_volta")).map((e) => e.occurredOn);
     expect(volta.length).toBeGreaterThanOrEqual(8);
     for (let i = 1; i < volta.length; i++) expect(Date.parse(volta[i]!) - Date.parse(volta[i - 1]!)).toBe(10 * 86_400_000);
     for (const e of ledgerEntries.filter((x) => x.payeeId?.endsWith("_payee_volta"))) {
-      expect(Math.abs(e.amountCents - 30_000)).toBeLessThanOrEqual(1_800);
+      expect(Math.abs(e.amountCents - 30_000)).toBeLessThanOrEqual(1_200);
     }
-    const on12th = dues.filter((d) => d.dueOn === "2026-11-12").map((d) => d.payeeId.split("_payee_")[1]).sort();
-    expect(on12th).toEqual(["rent", "volta"]);
+    expect(volta.at(-1)).toBe("2026-11-02");
+    // Volta isn't confirmed yet, so it has no dues of its own: lib/forecast projects its next payment.
+    const on12th = dues.filter((d) => d.dueOn === "2026-11-12").map((d) => d.payeeId.split("_payee_")[1]);
+    expect(on12th).toEqual(["rent"]);
   });
 
   it("includes the bills and the owner's transfers to their bank every other Monday", () => {
@@ -63,13 +65,12 @@ describe("buildDemoSeed", () => {
     expect(payees.map((p) => p.name)).toEqual(
       expect.arrayContaining(["Rent", "Internet", "Store software", "Equipment loan", "Transfer to your bank"]),
     );
-    const transfers = [
-      ...ledgerEntries.filter((e) => e.category === "OWNER_TRANSFER").map((e) => e.occurredOn),
-      ...dues.filter((d) => d.payeeId.endsWith("_payee_owner")).map((d) => d.dueOn),
-    ];
-    expect(transfers.length).toBeGreaterThanOrEqual(6);
-    expect(transfers.every((d) => weekdayIndex(d) === 1)).toBe(true);
-    expect(dues.some((d) => d.payeeId.endsWith("_payee_owner") && d.dueOn === "2026-11-09")).toBe(true);
+    const transfers = ledgerEntries.filter((e) => e.category === "OWNER_TRANSFER");
+    expect(transfers.map((e) => e.occurredOn)).toEqual(["2026-08-17", "2026-08-31", "2026-09-14", "2026-09-28", "2026-10-12", "2026-10-26"]);
+    expect(transfers.every((e) => weekdayIndex(e.occurredOn) === 1 && Math.abs(e.amountCents - 250_000) <= 5_000)).toBe(true);
+    // Only confirmed payees (the bills) have dues written by the seed.
+    const confirmed = new Set(payees.filter((p) => p.status === "CONFIRMED").map((p) => p.id));
+    expect(dues.every((d) => confirmed.has(d.payeeId))).toBe(true);
   });
 
   it("has the abandoned $72 order from a customer who allowed contact", () => {
@@ -81,7 +82,7 @@ describe("buildDemoSeed", () => {
     expect(buyer.contactConsent).toBe(true);
   });
 
-  it("works the opening balance back so today's balance is $1,590 and never negative", () => {
+  it("works the opening balance back so today's balance is $1,987.56, never below the $100 minimum before", () => {
     const { store, ledgerEntries } = build();
     let balance = store.openingBalanceCents;
     let lowest = balance;
@@ -89,9 +90,10 @@ describe("buildDemoSeed", () => {
       balance += e.direction === "IN" ? e.amountCents : -e.amountCents;
       lowest = Math.min(lowest, balance);
     }
-    expect(balance).toBe(159_000);
-    expect(store.openingBalanceCents).toBeGreaterThanOrEqual(0);
-    expect(lowest).toBeGreaterThanOrEqual(0);
+    expect(balance).toBe(DEMO_STORE_SETTINGS.balanceAtStartOfTodayCents);
+    expect(balance).toBe(198_756);
+    expect(store.openingBalanceCents).toBe(313_350);
+    expect(lowest).toBeGreaterThanOrEqual(DEMO_STORE_SETTINGS.minimumBalanceCents);
   });
 
   it("matches the products the mocks show", () => {

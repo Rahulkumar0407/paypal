@@ -1,6 +1,6 @@
 # lib/demo/
 
-**Owner:** Person 1. Copies and reset work since the foundation; P1-6 and P1-8 tune the numbers.
+**Owner:** Person 1. Copies and reset work since the foundation; P1-6 tuned the numbers for the real forecast.
 
 **What goes here:** the SIMULATED Loop Audio demo store, one private copy per visitor, and reset.
 
@@ -13,9 +13,12 @@
 - `getDemoStoreStatus(storeId)`, `buildDemoSeed(storeId, today, runId)`, `paypalFeeCents(gross)`, `DEMO_CATALOG`.
 
 **How the seed works (`seed.ts`):** pure and deterministic (seeded random), so a reset gives identical rows; only
-`demoRunId` changes. It builds 8 products, 90 days of simulated sales (net of PayPal's 3.49% + $0.49 fee), Volta Audio
-Parts about $300 every 10 days, rent ($1,200 on the 12th), store software, internet, shipping supplies, the loan, the
-owner's transfers to their bank every other Monday, Maya's abandoned $72 order, a no-consent abandoned order, and two
-risky orders. The opening balance is solved so the balance at the start of `DEMO_TODAY` is exactly $1,590.
+`demoRunId` changes. It builds 8 products, 90 days of simulated sales (257 orders, more at weekends, net of PayPal's
+3.49% + $0.49 fee), Volta Audio Parts about $300 every 10 days (last Mon 2 Nov), rent ($1,200 on the 12th), store
+software, internet, shipping supplies, the loan, the owner's transfers to their bank (about $2,500 every other Monday,
+last Mon 26 Oct), Maya's abandoned $72 order, a no-consent abandoned order, and two risky orders. Only confirmed
+payees (the bills) get future dues; Volta and the owner's transfers are found by lib/forecast. The opening balance is
+worked back so the balance at the start of `DEMO_TODAY` is $1,987.56, which makes Thu 12 Nov exactly $90 short.
+`DEMO.md` has every number.
 
 Tests: `seed.test.ts` (determinism, store ids, the story's rows, a balance that never goes negative).

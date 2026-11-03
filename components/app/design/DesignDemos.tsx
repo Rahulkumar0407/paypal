@@ -75,7 +75,8 @@ export function ScreenPreview() {
           </button>
         ))}
       </div>
-      <div className="flex flex-col gap-8 xl:flex-row xl:items-start">
+      {/* Fixed-width frames: on a narrow screen they scroll inside this box, never the page. */}
+      <div className="flex flex-col gap-8 overflow-x-auto p-2 xl:flex-row xl:items-start">
         <figure className="shrink-0">
           <figcaption className="mb-2 text-[13px] text-ink-muted">Phone, 390 × 844</figcaption>
           <iframe

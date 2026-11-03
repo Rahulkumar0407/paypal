@@ -175,7 +175,12 @@ URL (P2-2), the buyer login (P2-1), and the cold test (T-2)._
 
 Then, in this order:
 
-### [ ] P1-6 Forecast and regular payment detection (was P3-0, P3-1; Tue 3 to Wed 4 Nov)
+### [x] P1-6 Forecast and regular payment detection (was P3-0, P3-1; Tue 3 to Wed 4 Nov)
+_Status 3 Nov: done. Real detection and forecast in lib/forecast (pure engine, 63 new unit tests). Seed retuned: the
+real maths gives exactly $90 short on Thu 12 Nov, $21 after the $72 payment ($69 net), covered at $156 after $11 a
+day; "$200 on Monday" makes the 12th $144 short (DEMO.md has the hand calculation). Volta and the owner's transfers
+are found from history and count before they're confirmed; Confirm and Not regular are saved. Pending orders count
+only once captured (P1-11 decides more). Home, dues and /design checked at 390px and 1440px._
 - **Demo numbers** in `DEMO.md`, for `DEMO_TODAY` Thu 5 Nov 2026: opening balance; about 8 weeks of sales history
   with a weekday pattern; the owner's regular transfers to their bank; Volta's payments and the bills with their
   dates (Volta and rent both on Thu 12 Nov); the abandoned $72 checkout; one risky order and one customer who has

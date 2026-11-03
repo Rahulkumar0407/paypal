@@ -2,7 +2,8 @@
 
 **Owner:** Person 1 (every file).
 
-**What goes here:** FAKE data the module stubs return until the real modules land, and the `/design` page uses.
+**What goes here:** FAKE data the module stubs return until the real modules land. (`/design` shows the real
+forecast since P1-6; it still uses the sample receipts here.)
 The numbers tell the demo story: $90 short on Thu 12 Nov; $21 short after the $72 order is paid ($69 after
 PayPal's fee); covered after setting aside $11 a day; "$200 on Monday" leaves $745 on Mon 9 Nov but makes
 Thursday $290 short.
