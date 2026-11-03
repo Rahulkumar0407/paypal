@@ -1,10 +1,10 @@
 import type { PrismaClient } from "@/generated/prisma/client";
 import type { ActionProposal, Due, PayeeKind } from "@/types";
-import { createOrder, createPayout, refundCapture } from "@/lib/paypal";
+import { createCheckoutForOrder, createPayout, paypalMode, PayPalNotConfiguredError, refundCapture } from "@/lib/paypal";
 import { getDues } from "@/lib/forecast";
+import { recordAttempt } from "@/lib/store";
 import { today } from "@/lib/shared/clock";
 import { formatDay } from "@/lib/shared/dates";
-import { getEnv } from "@/lib/shared/env";
 import { formatCents } from "@/lib/shared/money";
 import { ExecutionError, type ExecutionResult } from "./flow";
 
@@ -32,6 +32,25 @@ export function withCheckoutLink(draft: string, link: string): string {
   return draft.includes("{checkout_link}") ? draft.replaceAll("{checkout_link}", link) : `${draft}\n\n${link}`;
 }
 
+/** The PayPal mode, or "off" when it can't be used (fake mode refused in production). */
+function safeMode(): "sandbox" | "fake" | "off" {
+  try {
+    return paypalMode();
+  } catch {
+    return "off";
+  }
+}
+
+/** PayPal calls that need PayPal set up: without it, the action stops with plain words and nothing changes. */
+async function withPayPal<T>(what: string, call: () => Promise<T>): Promise<T> {
+  try {
+    return await call();
+  } catch (error) {
+    if (error instanceof PayPalNotConfiguredError || safeMode() === "off") throw new ExecutionError(`PayPal isn't set up yet, so ${what}.`);
+    throw error;
+  }
+}
+
 export function createExecutor(db: PrismaClient) {
   /** A payment from today on, whether it has its own row or is still a projection from a found payee. */
   async function findDue(storeId: string, dueId: string): Promise<Due> {
@@ -43,21 +62,19 @@ export function createExecutor(db: PrismaClient) {
   async function sendReminder(p: Proposal<"SEND_REMINDER">): Promise<ExecutionResult> {
     const order = await db.order.findFirst({ where: { id: p.params.orderId, storeId: p.storeId }, include: { customer: true } });
     if (!order) throw new ExecutionError("That order isn't there any more, so no reminder was sent.");
-    const appUrl = getEnv().APP_URL.replace(/\/$/, "");
-    const paypalOrder = await createOrder({
-      storeId: p.storeId,
-      orderId: order.id,
-      amountCents: order.totalCents,
-      description: `Loop Audio order #${order.number}`,
-      idempotencyKey: p.idempotencyKey,
-      returnUrl: `${appUrl}/store/return?order=${encodeURIComponent(order.id)}`,
-      cancelUrl: `${appUrl}/store/cancel?order=${encodeURIComponent(order.id)}`,
-    });
-    if (!paypalOrder.approveUrl) throw new ExecutionError("PayPal didn't return a checkout link, so no reminder was sent.");
+    // A fresh PayPal checkout for the unpaid order, made now (approval links expire, so never in the seed).
+    // Without PayPal set up, the reminder still goes to the outbox, without a link, and says so.
+    const live = safeMode() !== "off";
+    const paypalOrder = live
+      ? await createCheckoutForOrder({ storeId: p.storeId, orderId: order.id, orderNumber: order.number, amountCents: order.totalCents, idempotencyKey: p.idempotencyKey })
+      : null;
+    if (live && !paypalOrder?.approveUrl) throw new ExecutionError("PayPal didn't return a checkout link, so no reminder was sent.");
     const firstName = order.customer.name.split(" ")[0] ?? order.customer.name;
-    const body = withCheckoutLink(p.draftText ?? reminderTemplate(firstName, order.number), paypalOrder.approveUrl);
-    await db.$transaction([
-      db.outboxMessage.create({
+    const draft = p.draftText ?? reminderTemplate(firstName, order.number);
+    const body = paypalOrder?.approveUrl ? withCheckoutLink(draft, paypalOrder.approveUrl) : draft.replaceAll("{checkout_link}", "(link to follow)");
+    await db.$transaction(async (tx) => {
+      if (paypalOrder) await recordAttempt({ storeId: p.storeId, orderId: order.id, paypalOrderId: paypalOrder.id, source: "REMINDER" }, tx);
+      await tx.outboxMessage.create({
         data: {
           storeId: p.storeId,
           proposalId: p.id,
@@ -65,17 +82,15 @@ export function createExecutor(db: PrismaClient) {
           to: order.customer.email,
           subject: p.sequence > 1 ? `A last reminder about Loop Audio order #${order.number}` : `Your Loop Audio order #${order.number} is waiting`,
           body,
-          checkoutUrl: paypalOrder.approveUrl,
-          paypalOrderId: paypalOrder.id,
+          checkoutUrl: paypalOrder?.approveUrl ?? "",
+          paypalOrderId: paypalOrder?.id ?? null,
           simulated: true,
         },
-      }),
-      db.order.updateMany({ where: { id: order.id, storeId: p.storeId }, data: { paypalOrderId: paypalOrder.id } }),
-    ]);
-    return {
-      detail: `Reminder to ${order.customer.name} placed in the simulated outbox, with a new PayPal checkout link for ${formatCents(order.totalCents)}.`,
-      paypalIds: [paypalOrder.id],
-    };
+      });
+    });
+    return paypalOrder
+      ? { detail: `Reminder to ${order.customer.name} placed in the simulated outbox, with a new PayPal checkout link for ${formatCents(order.totalCents)}.`, paypalIds: [paypalOrder.id] }
+      : { detail: `Reminder to ${order.customer.name} placed in the simulated outbox. PayPal isn't set up yet, so it has no payment link.`, paypalIds: [] };
   }
 
   async function setAside(p: Proposal<"SET_ASIDE">): Promise<ExecutionResult> {
@@ -116,12 +131,9 @@ export function createExecutor(db: PrismaClient) {
     if (!payee) throw new ExecutionError("That supplier isn't there any more, so nothing was paid.");
     if (!payee.paypalEmail) throw new ExecutionError(`${payee.name} has no PayPal email for payouts, so nothing was paid.`);
     const due = p.params.dueId ? await findDue(p.storeId, p.params.dueId) : null;
-    const { payoutBatchId } = await createPayout({
-      receiverEmail: payee.paypalEmail,
-      amountCents: p.amountCents,
-      note: `Payment from Loop Audio`,
-      idempotencyKey: p.idempotencyKey,
-    });
+    const { payoutBatchId } = await withPayPal("nothing was paid", () =>
+      createPayout({ receiverEmail: payee.paypalEmail!, amountCents: p.amountCents, note: "Payment from Loop Audio", idempotencyKey: p.idempotencyKey }),
+    );
     const day = today();
     await db.$transaction([
       db.ledgerEntry.create({
@@ -155,7 +167,7 @@ export function createExecutor(db: PrismaClient) {
     if (!order) throw new ExecutionError("That order isn't there any more, so nothing was refunded.");
     const captureId = p.params.captureId ?? order.paypalCaptureId;
     if (!captureId || order.status !== "CAPTURED") throw new ExecutionError(`Order #${order.number} has no PayPal payment to refund.`);
-    const { refundId } = await refundCapture(captureId, p.amountCents, p.idempotencyKey);
+    const { refundId } = await withPayPal("nothing was refunded", () => refundCapture(captureId, p.amountCents, p.idempotencyKey));
     await db.$transaction([
       db.ledgerEntry.create({
         data: {

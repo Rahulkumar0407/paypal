@@ -1,25 +1,59 @@
 /**
- * lib/store: reading the store's catalogue, orders and settings. Owner: Person 2.
- * Used by the buyer-facing store page (app/store), the dashboard (Person 4) and settings.
- * Foundation stubs by Person 1 return FAKE data from mocks/.
+ * lib/store: the store's catalogue, orders, settings and payment records. Owner: Person 1.
+ * Payment records are written after a PayPal call made elsewhere (store routes, webhook, the Guard's executor):
+ * lib/store itself never calls PayPal.
  */
 import type { Order, Product, StoreId, StoreSettings } from "@/types";
 import { MOCK_MINIMUM_BALANCE, MOCK_TIGHT_MARGIN } from "@/mocks/forecast";
 import { mockProducts, mockRecentOrders } from "@/mocks/store";
+import { getDb, isDatabaseConfigured } from "@/lib/shared/db";
 
+export {
+  applyPayPalEvent,
+  findAttempt,
+  getPaidOrder,
+  recordApproval,
+  recordAttempt,
+  recordCancelled,
+  recordCapture,
+  recordDenied,
+  startStoreCheckout,
+  type AttemptView,
+  type PaymentEvent,
+} from "./payments";
+
+/** The catalogue, dearest first. Without a database, the sample catalogue (same products and prices as the seed). */
 export async function listProducts(storeId: StoreId): Promise<Product[]> {
-  // TODO(Person 2): read Product rows (P2-1).
-  return mockProducts.map((p) => ({ ...p, storeId }));
+  if (!isDatabaseConfigured()) return mockProducts.map((p) => ({ ...p, storeId }));
+  const rows = await getDb().product.findMany({ where: { storeId, active: true }, orderBy: [{ priceCents: "desc" }, { sku: "asc" }] });
+  return rows.map((p) => ({ id: p.id, storeId: p.storeId, sku: p.sku, name: p.name, description: p.description, priceCents: p.priceCents, costCents: p.costCents }));
 }
 
+/** Newest orders first, with the customer's name. */
 export async function listRecentOrders(storeId: StoreId, limit = 50): Promise<Order[]> {
-  // TODO(Person 2): newest first, with the customer's name.
-  return mockRecentOrders.slice(0, limit).map((o) => ({ ...o, storeId }));
+  if (!isDatabaseConfigured()) return mockRecentOrders.slice(0, limit).map((o) => ({ ...o, storeId }));
+  const rows = await getDb().order.findMany({ where: { storeId }, include: { customer: { select: { name: true } } }, orderBy: [{ placedAt: "desc" }, { number: "desc" }], take: limit });
+  return rows.map((o) => ({
+    id: o.id,
+    storeId: o.storeId,
+    number: o.number,
+    customerId: o.customerId,
+    customerName: o.customer.name,
+    status: o.status,
+    placedOn: o.placedOn,
+    totalCents: o.totalCents,
+    feeCents: o.feeCents,
+    netCents: o.netCents,
+    failedAttempts: o.failedAttempts,
+    riskHold: o.riskHold,
+    paypalOrderId: o.paypalOrderId,
+    paypalCaptureId: o.paypalCaptureId,
+    simulated: o.simulated,
+  }));
 }
 
 export async function getStoreSettings(storeId: StoreId): Promise<StoreSettings> {
-  // TODO(Person 2): read the Store row.
-  return {
+  const fallback: StoreSettings = {
     storeId,
     name: "Loop Audio",
     currency: "USD",
@@ -29,5 +63,19 @@ export async function getStoreSettings(storeId: StoreId): Promise<StoreSettings>
     whatYouSell: "Headphones, earbuds and spare parts, sold online across the US.",
     supplierPaymentMethod: "PAYPAL_PAYOUTS",
     busySeasons: ["Late November (Black Friday)", "December holidays", "Back to school (late August)"],
+  };
+  if (!isDatabaseConfigured()) return fallback;
+  const s = await getDb().store.findUnique({ where: { id: storeId } });
+  if (!s) return fallback;
+  return {
+    storeId,
+    name: s.name,
+    currency: "USD",
+    timezone: s.timezone,
+    minimumBalanceCents: s.minimumBalanceCents,
+    tightMarginCents: s.tightMarginCents,
+    whatYouSell: s.whatYouSell,
+    supplierPaymentMethod: s.supplierPaymentMethod,
+    busySeasons: s.busySeasons,
   };
 }

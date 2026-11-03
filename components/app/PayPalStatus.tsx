@@ -9,7 +9,8 @@ export type PayPalSetup = "sandbox" | "fake" | "not-configured";
 export function paypalSetup(): PayPalSetup {
   const env = getEnv();
   if (env.PAYPAL_CLIENT_ID && env.PAYPAL_CLIENT_SECRET) return "sandbox";
-  if (env.PAYPAL_FAKE === "1") return "fake";
+  // Fake mode is refused in production (lib/paypal throws), so there it reads as not set up.
+  if (env.PAYPAL_FAKE === "1" && env.NODE_ENV !== "production") return "fake";
   return "not-configured";
 }
 

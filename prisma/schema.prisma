@@ -52,6 +52,7 @@ model Store {
   gapLoans      GapLoan[]
   riskFlags     RiskFlag[]
   webhookEvents WebhookEvent[]
+  payments      PaymentAttempt[]
 
   @@index([lastSeenAt])
 }
@@ -128,6 +129,7 @@ model Order {
   ledgerEntries LedgerEntry[]
   riskFlags     RiskFlag[]
   outbox        OutboxMessage[]
+  payments      PaymentAttempt[]
 
   @@unique([storeId, number])
   @@index([storeId, status])
@@ -423,6 +425,38 @@ model RiskFlag {
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@index([storeId])
+}
+
+enum PaymentAttemptStatus {
+  CREATED // PayPal order made; the buyer hasn't approved it
+  APPROVED // the buyer approved it; not captured yet
+  CAPTURED // paid: gross, fee and net are filled in
+  DENIED // PayPal denied the capture
+  CANCELLED // the buyer cancelled at PayPal
+  REFUNDED
+}
+
+/// One PayPal checkout for an order. An order can have several (the store checkout, then a fresh link in each
+/// reminder), so webhooks find the right order from the PayPal order id.
+model PaymentAttempt {
+  id              String               @id
+  storeId         String
+  orderId         String
+  paypalOrderId   String               @unique
+  source          String // STORE (the buyer's own checkout) | REMINDER (a link in a reminder)
+  status          PaymentAttemptStatus @default(CREATED)
+  paypalCaptureId String?
+  grossCents      Int?
+  feeCents        Int? // PayPal's fee, from the capture
+  netCents        Int? // what actually arrived
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([storeId, orderId])
+  @@index([paypalCaptureId])
 }
 
 model WebhookEvent {

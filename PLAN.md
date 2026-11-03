@@ -250,7 +250,13 @@ has the fixes table and the judge script._
 - a test shows a reset of one copy leaves another copy unchanged;
 - a test shows cleanup removes only idle copies.
 
-### [ ] P1-9 PayPal checkout, store page and webhooks (was P2-1, P2-2; Sat 7 Nov)
+### [x] P1-9 PayPal checkout, store page and webhooks (was P2-1, P2-2; Sat 7 Nov)
+_Status 3 Nov: done in fake mode; P2-3 switches on the sandbox with SWITCH-ON.md. lib/paypal is a typed REST wrapper
+(no SDK, no Agent Toolkit) with sandbox, fake and off modes; every write sends PayPal-Request-Id. /store checks out,
+captures on return and shows gross, fee and net; each attempt is a PaymentAttempt row (new table, migration
+20261103120000). The webhook verifies first, stores each event once and handles approved, completed, denied and
+refunded. Story steps 1 to 5 clicked through in fake mode on 3 Nov. Shared change for P2: prisma/schema.prisma gained
+PaymentAttempt._
 Built so it runs in fake PayPal mode now and uses the real sandbox automatically once `PAYPAL_CLIENT_ID` and
 `PAYPAL_CLIENT_SECRET` are set (AGENTS.md section 6).
 - `lib/paypal/client.ts`: OAuth, Orders v2 (create, get, capture), refund, Payouts, webhook signature verification.

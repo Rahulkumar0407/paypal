@@ -20,6 +20,9 @@ const envSchema = z.object({
   NEXT_PUBLIC_PAYPAL_CLIENT_ID: z.string().min(1).optional(),
   PAYPAL_FAKE: z.enum(["0", "1"]).optional(),
 
+  /** Set by Next.js and Node. Fake PayPal mode is refused when this is "production". */
+  NODE_ENV: z.enum(["development", "production", "test"]).optional(),
+
   AI_MODEL: z.string().min(1).optional(),
   GOOGLE_GENERATIVE_AI_API_KEY: z.string().min(1).optional(),
   OPENROUTER_API_KEY: z.string().min(1).optional(),
