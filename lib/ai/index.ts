@@ -8,7 +8,7 @@ import type { ChatAnswer, Forecast, RecurringPayee, ReminderDraft, StoreId } fro
 import { canAfford, getDues, getForecast, getPatternEvidence, listRecentPayments, type PatternEvidence } from "@/lib/forecast";
 import { today } from "@/lib/shared/clock";
 import { answerWith, type AskData } from "./ask";
-import { explainRegularPayment as explainPayee, explainShortfall as explainGap } from "./explain";
+import { explainRegularPayment as explainPayee, explainRisk as explainRiskWith, explainShortfall as explainGap, type RiskFacts } from "./explain";
 import { allowAiAnswer } from "./limit";
 import { getLanguageModel } from "./model";
 import { draftReminder as draft, type DraftInput } from "./reminder";
@@ -16,7 +16,7 @@ import { draftReminder as draft, type DraftInput } from "./reminder";
 export { getModelId, isAiConfigured } from "./model";
 export { SUGGESTED_QUESTIONS, type AskData } from "./ask";
 export { reminderTemplate, type DraftInput } from "./reminder";
-export { regularPaymentTemplate, shortfallTemplate } from "./explain";
+export { regularPaymentTemplate, riskTemplate, shortfallTemplate, type RiskFacts } from "./explain";
 
 function liveData(storeId: StoreId): AskData {
   return {
@@ -53,4 +53,9 @@ export async function explainRegularPayments(storeId: StoreId, payees: Recurring
   const model = getLanguageModel();
   const pairs = await Promise.all(payees.map(async (p) => [p.id, evidence.has(p.id) ? await explainPayee(p, evidence.get(p.id)!, model) : null] as const));
   return Object.fromEntries(pairs.filter((x): x is [string, string] => x[1] !== null));
+}
+
+/** One line on why the risk check wants to hold an order (the flags are code's; this only words them). */
+export async function explainRisk(facts: RiskFacts): Promise<string> {
+  return explainRiskWith(facts, getLanguageModel());
 }

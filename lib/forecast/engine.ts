@@ -15,6 +15,7 @@ import type {
 } from "@/types";
 import { addDays, daysBetween, eachDay, weekdayIndex } from "@/lib/shared/dates";
 import { assertCents } from "@/lib/shared/money";
+import { isRisky, scoreOrder } from "@/lib/shared/risk";
 import { type Cadence, datesBetween, detectPattern, type PastPayment, type Pattern, summaryFor } from "./detect";
 
 /**
@@ -66,8 +67,27 @@ export interface StoreRows {
   /** Active set-asides only. */
   setAsides: readonly { dailyAmountCents: number; startOn: string; endOn: string; forDate: string }[];
   gapLoans: readonly { id: string; amountCents: number; feeCents: number; receivedOn: string; repayOn: string }[];
-  /** Pending orders on risk hold, with what would arrive after PayPal's fee. */
-  heldOrders: readonly { id: string; number: number; netCents: number }[];
+  /**
+   * Orders approved but not captured yet, with what would arrive after PayPal's fee. They count as money in today,
+   * unless they're on risk hold or the risk score flags them and the owner hasn't cleared them (feature 7).
+   */
+  pendingOrders: readonly PendingOrder[];
+  /** The usual order size (median of paid orders), for the risk score. */
+  typicalOrderCents: number;
+}
+
+export interface PendingOrder {
+  id: string;
+  number: number;
+  totalCents: number;
+  netCents: number;
+  riskHold: boolean;
+  /** The owner declined the risk check's hold, so it counts like any other order. */
+  cleared: boolean;
+  failedAttempts: number;
+  placedOn: string;
+  customerFirstSeenOn: string;
+  customerPaidOrders: number;
 }
 
 export interface PayeeRow {
@@ -249,7 +269,12 @@ export function inputFromRows(rows: StoreRows, storeId: StoreId, today: IsoDate)
     else outs.push(loanRepayment(storeId, loan.id, loan.repayOn, loan.amountCents + loan.feeCents));
   }
 
-  const heldToday = rows.heldOrders.reduce((sum, o) => sum + o.netCents, 0);
+  let heldToday = 0;
+  for (const o of rows.pendingOrders) {
+    const risky = o.riskHold || (!o.cleared && isRisky(scoreOrder(o, rows.typicalOrderCents)));
+    if (risky) heldToday += o.netCents;
+    else addIn(today, o.netCents);
+  }
   const historyStart = rows.store.openingBalanceOn;
   const { confidence, reason } = salesConfidence(salesByDay, historyStart, today);
 

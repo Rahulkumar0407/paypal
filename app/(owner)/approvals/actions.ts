@@ -40,7 +40,9 @@ export async function decideEscalation(receiptId: string, choice: "approve" | "d
       case "EXECUTION_FAILED":
         return { ok: true, receiptId, choice, decision: null, message: `Approved, but it didn't go through: ${last.detail} Nothing moved.` };
       case "OWNER_REJECTED":
-        return { ok: true, receiptId, choice, decision: null, message: "Declined. Nothing will happen, and the receipt notes your choice." };
+        return item.receipt.proposal.type === "HOLD_ORDER"
+          ? { ok: true, receiptId, choice, decision: null, message: "Cleared. The order isn't held, and its money now counts in your forecast." }
+          : { ok: true, receiptId, choice, decision: null, message: "Declined. Nothing will happen, and the receipt notes your choice." };
       default:
         return parsed.data.choice === "approve"
           ? { ok: true, receiptId, choice, decision: null, message: "You approved it. NeverShort runs its safety checks once more, then does it." }

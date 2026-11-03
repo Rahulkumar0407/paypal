@@ -38,7 +38,8 @@ async function load(): Promise<HomeData | null> {
       getFixOptions(storeId),
       getRecurringPayees(storeId),
       findRecoveryCandidates(storeId),
-      getAlerts(storeId),
+      // Alerts are extras: if they fail, Today still shows the forecast.
+      getAlerts(storeId).catch(() => []),
     ]);
     return { storeId, forecast, dues, fixes, payees, candidates, alerts };
   } catch (error) {

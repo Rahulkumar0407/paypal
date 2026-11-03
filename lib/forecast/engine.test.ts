@@ -12,6 +12,7 @@ import {
   runForecast,
   withAdjustments,
   type PayeeRow,
+  type PendingOrder,
   type StoreRows,
 } from "./engine";
 
@@ -29,7 +30,7 @@ import {
 const TODAY = "2026-11-05";
 const STORE = "st_test";
 
-type Rows = StoreRows & { ledger: StoreRows["ledger"][number][]; dues: StoreRows["dues"][number][]; payees: PayeeRow[] };
+type Rows = StoreRows & { ledger: StoreRows["ledger"][number][]; dues: StoreRows["dues"][number][]; payees: PayeeRow[]; pendingOrders: PendingOrder[] };
 
 interface Options {
   weeks?: number;
@@ -75,7 +76,8 @@ function rows({ weeks = 12, sale = () => 20_000, start = 40_000, supplierStatus 
     dues: rent ? [{ id: "rent_1112", payeeId: "rent", dueOn: "2026-11-12", amountCents: 70_000, status: "SCHEDULED" }] : [],
     setAsides: [],
     gapLoans: [],
-    heldOrders: [],
+    pendingOrders: [],
+    typicalOrderCents: 7_000,
   };
 }
 
@@ -209,10 +211,35 @@ describe("what counts as money out", () => {
     expect(day(r, "2026-11-14").dues[0]).toMatchObject({ payeeName: "Gap loan repayment", amountCents: 15_300, simulated: true });
   });
 
-  it("shows money held for a risk check without counting it", () => {
+  const pending = (over: Partial<PendingOrder>): PendingOrder => ({
+    id: "ord_p",
+    number: 1300,
+    totalCents: 5_900,
+    netCents: 5_645,
+    riskHold: false,
+    cleared: false,
+    failedAttempts: 0,
+    placedOn: "2026-11-04",
+    customerFirstSeenOn: "2026-09-01",
+    customerPaidOrders: 4,
+    ...over,
+  });
+
+  it("counts a pending order as money in today, after PayPal's estimated fee", () => {
     const r = rows();
-    r.heldOrders = [{ id: "ord_1198", number: 1198, netCents: 54_672 }];
+    r.pendingOrders = [pending({})];
+    expect(day(r, TODAY)).toMatchObject({ expectedInCents: 25_645, heldInCents: 0, closingCents: 65_645 });
+  });
+
+  it("leaves a risky pending order out (shown as held) until the owner clears it, and always when it's on hold", () => {
+    const risky = pending({ id: "ord_1260", totalCents: 56_700, netCents: 54_672, customerFirstSeenOn: "2026-11-04", customerPaidOrders: 0 });
+    const r = rows();
+    r.pendingOrders = [risky];
     expect(day(r, TODAY)).toMatchObject({ heldInCents: 54_672, closingCents: 60_000 });
+    r.pendingOrders = [{ ...risky, cleared: true }];
+    expect(day(r, TODAY)).toMatchObject({ heldInCents: 0, closingCents: 114_672 });
+    r.pendingOrders = [pending({ riskHold: true })];
+    expect(day(r, TODAY)).toMatchObject({ heldInCents: 5_645, closingCents: 60_000 });
   });
 });
 

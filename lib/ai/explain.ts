@@ -83,3 +83,27 @@ export async function explainRegularPayment(payee: RecurringPayee, evidence: Pat
     return text && problemWith(text, allowedFrom([facts])) === null ? text : template;
   });
 }
+
+export interface RiskFacts {
+  orderNumber: number;
+  customerName: string;
+  amountCents: number;
+  flags: { kind: string; detail: string }[];
+}
+
+export function riskTemplate(r: RiskFacts): string {
+  return `Order #${r.orderNumber} from ${r.customerName}: ${r.flags.map((f) => f.detail).join(" ")}`;
+}
+
+const riskMemo = memo<string>();
+
+/** Why the risk check wants to hold an order, in one line. The flags themselves are code's; this only words them. */
+export async function explainRisk(r: RiskFacts, model: LanguageModel | null): Promise<string> {
+  const template = riskTemplate(r);
+  if (!model) return template;
+  const facts = { order: `#${r.orderNumber}`, customer: r.customerName, amount: formatDollars(r.amountCents), reasons: r.flags.map((f) => f.detail) };
+  return riskMemo(JSON.stringify(facts), async () => {
+    const text = await aiText(model, `${STYLE} Say why this order looks risky, calmly, without accusing the customer.`, JSON.stringify(facts));
+    return text && problemWith(text, allowedFrom([facts])) === null ? text : template;
+  });
+}

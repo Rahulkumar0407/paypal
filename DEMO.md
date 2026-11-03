@@ -6,8 +6,8 @@ these numbers; `lib/forecast/demo-story.test.ts` checks every one.
 
 - **Today:** Thu 5 Nov 2026 (`DEMO_TODAY=2026-11-05`). "Monday" in the story is Mon 9 Nov.
 - **Store:** Loop Audio, USD. Minimum balance **$100**. A day is **tight** below $150 (within $50 of the minimum).
-- **PayPal's fee:** 3.49% + $0.49 per capture, PayPal's published US rate. **This is an estimate** until P2's first
-  real sandbox capture (P2-3) confirms it.
+- **PayPal's fee:** 3.49% + $0.49 per capture, PayPal's published US rate. **Confirmed** by a real sandbox capture of
+  the $72 order on 3 Nov 2026: gross $72.00, fee $3.00, net $69.00.
 
 The judge script (step by step, with the buyer login) is added in P1-8 and P2-1.
 
@@ -160,7 +160,7 @@ The judges' sandbox buyer login: _P2 adds it here and on `/demo` (task P2-1)._
 | Step | Where | Do | Expect |
 |------|-------|----|--------|
 | 1 | Today (`/`) | Read the sentence on the green note. | "Clear until Wednesday. On Thu 12 Nov you'll be $90 short: the supplier order and rent land the same day." Thu 12 is the red $10 tile. |
-| 2 | Approvals | Open it. The reminder helper checks unfinished checkouts and the Guard decides each. | Maya's $72 reminder: **Approved**, and it appears under Sent reminders (Simulated) with a payment link. Hana's: **Blocked** (she didn't agree to contact). Sam's $119: **Needs your OK** (over $100). |
+| 2 | Approvals | Open it. The reminder helper checks unfinished checkouts and the risk check checks pending orders; the Guard decides each. | Maya's $72 reminder: **Approved**, and it appears under Sent reminders (Simulated) with a payment link. Hana's: **Blocked** (she didn't agree to contact). Waiting for your OK: Sam's $119 reminder, and holds on Jordan's $567, Isla's $894 and Sam's $119 orders (the risky ones, not counted in the forecast until you decide). |
 | 3 | Sent reminders | Open the payment link and pay as the test buyer. | The order is paid. $72.00 minus PayPal's $3.00 fee: $69.00 arrives. Today's sentence says Thu 12 Nov is $21 short. |
 | 4 | Sent reminders | Press **Send a follow-up** on Maya's reminder. | **Blocked**: "PayPal shows order #1258 already paid". Only rule 1 fails on its receipt. |
 | 5 | Fix the gap (`/fix`) | Pick **Set aside $11 a day**. | **Approved**. Thu 12 Nov closes at $156 and turns green; the sentence says clear for two weeks. |

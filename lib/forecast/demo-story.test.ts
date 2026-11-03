@@ -81,10 +81,10 @@ describe("story step 1: the forecast on Thu 5 Nov", () => {
     expect(buildHeadline(forecast()).text).toBe("Clear until Wednesday. On Thu 12 Nov you'll be $90 short: the supplier order and rent land the same day.");
   });
 
-  it("leaves the risky pending order out until PayPal captures it", () => {
+  it("leaves the two risky pending orders out of money in, and shows them as held for a risk check", () => {
     const seed = buildDemoSeed(STORE, TODAY, "run_x");
-    expect(seed.orders.filter((o) => o.status === "PENDING").map((o) => o.totalCents)).toEqual([56_700]);
-    expect(run().days[0]!.expectedInCents).toBe(27_250);
+    expect(seed.orders.filter((o) => o.status === "PENDING").map((o) => o.totalCents)).toEqual([56_700, 89_400]);
+    expect(run().days[0]).toMatchObject({ expectedInCents: 27_250, heldInCents: (56_700 - paypalFeeCents(56_700)) + (89_400 - paypalFeeCents(89_400)) });
   });
 });
 

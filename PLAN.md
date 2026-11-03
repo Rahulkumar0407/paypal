@@ -15,6 +15,32 @@ Status: `[ ]` not started, `[~]` in progress, `[x]` done (test run and passed).
 
 ---
 
+## Where things stand (Tue 3 Nov, night): read this first
+
+**P1's build tasks are in (P1-6 to P1-11, all pushed).** The forecast, Margin Guard, reminder helper, fix the gap,
+PayPal checkout and webhooks, Ask chat and the risk check are real code with 195 unit tests (`npm run check`).
+Next for P1: the 6-step click-through after P1-11 (Wed 4 Nov), then the design pass (P1-12).
+
+What P2 (and P2's agent) needs to know:
+- **PayPal sandbox works.** A US business sandbox app and a US personal buyer exist (P1 made them; keys are in P1's
+  local `.env`, never in git). One real sandbox payment went through on 3 Nov: $72.00 paid, $3.00 fee, $69.00 arrived,
+  exactly the `DEMO.md` numbers. Accounts must be **United States**: an India account gets "This seller doesn't accept
+  payments in your currency".
+- **P2-1:** send P1 the judges' buyer login (a separate US personal sandbox account) for `/demo` and `DEMO.md`.
+- **P2-2 Render, P2-3 switch PayPal on:** follow `SWITCH-ON.md` (env keys, webhook URL and the 4 events, a test
+  payment). `PAYPAL_FAKE` must stay unset on Render. Migrations: `npm run db:migrate`.
+- **Shared change:** `prisma/schema.prisma` gained `PaymentAttempt` (migration `20261103120000_payment_attempts`,
+  already applied to Supabase).
+- **P2-5:** `lib/store` `listRecentOrders`, `lib/forecast` `getForecast` / `getDues` / `listRecentPayments` and
+  `lib/guard` `listReceipts` are real now: build the dashboard and chart on them.
+- **P2-6:** `tests/e2e/smoke.spec.ts` (P2's file) has 8 failing checks from old wording: the "closes at $150" text
+  on Home, 6 sample receipts on `/receipts` (a fresh copy has none until something is decided), and the `/approvals`
+  and `/demo` headings. Update them to the current screens, then add the 6-step story with `PAYPAL_FAKE=1`.
+- **P2-7 README:** copy the AI section from `lib/ai/README.md` (default model `gemini-3.5-flash`; with no
+  `AI_MODEL` or key, every AI feature uses its plain fallback). Live Gemini hasn't been tried yet.
+- **Running locally:** `npm run dev`. Pages take seconds because the database is in Paris; on Render (Frankfurt) it
+  should be quick. Approvals runs the reminder helper and the risk check each time it opens.
+
 ## Decisions pending
 
 Agents: if your task is listed under "Blocks", stop and ask. Do not guess.
@@ -299,7 +325,12 @@ payment line, each with a template. Step 6 answers "Not yet: Mon 9 Nov ends at $
 - with the AI down, the recovery flow still completes using the template;
 - switching to OpenRouter by editing only `model.ts` has been shown working locally once.
 
-### [ ] P1-11 Risk check; extras only if time allows (was P4-3, P4-4; Mon 9 Nov)
+### [~] P1-11 Risk check; extras only if time allows (was P4-3, P4-4; Mon 9 Nov)
+_Status 3 Nov: built and unit-tested. Fixed rules (lib/shared/risk.ts) flag an unusual amount, a new buyer's big
+order and repeated failed attempts; a flagged order never counts as money in until the owner clears it (declines the
+hold), and Approvals proposes a HOLD_ORDER through the Guard with one line on why. Seed: Isla Moreno's $894 pending
+order added; store software went up from $89 to $99. Extras done: price-rise alert, slow-week warning, quiet when
+unsure. Every page opened without errors in fake mode. Left: the full 6-step click-through on /demo._
 - Flags for an unusual amount, a brand-new buyer with a big order, and repeated failed attempts. Each flag creates
   a HOLD_ORDER proposal through the Guard. Held orders don't count as expected money.
 - Saving the Settings form (`saveStoreSettings` in `lib/store`), so the minimum balance can be edited.

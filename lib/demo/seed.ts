@@ -79,7 +79,8 @@ const FIXED = [0] as const;
 const PAYEES: readonly PayeePlan[] = [
   { key: "volta", name: "Volta Audio Parts", label: "the supplier order", kind: "SUPPLIER", status: "DETECTED", typicalAmountCents: 30_000, cadence: "EVERY_N_DAYS", intervalDays: 10, paypalEmail: "orders@volta-audio-parts.example", pastJitterDollars: [4, -6, 12, 0, -9, 7, 0, -3, 5], category: "SUPPLIER" },
   { key: "rent", name: "Rent", label: "rent", kind: "BILL", status: "CONFIRMED", typicalAmountCents: 120_000, cadence: "MONTHLY", dayOfMonth: 12, pastJitterDollars: FIXED, category: "BILL" },
-  { key: "software", name: "Store software", label: "the store software bill", kind: "BILL", status: "CONFIRMED", typicalAmountCents: 9_900, cadence: "MONTHLY", dayOfMonth: 13, pastJitterDollars: FIXED, category: "BILL" },
+  // Store software went up: $89 for the last three months, $99 from Fri 13 Nov (the price-rise alert finds it).
+  { key: "software", name: "Store software", label: "the store software bill", kind: "BILL", status: "CONFIRMED", typicalAmountCents: 9_900, cadence: "MONTHLY", dayOfMonth: 13, pastJitterDollars: [-10], category: "BILL" },
   { key: "internet", name: "Internet", label: "the internet bill", kind: "BILL", status: "CONFIRMED", typicalAmountCents: 6_000, cadence: "MONTHLY", dayOfMonth: 3, pastJitterDollars: FIXED, category: "BILL" },
   { key: "shipping", name: "Shipping supplies", label: "the shipping supplies bill", kind: "BILL", status: "CONFIRMED", typicalAmountCents: 24_000, cadence: "MONTHLY", dayOfMonth: 30, pastJitterDollars: FIXED, category: "BILL" },
   { key: "loan", name: "Equipment loan", label: "the loan repayment", kind: "LOAN", status: "CONFIRMED", typicalAmountCents: 15_000, cadence: "MONTHLY", dayOfMonth: 25, pastJitterDollars: FIXED, category: "LOAN_REPAYMENT" },
@@ -246,6 +247,9 @@ export function buildDemoSeed(storeId: StoreId, today: IsoDate, demoRunId: strin
   const sam = DEMO_CUSTOMER_NAMES.length + 1;
   addCustomer(sam, "Sam Whitfield", true, yesterday);
   addOrder({ customerIndex: sam, date: yesterday, time: "21:10", lines: [{ key: "buds-pro", quantity: 1 }], status: "FAILED", failedAttempts: 3 });
+  // A regular customer suddenly ordering six over-ear headphones: an unusual amount for the risk check.
+  const isla = DEMO_CUSTOMER_NAMES.indexOf("Isla Moreno");
+  addOrder({ customerIndex: isla, date: yesterday, time: "22:41", lines: [{ key: "one", quantity: 6 }], status: "PENDING" });
 
   // --- Payees, past payments, future dues ------------------------------------
   const payees: Prisma.PayeeCreateManyInput[] = PAYEES.map((p) => ({

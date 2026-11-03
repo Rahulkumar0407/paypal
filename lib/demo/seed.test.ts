@@ -92,7 +92,7 @@ describe("buildDemoSeed", () => {
     }
     expect(balance).toBe(DEMO_STORE_SETTINGS.balanceAtStartOfTodayCents);
     expect(balance).toBe(198_756);
-    expect(store.openingBalanceCents).toBe(313_350);
+    expect(store.openingBalanceCents).toBe(310_350);
     expect(lowest).toBeGreaterThanOrEqual(DEMO_STORE_SETTINGS.minimumBalanceCents);
   });
 

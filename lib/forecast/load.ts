@@ -3,7 +3,8 @@ import type { Cents, IsoDate, StoreId } from "@/types";
 import { buildDemoSeed, ensureStore, paypalFeeCents, type DemoSeed } from "@/lib/demo";
 import { addDays } from "@/lib/shared/dates";
 import { getDb, isDatabaseConfigured } from "@/lib/shared/db";
-import { forecastFrom, inputFromRows, type StoreRows } from "./engine";
+import { typicalOrderCents } from "@/lib/shared/risk";
+import { forecastFrom, inputFromRows, type PendingOrder, type StoreRows } from "./engine";
 
 /**
  * Reads one store's rows for the forecast. Seven small queries in parallel, memoised for the length of one
@@ -13,7 +14,7 @@ import { forecastFrom, inputFromRows, type StoreRows } from "./engine";
 export async function readStoreRows(storeId: StoreId, today: IsoDate, retried = false): Promise<StoreRows> {
   if (!isDatabaseConfigured()) return rowsFromSeed(buildDemoSeed(storeId, today, "run_preview"));
   const db = getDb();
-  const [store, ledger, payees, dues, setAsides, gapLoans, held] = await Promise.all([
+  const [store, ledger, payees, dues, setAsides, gapLoans, pending, paid, cleared] = await Promise.all([
     db.store.findUnique({
       where: { id: storeId },
       select: { id: true, minimumBalanceCents: true, tightMarginCents: true, openingBalanceCents: true, openingBalanceOn: true },
@@ -26,7 +27,20 @@ export async function readStoreRows(storeId: StoreId, today: IsoDate, retried = 
     db.due.findMany({ where: { storeId } }),
     db.setAside.findMany({ where: { storeId, active: true } }),
     db.gapLoan.findMany({ where: { storeId } }),
-    db.order.findMany({ where: { storeId, status: "PENDING", riskHold: true }, select: { id: true, number: true, totalCents: true } }),
+    db.order.findMany({
+      where: { storeId, status: "PENDING" },
+      select: {
+        id: true,
+        number: true,
+        totalCents: true,
+        riskHold: true,
+        failedAttempts: true,
+        placedOn: true,
+        customer: { select: { firstSeenOn: true, _count: { select: { orders: { where: { status: "CAPTURED" } } } } } },
+      },
+    }),
+    db.order.findMany({ where: { storeId, status: "CAPTURED" }, select: { totalCents: true } }),
+    db.proposal.findMany({ where: { storeId, type: "HOLD_ORDER", status: "OWNER_REJECTED" }, select: { targetId: true } }),
   ]);
   if (!store) {
     // A new visitor's first page renders alongside the layout that creates their copy, so it may not exist yet.
@@ -35,15 +49,39 @@ export async function readStoreRows(storeId: StoreId, today: IsoDate, retried = 
     await ensureStore(storeId);
     return readStoreRows(storeId, today, true);
   }
-  return { store, ledger, payees, dues, setAsides, gapLoans, heldOrders: held.map(heldOrder) };
+  const clearedIds = new Set(cleared.map((c) => c.targetId));
+  return {
+    store,
+    ledger,
+    payees,
+    dues,
+    setAsides,
+    gapLoans,
+    pendingOrders: pending.map((o) =>
+      pendingOrder(o, { cleared: clearedIds.has(o.id), customerFirstSeenOn: o.customer.firstSeenOn, customerPaidOrders: o.customer._count.orders }),
+    ),
+    typicalOrderCents: typicalOrderCents(paid.map((o) => o.totalCents)),
+  };
 }
 
 /** `readStoreRows`, read once per server request. */
 export const loadStoreRows = cache((storeId: StoreId, today: IsoDate) => readStoreRows(storeId, today));
 
-function heldOrder(o: { id: string; number: number; totalCents: number }) {
+function pendingOrder(
+  o: { id: string; number: number; totalCents: number; riskHold?: boolean; failedAttempts?: number; placedOn: string },
+  extra: { cleared: boolean; customerFirstSeenOn: string; customerPaidOrders: number },
+): PendingOrder {
   // Not captured yet, so PayPal's fee is the published estimate.
-  return { id: o.id, number: o.number, netCents: o.totalCents - paypalFeeCents(o.totalCents) };
+  return {
+    id: o.id,
+    number: o.number,
+    totalCents: o.totalCents,
+    netCents: o.totalCents - paypalFeeCents(o.totalCents),
+    riskHold: o.riskHold ?? false,
+    failedAttempts: o.failedAttempts ?? 0,
+    placedOn: o.placedOn,
+    ...extra,
+  };
 }
 
 type RowOf<K extends keyof StoreRows> = StoreRows[K] extends readonly (infer R)[] ? R : never;
@@ -61,7 +99,14 @@ export function rowsFromSeed(seed: DemoSeed): SeedRows {
     dues: seed.dues,
     setAsides: [],
     gapLoans: [],
-    heldOrders: seed.orders.filter((o) => o.status === "PENDING" && o.riskHold).map(heldOrder),
+    pendingOrders: seed.orders
+      .filter((o) => o.status === "PENDING")
+      .map((o) => {
+        const customer = seed.customers.find((c) => c.id === o.customerId);
+        const paidBefore = seed.orders.filter((x) => x.customerId === o.customerId && x.status === "CAPTURED").length;
+        return pendingOrder(o, { cleared: false, customerFirstSeenOn: customer?.firstSeenOn ?? o.placedOn, customerPaidOrders: paidBefore });
+      }),
+    typicalOrderCents: typicalOrderCents(seed.orders.filter((o) => o.status === "CAPTURED").map((o) => o.totalCents)),
   };
 }
 

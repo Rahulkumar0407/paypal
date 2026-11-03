@@ -61,10 +61,14 @@ export function InboxList({ items, decide }: { items: InboxItem[]; decide?: Deci
             <p className="mt-2 text-[17px] leading-6 font-semibold text-ink">
               {ACTION_WORD[proposal.type]}: {proposal.target.label}
             </p>
+            {proposal.type === "HOLD_ORDER" && proposal.draftText ? <p className="mt-1 text-[15px] leading-6 text-ink">{proposal.draftText}</p> : null}
             <p className="mt-0.5 text-[15px] leading-6 text-ink-muted">
               {waiting ? "Waiting because: " : ""}
               {decision.headlineReason}
             </p>
+            {waiting && proposal.type === "HOLD_ORDER" ? (
+              <p className="mt-0.5 text-[14px] leading-5 text-ink-muted">Until you decide, its money isn&apos;t counted in your forecast.</p>
+            ) : null}
             {!waiting && !done && outcomeLine(receipt) ? <p className="mt-1 text-[15px] leading-6 text-ink">{outcomeLine(receipt)}</p> : null}
             <p className="mt-0.5 text-[13px] leading-5 text-ink-muted">
               Proposed by {proposerWord(proposal.proposedBy)} on {formatDay(proposal.demoDate)}
@@ -74,10 +78,10 @@ export function InboxList({ items, decide }: { items: InboxItem[]; decide?: Deci
               {waiting && decide ? (
                 <>
                   <Button onClick={() => choose(receipt.id, "approve")} disabled={pending !== null}>
-                    {pending?.id === receipt.id && pending.choice === "approve" ? "Approving" : "Approve"}
+                    {pending?.id === receipt.id && pending.choice === "approve" ? "Approving" : proposal.type === "HOLD_ORDER" ? "Hold it" : "Approve"}
                   </Button>
                   <Button variant="secondary" onClick={() => choose(receipt.id, "decline")} disabled={pending !== null}>
-                    {pending?.id === receipt.id && pending.choice === "decline" ? "Declining" : "Decline"}
+                    {pending?.id === receipt.id && pending.choice === "decline" ? "Declining" : proposal.type === "HOLD_ORDER" ? "It's fine, count it" : "Decline"}
                   </Button>
                 </>
               ) : null}

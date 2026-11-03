@@ -5,6 +5,7 @@ import { InboxList } from "@/components/app/InboxList";
 import { getVisitorStoreId } from "@/lib/demo";
 import { listInbox } from "@/lib/guard";
 import { listOutbox, runRecoveryAgent } from "@/lib/recovery";
+import { runRiskCheck } from "@/lib/risk";
 import { FollowUp } from "@/components/app/FollowUp";
 import { paypalSetup } from "@/components/app/PayPalStatus";
 import { decideEscalation, sendFollowUp } from "./actions";
@@ -19,6 +20,10 @@ export default async function ApprovalsPage() {
   // If it fails, the page still works: AI and agent failures are never app failures.
   await runRecoveryAgent(storeId).catch((error: unknown) => {
     console.error("[approvals] the reminder helper didn't run:", error instanceof Error ? error.message : error);
+  });
+  // Then the risk check: a hold for each order the rules flag, decided by the Guard like everything else.
+  await runRiskCheck(storeId).catch((error: unknown) => {
+    console.error("[approvals] the risk check didn't run:", error instanceof Error ? error.message : error);
   });
   const loaded = await Promise.all([listInbox(storeId), listOutbox(storeId)]).catch((error: unknown) => {
     console.error("[approvals] could not load the inbox:", error instanceof Error ? error.message : error);
