@@ -1,6 +1,6 @@
 # components/ask/
 
-**Owner:** Person 4. Task P4-1.
+**Owner:** Person 1. Task P1-10.
 
 **What goes here:** the Ask chat UI (client component) that talks to `app/api/ai`. Answers show the calculated
 facts under the sentence, labelled by what they are ("Worked out from your forecast"), never "AI-powered".

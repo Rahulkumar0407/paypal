@@ -6,10 +6,10 @@ store id with `getVisitorStoreId()` (lib/demo), call the module, return JSON.
 | Route | Owner | Now |
 |-------|-------|-----|
 | `GET /api/health` | Person 1 | Real: one `SELECT 1`. The uptime pinger opens it every 10 minutes (keeps Render awake, Supabase from pausing). Also answers HEAD |
-| `POST /api/demo/reset` | Person 3 | Real: resets the calling visitor's copy, redirects to `/demo`. The `/demo` page itself resets through a server action that calls the same `resetStore` |
-| `GET /api/forecast` | Person 3 | Stub data |
-| `GET /api/recovery` | Person 3 | Stub data |
-| `GET` / `POST /api/guard` | Person 2 | GET stub data; POST returns 501 until P2-3 |
-| `POST /api/paypal/webhook` | Person 2 | 501 until P2-2 (excluded from the visitor cookie in `proxy.ts`) |
-| `POST /api/ai` | Person 4 | Stub answer; validates `{ question }` |
-| `GET /api/risk` | Person 4 | Stub data |
+| `POST /api/demo/reset` | Person 1 | Real: resets the calling visitor's copy, redirects to `/demo`. The `/demo` page itself resets through a server action that calls the same `resetStore` |
+| `GET /api/forecast` | Person 1 | Stub data |
+| `GET /api/recovery` | Person 1 | Stub data |
+| `GET` / `POST /api/guard` | Person 1 | GET stub data; POST returns 501 until P1-7 |
+| `POST /api/paypal/webhook` | Person 1 | 501 until P1-9 (excluded from the visitor cookie in `proxy.ts`) |
+| `POST /api/ai` | Person 1 | Stub answer; validates `{ question }` |
+| `GET /api/risk` | Person 1 | Stub data |

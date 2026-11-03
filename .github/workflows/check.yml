@@ -1,4 +1,4 @@
-# Owner: Person 2. Runs `npm run check` (lint, typecheck, unit tests) on every pull request and on main.
+# Owner: Person 1. Runs `npm run check` (lint, typecheck, unit tests) on every push to main, and on pull requests.
 name: check
 
 on:

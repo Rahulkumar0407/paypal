@@ -1,6 +1,6 @@
 # lib/demo/
 
-**Owner:** Person 3. Foundation version by Person 1: copies and reset work; Person 3 tunes the numbers (P3-0).
+**Owner:** Person 1. Copies and reset work since the foundation; P1-6 and P1-8 tune the numbers.
 
 **What goes here:** the SIMULATED Loop Audio demo store, one private copy per visitor, and reset.
 

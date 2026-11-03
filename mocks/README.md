@@ -1,7 +1,6 @@
 # mocks/
 
-**Owner:** each file belongs to the owner of the module it fakes: `forecast.ts`, `fixes.ts`, `recovery.ts` (Person 3);
-`guard.ts`, `store.ts` (Person 2); `risk.ts`, `ask.ts` (Person 4).
+**Owner:** Person 1 (every file).
 
 **What goes here:** FAKE data the module stubs return until the real modules land, and the `/design` page uses.
 The numbers tell the demo story: $90 short on Thu 12 Nov; $21 short after the $72 order is paid ($69 after

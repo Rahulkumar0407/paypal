@@ -1,6 +1,6 @@
 # lib/risk/
 
-**Owner:** Person 4. Tasks P4-3 (risk check) and P4-4 (extras).
+**Owner:** Person 1. Task P1-11 (risk check; extras only if time allows).
 
 **What goes here:** deterministic risk flags (unusual amount, brand-new buyer with a big order, repeated failed
 attempts) that PROPOSE `HOLD_ORDER` through the Guard, and the extras: price-rise alert, slow-week warning,

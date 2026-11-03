@@ -1,6 +1,6 @@
 # lib/ai/
 
-**Owner:** Person 4. Tasks P4-1 (Ask chat), P4-2 (explanations, reminder drafts), P4-6 (this README's AI section for the main README).
+**Owner:** Person 1. Task P1-10 (Ask chat, explanations, reminder drafts). Person 2 copies the AI section into the main README (P2-7).
 
 **What goes here:** everything that calls a language model. AI never calculates money and never calls PayPal
 (AGENTS.md sections 3 and 5). Every function falls back to calculated numbers or a template when the model fails.

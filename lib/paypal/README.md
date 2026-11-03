@@ -1,6 +1,6 @@
 # lib/paypal/
 
-**Owner:** Person 2. Tasks P2-1 (checkout) and P2-2 (webhooks). Rules: AGENTS.md section 6.
+**Owner:** Person 1. Task P1-9 (checkout and webhooks; Person 2 switches it on in P2-3). Rules: AGENTS.md section 6.
 
 **What goes here:** the ONE file that talks to PayPal, `client.ts`. Sandbox only. Every call that creates or changes
 something sends `PayPal-Request-Id`. ESLint only lets `lib/guard`, `app/api/paypal` and `app/store` import this module.

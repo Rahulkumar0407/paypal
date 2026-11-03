@@ -1,6 +1,6 @@
 # lib/guard/
 
-**Owner:** Person 2. Task P2-3. Rules and semantics: AGENTS.md section 4.
+**Owner:** Person 1. Task P1-7. Rules and semantics: AGENTS.md section 4.
 
 **What goes here:** the Margin Guard (8 deterministic rules, no AI), receipts (append-only), the approval inbox, and
 the executor: the only code that carries out actions, and one of the few allowed to import `@/lib/paypal`.

@@ -21,7 +21,7 @@ Tasks, owners, decisions and status live in `PLAN.md`.
 
 ## 1. Start of every session
 
-1. **Know who you work for.** The team is four people, P1 to P4 (section 10). If you were not told which person
+1. **Know who you work for.** The team is two people, P1 and P2 (section 10). If you were not told which person
    you are working for, ask before doing anything else. You may only change files in that person's folders.
 2. **Pick one task.** Open `PLAN.md`, find the current task, and work on that task only. If it depends on an item
    under "Decisions pending" in `PLAN.md`, stop and ask.
@@ -81,8 +81,6 @@ Should-have:
 9. **Extras.** Price-rise alert on a bill; "quiet when unsure" (no alert when confidence is low); owner's minimum
    balance; slow-week warning; a short setup form (what you sell, how you pay suppliers, busy seasons).
 
-If time allows: reconciliation of orders against PayPal payments.
-
 ### The demo story (must work end to end on the hosted link)
 
 1. Today (Thu 5 Nov 2026) the forecast shows about $90 short on Thu 12 Nov: the supplier order and rent land the
@@ -128,7 +126,7 @@ If time allows: reconciliation of orders against PayPal payments.
 
 ## 4. Margin Guard
 
-Lives in `lib/guard/` (P2). Plain TypeScript. No AI. Fully unit-tested.
+Lives in `lib/guard/` (P1). Plain TypeScript. No AI. Fully unit-tested.
 
 ### Action types
 
@@ -218,10 +216,13 @@ never edited in. A receipt holds:
 - **Runs without keys.** With no sandbox keys the app still works: pages show "PayPal isn't set up yet"
   (`components/app/PayPalStatus.tsx`), checkout is switched off, and nothing calls PayPal. `PAYPAL_FAKE=1` keeps
   the fake PayPal mode for tests and offline demos; it is refused in production.
+- **Switches on by itself.** P1 builds checkout and webhooks against fake mode first. Once `PAYPAL_CLIENT_ID` and
+  `PAYPAL_CLIENT_SECRET` are set, the same code uses the real sandbox, with no code change. `SWITCH-ON.md` has the
+  exact steps P2 follows (keys, webhook registration, one real test payment).
 - **APIs:** Orders v2 (create, get, capture), Webhooks with signature verification, Payments (refund),
   Payouts (paying the supplier).
 - **One file.** All PayPal HTTP calls live in `lib/paypal/client.ts`: the official SDK or a small typed REST
-  wrapper (P2 decides in task P2-1).
+  wrapper (P1 decides in task P1-9).
 - **Agent Toolkit: optional.** If it fits cleanly, it may be used only as a plain library behind
   `lib/paypal/client.ts`, called by the Guard's executor. Never hand its tools to an LLM. If it doesn't fit, skip
   it.
@@ -360,9 +361,7 @@ Every screen and every module component has a real empty state, loading state an
 - **Tables and charts:** AG Grid Community for tables, AG Charts Community for the forecast chart. Both are
   hackathon sponsors (AG Grid has the biggest sponsor prize), so use them meaningfully and style them in our
   design. Never import `ag-grid-enterprise`, `ag-charts-enterprise` or enterprise-only features.
-- **Bryntum (optional):** a hackathon sponsor with its own prize. It is the last, optional task (`PLAN.md`,
-  P2-6) and is used only with a hackathon licence. Without one, we build the laptop calendar ourselves.
-- **Heavy libraries stay off the phone.** AG Grid, AG Charts and Bryntum are laptop-only: load them with dynamic
+- **Heavy libraries stay off the phone.** AG Grid and AG Charts are laptop-only: load them with dynamic
   import on their own routes, never on phone screens.
 - **Tests:** Vitest for unit tests, Playwright for the end-to-end demo test.
 - **Hosting:** Render web service in Frankfurt (moved to a paid plan before judging, so it never sleeps). Database
@@ -384,7 +383,7 @@ Every screen and every module component has a real empty state, loading state an
   (`@/lib/shared/money`). That keeps the database client out of browser bundles.
 - **Stubs and mocks.** Until a module is real, its `index.ts` returns fake data from `mocks/`, marked
   `TODO(Person N)`. Replace the stub body, keep the signature. If a signature must change, that is a `types/`
-  change: hand it to P2.
+  change: tell the other person first (section 10).
 - **Store-scoped data.** Every table that holds store data has a `storeId` column.
 - **Environment.** Read env only through `lib/shared/env.ts` (zod-validated). Secrets only in `.env` (gitignored).
   `.env.example` lists every key with no real values.
@@ -419,23 +418,22 @@ OPENROUTER_API_KEY=             # only if we switch provider
 
 | Owner | Folders and files |
 |-------|-------------------|
-| **P1 (Diwakar)** | `app/` (pages, layouts, global styles and design tokens, `app/(owner)/demo/`, `app/design/`, `app/api/health/`, any API route not listed below), except the paths owned by others. `components/` except the folders owned by others (this includes `components/ui/` and `components/app/`). `public/` (PWA manifest, icons, service worker). `proxy.ts` (sets the visitor cookie). |
-| **P2** | `lib/paypal/`, `lib/guard/`, `lib/store/` (catalogue, orders, settings reads), `components/calendar/` (laptop calendar: Bryntum or our own), `app/store/` (buyer-facing store and checkout pages), `app/api/paypal/`, `app/api/guard/`, `README.md`, `.github/` (CI), the Render deploy. Reviews PRs into `main` when asked. |
-| **P3** | `lib/forecast/` (incl. payment detection and fix-the-gap maths), `lib/recovery/`, `lib/demo/` (seed, per-visitor copies, reset), `app/api/forecast/`, `app/api/recovery/`, `app/api/demo/`, `tests/e2e/`, `playwright.config.ts`, `DEMO.md`. |
-| **P4** | `lib/ai/`, `lib/risk/` (risk check and extras), `components/dashboard/` (AG Grid), `components/charts/` (AG Charts), `components/ask/` (chat UI), `app/api/ai/`, `app/api/risk/`. |
-| **Shared** | `types/`, `prisma/` (`prisma/seed.ts` only calls `lib/demo`), `lib/shared/` (db client, clock, dates, money, env, visitor cookie), `package.json`, `package-lock.json`, `.env.example`, root config files (`tsconfig.json`, `next.config.ts`, `eslint.config.mjs`, `vitest.config.mts`, `prisma.config.ts`), `LICENSE`, `CONTRIBUTING.md`, `.gitignore`, `.nvmrc`. P1 creates them in the foundation; after that, changes go through P2. |
-| **Mocks** | `mocks/<file>.ts` belongs to the owner of the module it fakes: `forecast.ts`, `fixes.ts`, `recovery.ts` (P3); `guard.ts`, `store.ts` (P2); `risk.ts`, `ask.ts` (P4). `mocks/mocks.test.ts` keeps the fake story numbers honest; update it with your mock. |
+| **P1 (Diwakar)** | Everything not listed for P2 or as shared below: `app/` (including `app/store/` and every API route), `components/` (except `dashboard/` and `charts/`), `public/`, `proxy.ts`, every `lib/` module (`forecast`, `guard`, `recovery`, `demo`, `paypal`, `store`, `ai`, `risk`, `shared`), `mocks/`, `DEMO.md`, `SWITCH-ON.md`, `.github/` (CI), `package.json`, `package-lock.json`, `.env.example`, the root config files, `playwright.config.ts`, `CONTRIBUTING.md`, `LICENSE`, `.gitignore`, `.nvmrc`. |
+| **P2 (name to add, any AI agent)** | `components/dashboard/` (AG Grid), `components/charts/` (AG Charts), `tests/e2e/`, `README.md`, and all deployment settings: the Render service and its environment variables, the uptime pinger, and the PayPal sandbox app and accounts. |
+| **Shared** | `types/` and `prisma/`. Whoever changes one tells the other person first. |
+| **Mocks** | `mocks/` belongs to P1. `mocks/mocks.test.ts` keeps the fake story numbers honest; update it with your mock. |
 | **Never edit** | `generated/` (Prisma client output), `node_modules/`, `.next/`. |
-| **Team** | `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `PLAN.md`. Change only when the team agrees. Ticking your own task's status in `PLAN.md` is fine. `CLAUDE.md` and `GEMINI.md` only import this file; put no rules there. |
+| **Team** | `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `PLAN.md`. Change only when both agree. Ticking your own task's status in `PLAN.md` is fine. `CLAUDE.md` and `GEMINI.md` only import this file; put no rules there. |
 
 - **Only change files in the current person's folders.** If anything outside them is needed, stop and say exactly
   which file, what change, and why.
 - **Foundation exception.** During P1's foundation task only, P1 creates the skeleton in every folder, including
   stub `index.ts` files that return fake typed data. Once the foundation is merged, each folder belongs to its
   owner.
-- **Shared files.** To change one after the foundation, write the exact change and the reason, and hand it to P2.
+- **Shared files** (`types/`, `prisma/`). Whoever changes one tells the other person first, in chat, with the exact
+  change and why.
 - **Dependencies.** The foundation installs every library in the stack. Need another one? Stop and say which and
-  why (`package.json` is shared).
+  why (`package.json` belongs to P1; tell P2 when one is added).
 
 ---
 
@@ -448,11 +446,15 @@ OPENROUTER_API_KEY=             # only if we switch provider
   3. give exact steps to test it by hand: URL, what to click, what to expect, with amounts;
   4. stop and wait.
 - **Never claim something works without running it.** If you could not run something, say so plainly.
-- **Git.** Anyone may push straight to `main` when their work is ready, as long as it doesn't conflict: first pull
-  the latest `main` (if that brings a conflict in someone else's files, stop and ask their owner rather than
-  resolving it yourself), then run `npm run check`, and push only if it passes. `main` must always pass `npm run check` and deploy. A branch
-  (`p<person>/<task-id>-<short-name>`, for example `p3/P3-1-forecast`) and a PR are still welcome for bigger or
-  risky changes, or when you want a review.
+- **Git.** We work one after the other, never at the same time, and both push straight to `main`. No branches or
+  pull requests are needed.
+  - Before starting any work: `git pull` on `main`.
+  - Before pushing: run `npm run check`, and push only if it passes. GitHub runs the same check on every push to
+    `main`, so `main` always passes `npm run check` and deploys.
+  - Never force-push, and never rewrite `main`'s history (no amending or squashing commits that are already pushed).
+  - If a push is rejected because the other person pushed first: pull, fix any conflict, run `npm run check`
+    again, then push.
+  - Tell the other person in chat when you start and when you've pushed, so you never work at the same time.
 - **No co-authors, ever.** Never add `Co-authored-by` trailers, "Generated with" lines or any other AI or tool
   attribution to commit messages or PR descriptions in this project.
 

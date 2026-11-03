@@ -2,12 +2,14 @@
 
 - **Deadline:** Thu 12 Nov 2026, 12:00pm PST, which is 1:30am Fri 13 Nov in India. **We submit by Wed 11 Nov
   night (IST).** Thu 12 Nov is emergency buffer only.
-- **Today:** Sun 1 Nov 2026.
+- **Today:** Tue 3 Nov 2026.
+- **Team:** two people (D13). P1 (Diwakar, Claude Code) builds the app. P2 (name to add, any AI agent) takes it
+  live and finishes it. We work one after the other, never at the same time (AGENTS.md section 11).
 - **Judging:** reportedly 1 to 15 Dec 2026 (third-party listing; confirm on Devpost). The app must stay up until
   judging ends.
 - **Judged on:** Technological Implementation, Design, Potential Impact, Innovation/Idea, Presentation.
 - **Rules:** `AGENTS.md`. One task at a time. A task is done only when its "Done when" test has been **run and
-  passed**, and the result is posted in the PR or the commit message.
+  passed**, and the result is written in the commit message.
 
 Status: `[ ]` not started, `[~]` in progress, `[x]` done (test run and passed).
 
@@ -19,9 +21,9 @@ Agents: if your task is listed under "Blocks", stop and ask. Do not guess.
 
 | ID | Decision | Blocks |
 |----|----------|--------|
-| D10 | Names of the owners of T-1 (Devpost entry and video), T-2 (cold test) and T-3 (keeping the app running, including moving Render to a paid plan). The instructions had placeholders instead of names. | T-1, T-2, T-3 |
-| D11 | Does Bryntum offer a hackathon licence? (P2-6a asks.) | P2-6b |
-| D12 | Which coding agents P2 to P4 use (the instructions had a placeholder). Add a shim for any that doesn't read `AGENTS.md`. | Nothing |
+| D15 | Person 2's name (the instructions had a placeholder). | Nothing |
+
+D10 (owners of the team tasks), D11 (Bryntum licence) and D12 (which agents P2 to P4 use) are closed by D13 and D14.
 
 ## Decisions made (1 Nov 2026)
 
@@ -29,14 +31,22 @@ Agents: if your task is listed under "Blocks", stop and ask. Do not guess.
 |----|----------|
 | D1 | `DEMO_TODAY` is Thu 5 Nov 2026. "Monday" in the story is Mon 9 Nov. |
 | D2 | The seed includes the owner's regular transfers from PayPal to their bank. A set-aside keeps $X a day of those in PayPal until the due date, so the 12th genuinely becomes covered. |
-| D3 | Bryntum is a sponsor with its own prize, but optional: the last task, and only with a hackathon licence. Without one, we build the laptop calendar ourselves. AG Grid and AG Charts: our choice, Community editions (AG Grid has the biggest sponsor prize). |
+| D3 | (Bryntum part replaced by D14.) Bryntum is a sponsor with its own prize, but optional: the last task, and only with a hackathon licence. Without one, we build the laptop calendar ourselves. AG Grid and AG Charts: our choice, Community editions (AG Grid has the biggest sponsor prize). |
 | D4 | Reminders go to a simulated outbox labelled "Simulated", showing the message and the live PayPal sandbox checkout link. The judge clicks it and pays as the sandbox buyer. |
 | D5 | Each visitor gets their own copy of Loop Audio, with its own reset. |
-| D6 | Database: Supabase Postgres. Prisma uses the pooled URL for the app and the direct URL for migrations. Supabase in Paris (`eu-west-3`). A free uptime pinger opens `/api/health` every 10 minutes, which keeps Render awake and stops Supabase pausing the project. Web service: Render in Frankfurt, moved to a paid plan before judging (T-3). |
+| D6 | Database: Supabase Postgres. Prisma uses the pooled URL for the app and the direct URL for migrations. Supabase in Paris (`eu-west-3`). A free uptime pinger opens `/api/health` every 10 minutes, which keeps Render awake and stops Supabase pausing the project. Web service: Render in Frankfurt, moved to a paid plan before judging (P2-4). |
 | D7 | Money in counts what actually arrives after PayPal's fee. The seed is tuned so the story numbers still work. |
 | D8 | Official rules confirmed (top of `AGENTS.md`). No specific PayPal product is required. "AI never calls PayPal" stays. The Agent Toolkit is optional: only as a library behind `lib/paypal`, called by the Guard's executor, and only if it fits. |
 | D9 | P1 uses Claude Code. `GEMINI.md` points to `AGENTS.md`. |
 | (first review) | All additions approved: red for short, amber for tight; money in whole cents; code-built sentences; contrast fixes; P3-0 first; fake PayPal mode; checks on every PR; Ask chat as a must-have. Also: the laptop view must look finished in the same style; phone-first stays for the owner's daily view. |
+
+## Decisions made (3 Nov 2026)
+
+| ID | Decision |
+|----|----------|
+| D13 | The team is two people. P1 builds the app: everything Persons 3 and 4 had, plus the Margin Guard and the PayPal code from P2. P2 takes it live and finishes it: PayPal sandbox setup, Render, switching PayPal on, the uptime pinger and paid plan, the AG Grid dashboard and AG Charts chart, the live end-to-end test, the README, the Devpost entry and the video. Folder ownership follows (AGENTS.md section 10). |
+| D14 | Cut: the Bryntum calendar and reconciliation of orders against PayPal payments. The money calendar from P1-4 is the only calendar. |
+| D16 | Git: both push straight to `main`, one after the other. Pull before starting, run `npm run check` before pushing, never force-push or rewrite `main`'s history, and say in chat when you start and when you've pushed. GitHub runs the check on every push to `main`. |
 
 ---
 
@@ -44,20 +54,22 @@ Agents: if your task is listed under "Blocks", stop and ask. Do not guess.
 
 | Date | Milestone |
 |------|-----------|
-| Mon 2 Nov | **M0** Foundation live: Render web service, Supabase database, placeholder pages, a private copy per visitor, typed stubs. Types signed off by all four. |
-| Thu 5 Nov | **M1** Real modules replace stubs. Story step 1 (the $90 gap) shows on Render. |
-| Sat 7 Nov | **M2** Story steps 1 to 4 work on Render with a real sandbox payment. |
-| Mon 9 Nov | **M3** Story steps 1 to 6 work on Render, on phone and laptop. Feature freeze. |
-| Tue 10 Nov | **M4** Design pass done at both widths. E2E test green. `README.md` and `DEMO.md` complete. Draft video recorded. Cold judge test in the evening (T-2). |
-| Wed 11 Nov | **M5** Cold-test fixes by midday, then code freeze. Final video uploaded. **Devpost entry submitted by night (IST).** |
+| Mon 2 Nov | **M0** Foundation, every screen on stubs, demo guide and installable app (done). |
+| Wed 4 Nov | **M1** P1: real forecast and regular payment detection. Story step 1 (the $90 gap) shows from real maths. |
+| Thu 5 Nov | **M2** P1: real Margin Guard with receipts and tests. |
+| Fri 6 Nov | **M3** P1: Recovery agent, fix-the-gap maths and reset are real. Story steps 1, 2, 4 and 5 work locally. |
+| Sat 7 Nov | **M4** P1: checkout, store page and webhooks work in fake PayPal mode; `SWITCH-ON.md` is ready. P2: sandbox app, keys and the judges' buyer account exist. |
+| Sun 8 Nov | **M5** P2: Render is live, PayPal is switched on, and one real sandbox payment worked end to end. P1: Ask chat works. |
+| Mon 9 Nov | **M6** P1: risk check. Story steps 1 to 6 work on Render, on phone and laptop. Feature freeze. P2: dashboard and chart. |
+| Tue 10 Nov | **M7** P1: design pass at both widths. P2: end-to-end test green on the live link, README done, draft video. Cold test in the evening (T-2). |
+| Wed 11 Nov | **M8** Cold-test fixes by midday, then code freeze. Final video uploaded. **Devpost entry submitted by night (IST).** |
 | Thu 12 Nov | Emergency buffer only. The deadline is 1:30am Fri 13 Nov IST. |
-
-Until M0 lands, P2 to P4 work on pure functions and tests against the draft types, and on account setup: PayPal
-sandbox app and webhook (P2), the demo numbers (P3), the Gemini key and model choice (P4).
 
 ---
 
-## Person 1 (Diwakar): app, components, PWA, demo page
+## Person 1 (Diwakar): builds the app
+
+Done or nearly done (foundation, screens, demo guide):
 
 ### [x] P1-1 Setup (Sun 1 to Mon 2 Nov)
 _Status 2 Nov: done. Checked on a fresh clone on a second laptop: the repo is public and GitHub detects the MIT
@@ -80,33 +92,33 @@ lib/paypal fails lint._
 _Status 1 Nov: built and tested against a local Postgres: migration applies; `db:reset` twice gives identical
 data (753 rows, new run id); two browsers get two store ids and their own copies; resetting one copy leaves the
 other alone; `/api/health` queries the database; `npm run build` and `npm start` work. The seed is the full
-simulated history, not a placeholder (P3 tunes it). Status 2 Nov: the Supabase project is connected (`/api/health`
-reports the database OK). The Render deploy moved to P2 (P2-5). Left: the types/ sign-off from P2, P3 and P4._
+simulated history, not a placeholder (P1-6 tunes it). Status 2 Nov: the Supabase project is connected (`/api/health`
+reports the database OK). The Render deploy moved to P2 (P2-5). Left: P2 reads and agrees the `types/` shapes._
 - Folders per `AGENTS.md` section 10.
 - A Supabase project, and a Prisma schema (store-scoped) using the pooled URL at runtime and the direct URL for
   migrations, plus the first migration.
 - `types/` with every shape that crosses modules.
 - `lib/shared/` (db, clock, money, env).
 - A stub `index.ts` in every `lib/` module returning fake typed data.
-- A placeholder seed (P3 replaces it).
+- A placeholder seed (P1-6 and P1-8 replace it).
 - Request middleware that gives each new visitor a cookie and their own copy of the placeholder seed (through a
   `lib/demo` stub).
 - `/api/health`, which runs a real database query.
 - Placeholder pages.
-- The Render web service moved to P2 (task P2-5).
+- The Render web service moved to P2 (task P2-2).
 
 **Done when:**
-- the Render URL loads every placeholder page with fake data, on a phone and on a laptop (once P2 has deployed it);
+- the Render URL loads every placeholder page with fake data, on a phone and on a laptop (once P2 has deployed it, P2-2);
 - `/api/health` returns OK after a real database query;
 - migrations run over the direct URL and the app runs over the pooled URL;
 - two different browsers get two different `storeId`s;
 - `npm run check` passes on `main`;
-- P2, P3 and P4 have each approved the `types/` shapes for their module in the PR.
+- P2 has read and agreed the `types/` shapes.
 
 ### [~] P1-3 Design system and `/design` (Tue 3 to Wed 4 Nov)
 _Status 1 Nov: built early with the foundation. Fraunces chosen (Instrument Serif was tried first); the palette is locked in
 `app/globals.css`; `/design` shows every element and the real screens at 390px and 1280px; contrast was
-calculated for every pairing. Left: the team's review of the look, and a check with reduced motion switched on in
+calculated for every pairing. Left: P2's review of the look, and a check with reduced motion switched on in
 a real browser._
 - Colour, type and spacing tokens.
 - Pick the serif and record it in `AGENTS.md` section 7.
@@ -127,16 +139,16 @@ And no meaning colour is used as small text on white (checked with a contrast to
 _Status 2 Nov: built on the module stubs, each at 390px and 1440px with empty, loading and error states: Home, Dues,
 Fix the gap (`/fix`, sends a fix to the Guard and shows the referee card), Approvals (Approve / Decline and what
 happened), Receipts (newest first, filter, single receipt view) and the Settings form. Still fake: Guard decisions
-and fixes come from mocks and nothing is saved yet. Needs P3-2 (move the fix-to-proposal code from
-`app/(owner)/fix/actions.ts` into lib/forecast), P2-3 (saved receipts and inbox) and a `saveStoreSettings` in
-lib/store. Left: story steps 1 and 5 on the real modules, then the Done-when checks._
+and fixes come from mocks and nothing is saved yet. Needs P1-8 (move the fix-to-proposal code from
+`app/(owner)/fix/actions.ts` into lib/forecast), P1-7 (saved receipts and inbox) and a `saveStoreSettings` in
+lib/store (P1-11). Left: story steps 1 and 5 on the real modules, then the Done-when checks._
 - Home: headline, strip, next dues with how much is ready.
-- Money calendar, at both widths. This is the required laptop calendar; P2-6 is an optional extra.
+- Money calendar, at both widths.
 - Detected payments ("We think Volta is paid ~$300 every 10 days", confirm once).
 - Fix-the-gap sheet.
 - Approval inbox with referee cards, approve and reject, and receipt view.
 - Simulated outbox.
-- Ask page (hosts P4's chat component).
+- Ask page (hosts the chat from P1-10).
 - Settings and setup form, including minimum balance.
 
 **Done when:**
@@ -147,10 +159,10 @@ lib/store. Left: story steps 1 and 5 on the real modules, then the Done-when che
 
 ### [~] P1-5 PWA and demo guide (Sun 8 Nov)
 _Status 2 Nov: built early. `/demo` has the intro, the six story steps (what to do, what you'll see, a link, and a
-Simulated / PayPal sandbox label), the sandbox buyer login placeholder (`SANDBOX_BUYER`, TODO Person 2) and a reset
+Simulated / PayPal sandbox label), the sandbox buyer login placeholder (`SANDBOX_BUYER`, filled in from P2-1) and a reset
 that confirms in place (tested against Supabase). PWA: manifest, banknote-medallion icons, full-screen on iPhone, and
 a service worker that only serves an offline page. Checked on a local production build. Left: install on the Render
-URL, the buyer login from P2, and the cold teammate test._
+URL (P2-2), the buyer login (P2-1), and the cold test (T-2)._
 - Manifest, icons, and a service worker that never caches API or data responses.
 - `/demo` shows the demo date and a "Reset my copy" button. It walks through the 6 story steps, shows the sandbox
   buyer login, and links to the store page and the outbox.
@@ -161,53 +173,35 @@ URL, the buyer login from P2, and the cold teammate test._
 - a reset in one browser leaves another browser's copy unchanged;
 - a teammate who hasn't seen the app completes the 6 steps using only `/demo`.
 
-### [ ] P1-6 Design pass (Tue 10 Nov)
-Every screen at 390px and 1280px: voice, states, motion, "Simulated" labels, labelled charts. The laptop view gets
-the same care as the phone.
+Then, in this order:
 
-**Done when:**
-- the PR has screenshots of every screen at both widths;
-- a search of UI strings finds no `!`, emoji, "unlock", "seamless", "supercharge" or "AI-powered";
-- every screen's empty, loading and error state has been seen in the browser.
+### [ ] P1-6 Forecast and regular payment detection (was P3-0, P3-1; Tue 3 to Wed 4 Nov)
+- **Demo numbers** in `DEMO.md`, for `DEMO_TODAY` Thu 5 Nov 2026: opening balance; about 8 weeks of sales history
+  with a weekday pattern; the owner's regular transfers to their bank; Volta's payments and the bills with their
+  dates (Volta and rent both on Thu 12 Nov); the abandoned $72 checkout; one risky order and one customer who has
+  not consented; the expected numbers at every story step. Until P2's first real sandbox capture, use PayPal's
+  published fee (`paypalFeeCents`) and mark it as an estimate.
+- Deterministic recurring-payee detection (Volta, bills, and the owner's bank transfers).
+- A forecast from weekday averages (net of fees) minus known money out, with a daily balance, the first shortfall
+  and a confidence level.
+- Exposes `simulate(action)` for Guard rule 6, `canAfford(amount, date)` for Ask chat, and fix-the-gap inputs.
 
----
+**Done when** a hand calculation in `DEMO.md` shows about $90 short on Thu 12 Nov, what the $72 payment nets after
+PayPal's fee and the gap left, a set-aside within the 30% cap with a total of $100 or less that covers the 12th,
+and the exact answer to "Can I afford a $200 order on Monday?" (Mon 9 Nov). And unit tests show:
+- the seed history detects Volta at about $300 every 10 days, and the owner's transfers;
+- the demo seed's first shortfall is Thu 12 Nov at the `DEMO.md` amount;
+- `canAfford($200, Mon 9 Nov)` matches the strip's numbers;
+- a sparse-history fixture gives low confidence;
+- removing a due moves or clears the shortfall.
 
-## Person 2: PayPal, Margin Guard, Render deploy, README, CI
-
-### [ ] P2-1 PayPal client, checkout and store page (Mon 2 to Wed 4 Nov)
-- `lib/paypal/client.ts`: OAuth, Orders v2 (create, get, capture), refund, Payouts, webhook signature verification.
-- Decide between the official SDK and a typed REST wrapper, and whether the Agent Toolkit fits behind it (D8).
-- Orders carry the visitor's `storeId` in `custom_id`. Captures record gross, fee and net.
-- A fake mode (`PAYPAL_FAKE=1`, refused in production) so the e2e test can complete a checkout without PayPal's
-  login page.
-- `/store`: a buyer-facing Loop Audio page with PayPal checkout, plus return and cancel routes.
-- Send P3 the real fee from a $72 sandbox capture for the demo numbers.
-
-**Done when:**
-- unit tests (mocked fetch) show a `PayPal-Request-Id` on every write call;
-- a non-sandbox base URL throws;
-- fake mode throws when `NODE_ENV=production`;
-- on Render, a sandbox buyer pays on `/store` and the database shows the order captured, with its PayPal order and
-  capture IDs and the gross, fee and net amounts.
-
-### [ ] P2-2 Webhooks (Wed 4 to Thu 5 Nov)
-`/api/paypal/webhook`: verify the signature, record the event id, find the visitor's copy from `custom_id`, update
-the order, and let the forecast reflect it.
-
-**Done when:**
-- a real sandbox payment on Render produces a verified event in the logs (event id shown);
-- with two browsers open, a payment in one changes only that browser's copy;
-- unit test: the same event posted twice changes the database once;
-- unit test: a bad signature is rejected and changes nothing;
-- unit test: capture-on-return and webhook arriving in either order give the same final state.
-
-### [ ] P2-3 Margin Guard, receipts, executor, inbox API (Tue 3 to Sat 7 Nov)
+### [ ] P1-7 Margin Guard, receipts, executor, tests (was P2-3; Thu 5 Nov)
 All per `AGENTS.md` section 4:
 - pure rules, the context loader, and the decision;
 - append-only receipts;
-- the executor for all 7 action types (SEND_REMINDER writes to the simulated outbox with a live checkout link
-  created at execution);
-- the inbox API (list, approve, reject).
+- the executor for all 7 action types (SEND_REMINDER writes to the simulated outbox with a checkout link created
+  at execution);
+- the inbox API (list, approve, reject), wired to the Approvals screen.
 
 **Done when** unit tests cover:
 - each of the 8 rules passing, failing, and N/A for actions it doesn't apply to;
@@ -218,102 +212,21 @@ All per `AGENTS.md` section 4:
   re-check blocks;
 - a receipt saved for every decision, never edited.
 
-And on Render:
-- story steps 2 and 4 show the right referee card and receipt;
-- the approved reminder appears in the outbox, labelled "Simulated", with a link a sandbox buyer can pay.
+And in the app (fake PayPal mode until P2-3): story steps 2 and 4 show the right referee card and receipt.
 
-### [ ] P2-4 README (Tue 10 Nov)
-- Setup, env keys, run, test, deploy.
-- Supabase setup (pooled and direct URLs) and the uptime pinger on `/api/health`.
-- PayPal sandbox setup (app, buyer account, webhook registration).
-- Architecture, what's simulated, a link to `DEMO.md`, and P4's AI section.
-- A "Built with" section that explains every tool and how we use PayPal and AI (a judging requirement).
-
-**Done when:**
-- a teammate follows it on a clean clone and reaches a running app with the demo seed, without asking anyone;
-- "Built with" covers every tool in `package.json` that matters.
-
-### [ ] P2-5 Render deploy, CI and uptime pinger (deploy first, then daily from Mon 2 Nov)
-- A Render web service (free plan for now) in Frankfurt, close to the Supabase project in Paris. It deploys `main`,
-  runs `prisma migrate deploy`, and has every key from `.env.example`. Set `APP_URL` to its link once it exists.
-- A GitHub Actions workflow runs `npm run check` on every PR.
-- A free uptime pinger opens `<APP_URL>/api/health` every 10 minutes (keeps Render awake and Supabase from pausing).
-- Anyone may push to `main` when it doesn't conflict and `npm run check` passes (AGENTS.md section 11); P2 reviews PRs when asked.
-
-**Done when:**
-- the Render URL loads every page on a phone and on a laptop, and `/api/health` reports the database OK;
-- PR checks run on every PR;
-- the uptime pinger shows the health check passing for a full day.
-
-And each day:
-- CI is green on `main`;
-- Render has deployed `main`;
-- the story steps finished so far still work on Render.
-
-### [ ] P2-6 Laptop calendar with Bryntum (optional, last)
-**a. Licence check (by Tue 3 Nov).** Ask Bryntum whether they offer a hackathon licence (no trial watermark). Ask
-early: the build is last, but a reply may take days.
-**Done when** the answer is recorded under D11.
-
-**b. Build (Tue 10 Nov, only if M3 is met).** With a licence: a Bryntum calendar for laptop in
-`components/calendar/`. Without one: our own richer laptop calendar there, or skip it if P1-4's calendar is
-enough. Merge by Wed 11 Nov midday, or drop it.
-**Done when:**
-- at 1024px and wider, it shows 14 days of money in and out from the forecast module, each day coloured by state
-  with a word, and each due item showing how much is ready;
-- there is no trial watermark;
-- the calendar library is not in the phone bundle.
-
----
-
-## Person 3: forecast, recovery, demo data, e2e
-
-### [ ] P3-0 Demo numbers (Mon 2 Nov)
-Write the demo data plan into `DEMO.md`, for `DEMO_TODAY` Thu 5 Nov 2026:
-- opening balance;
-- about 8 weeks of sales history with a weekday pattern;
-- the owner's regular transfers to their bank;
-- Volta's payments and the bills with their dates (Volta and rent both on Thu 12 Nov);
-- the abandoned $72 checkout;
-- one risky order and one customer who has not consented;
-- the expected numbers at every story step.
-
-Until P2 sends the real fee from a sandbox capture, use an estimate and mark it.
-
-**Done when** a hand calculation in `DEMO.md` shows:
-- about $90 short on Thu 12 Nov;
-- what the $72 payment nets after PayPal's fee, and the gap left;
-- a set-aside per day, taken from the owner's bank transfers, that is within the 30% cap with a total of $100 or
-  less (so rule 8 doesn't escalate), and that covers the 12th;
-- the exact answer to "Can I afford a $200 order on Monday?" (Mon 9 Nov).
-
-And P2 and P4 have agreed the numbers.
-
-### [ ] P3-1 Payment detection and 14-day forecast (Tue 3 to Thu 5 Nov)
-- Deterministic recurring-payee detection (Volta, bills, and the owner's bank transfers).
-- A forecast from weekday averages (net of fees) minus known money out, with a daily balance, the first shortfall
-  and a confidence level.
-- Exposes `simulate(action)` for Guard rule 6, `canAfford(amount, date)` for Ask chat, and fix-the-gap inputs.
-
-**Done when** unit tests show:
-- the seed history detects Volta at about $300 every 10 days, and the owner's transfers;
-- the demo seed's first shortfall is Thu 12 Nov at the `DEMO.md` amount;
-- `canAfford($200, Mon 9 Nov)` matches the strip's numbers;
-- a sparse-history fixture gives low confidence;
-- removing a due moves or clears the shortfall.
-
-### [ ] P3-2 Fix the gap, Recovery agent, per-visitor copies and reset (Thu 5 to Sat 7 Nov)
+### [ ] P1-8 Recovery agent, fix-the-gap maths and demo reset (was P3-2; Fri 6 Nov)
 - **Fix the gap:** up to three fixes with calculated amounts: a set-aside (kept from the owner's transfers, within
-  the 30% cap), moving a payment to the first date sales can cover, and a simulated gap loan.
+  the 30% cap), moving a payment to the first date sales can cover, and a simulated gap loan. Move the
+  fix-to-proposal code from `app/(owner)/fix/actions.ts` into `lib/forecast`.
 - **Recovery agent:** a deterministic search for abandoned or failed checkouts, then a SEND_REMINDER proposal with
-  a draft from P4 (or a template).
-- **Seed and copies:** the seed in `lib/demo/`, built relative to `DEMO_TODAY`. Each visitor gets a copy on their
-  first visit.
-- **Reset:** per visitor, with a new demo run id.
-- **Cleanup:** remove copies idle for more than 7 days, to stay within Supabase's free storage.
+  a drafted message (a template until P1-10).
+- **Seed, copies and reset:** the seed in `lib/demo/`, built relative to `DEMO_TODAY`; a copy per visitor; reset
+  per visitor with a new demo run id; cleanup of copies idle for more than 7 days. (Copies and reset already work
+  from the foundation; this task makes the numbers match `DEMO.md`.)
+- **`DEMO.md` judge script:** step by step, with the expected numbers at each step and room for P2's buyer login.
 
 **Done when:**
-- after a reset, Home on Render shows the `DEMO.md` gap on Thu 12 Nov;
+- after a reset, Home shows the `DEMO.md` gap on Thu 12 Nov;
 - the Recovery agent proposes the $72 reminder;
 - fix-the-gap returns at most 3 fixes, with the gap loan labelled simulated;
 - after the $72 payment, the gap is recomputed from the net amount;
@@ -321,60 +234,111 @@ And P2 and P4 have agreed the numbers.
 - a test shows a reset of one copy leaves another copy unchanged;
 - a test shows cleanup removes only idle copies.
 
-### [ ] P3-3 DEMO.md judge script and e2e test (Mon 9 to Tue 10 Nov)
-- `DEMO.md`: a step-by-step judge script with the sandbox buyer login and the expected numbers at each step.
-- Playwright: the 6 story steps with `PAYPAL_FAKE=1`, plus a two-browser check that copies stay separate.
+### [ ] P1-9 PayPal checkout, store page and webhooks (was P2-1, P2-2; Sat 7 Nov)
+Built so it runs in fake PayPal mode now and uses the real sandbox automatically once `PAYPAL_CLIENT_ID` and
+`PAYPAL_CLIENT_SECRET` are set (AGENTS.md section 6).
+- `lib/paypal/client.ts`: OAuth, Orders v2 (create, get, capture), refund, Payouts, webhook signature verification.
+  Decide between the official SDK and a typed REST wrapper, and whether the Agent Toolkit fits behind it (D8).
+- Orders carry the visitor's `storeId` in `custom_id`. Captures record gross, fee and net.
+- Fake mode (`PAYPAL_FAKE=1`, refused in production), so the e2e test can complete a checkout without PayPal's
+  login page.
+- `/store`: the buyer-facing Loop Audio page with PayPal checkout, plus return and cancel routes.
+- `/api/paypal/webhook`: verify the signature, record the event id, find the visitor's copy from `custom_id`,
+  update the order, and let the forecast reflect it.
+- **`SWITCH-ON.md`:** exact steps for P2: which keys go where on Render, how to register the webhook for `APP_URL`
+  and set `PAYPAL_WEBHOOK_ID`, and the one real test payment that proves it works.
 
 **Done when:**
-- `npm run e2e` passes twice in a row, with a reset between runs;
-- the manual real-sandbox checklist in `DEMO.md` has been run once on Render and ticked, with the date.
+- unit tests (mocked fetch) show a `PayPal-Request-Id` on every write call;
+- a non-sandbox base URL throws, and fake mode throws when `NODE_ENV=production`;
+- in fake mode, a buyer pays on `/store` locally and the database shows the order captured, with gross, fee and net;
+- unit test: the same webhook event posted twice changes the database once;
+- unit test: a bad signature is rejected and changes nothing;
+- unit test: capture-on-return and webhook arriving in either order give the same final state;
+- `SWITCH-ON.md` exists and P2 has read it.
 
----
-
-## Person 4: AI, risk, dashboard, charts
-
-### [ ] P4-1 AI setup and Ask chat with tools (Mon 2 to Thu 5 Nov)
+### [ ] P1-10 Gemini and Ask chat (was P4-1, P4-2; Sun 8 Nov)
 - `lib/ai/model.ts` (the only provider import), driven by `AI_MODEL`.
 - Read-only chat tools backed by `lib/forecast`, for example `canAfford`, `getForecast` and `listDues`.
-- A chat route and the `components/ask/` UI.
-- A rate limit per visitor, and a calm fallback when AI fails.
+- The chat route and the `components/ask/` screen; a rate limit per visitor, and a calm fallback when AI fails.
+- Structured reminder drafts (zod), with code, not AI, inserting the checkout link; short explanations for the
+  forecast and receipts; voice and amount checks with a template fallback.
 
 **Done when:**
 - searching the code finds `@ai-sdk/google` only in `lib/ai/model.ts`;
-- on Render, "Can I afford a $200 order on Monday?" answers with exactly the numbers `canAfford` returns for
-  Mon 9 Nov (also covered by a unit test with a stubbed model);
+- "Can I afford a $200 order on Monday?" answers with exactly the numbers `canAfford` returns for Mon 9 Nov (also a
+  unit test with a stubbed model);
 - with an invalid API key, chat shows a calm error and every other screen still works;
+- a draft with `!`, emoji, a banned word, or an amount not in the input is replaced by the template;
+- with the AI down, the recovery flow still completes using the template;
 - switching to OpenRouter by editing only `model.ts` has been shown working locally once.
 
-### [ ] P4-2 AI explanations and reminder drafts (Thu 5 to Sat 7 Nov)
-- Structured reminder drafts (zod). Code, not AI, inserts the checkout link.
-- Short explanations for the forecast and receipts.
-- Voice and amount checks, with a template fallback.
-
-**Done when** unit tests (stubbed model) show:
-- drafts validate against the schema and contain the code-inserted link;
-- a draft with `!`, emoji, a banned word, or an amount not in the input is replaced by the template;
-- with the AI down, the recovery flow still completes using the template.
-
-### [ ] P4-3 Risk check (Sun 8 Nov)
-- Flags for an unusual amount, a brand-new buyer with a big order, and repeated failed attempts.
-- Each flag creates a HOLD_ORDER proposal through the Guard.
-- Held orders don't count as expected money.
+### [ ] P1-11 Risk check; extras only if time allows (was P4-3, P4-4; Mon 9 Nov)
+- Flags for an unusual amount, a brand-new buyer with a big order, and repeated failed attempts. Each flag creates
+  a HOLD_ORDER proposal through the Guard. Held orders don't count as expected money.
+- Saving the Settings form (`saveStoreSettings` in `lib/store`), so the minimum balance can be edited.
+- Only if time allows: price-rise alert, quiet when unsure, slow-week warning.
 
 **Done when:**
 - unit tests cover each flag and a clean order;
-- the seeded risky order gets a HOLD_ORDER proposal and a receipt;
-- once the order is held, the forecast excludes it.
+- the seeded risky order gets a HOLD_ORDER proposal and a receipt, and once held, the forecast excludes it;
+- any extra that ships has a unit test for when it fires and when it stays quiet, and a low-confidence forecast
+  produces no alert.
 
-### [ ] P4-4 Extras (Mon 9 Nov; ship what's done by feature freeze)
-- Price-rise alert, quiet when unsure, slow-week warning, setup form logic. The logic lives in `lib/risk/`.
-- The minimum balance exists in the seed from day one, because rule 6 needs it. This task adds editing it.
+### [ ] P1-12 Design pass (was P1-6; Tue 10 Nov)
+Every screen at 390px and 1280px: voice, states, motion, "Simulated" labels, labelled charts. The laptop view gets
+the same care as the phone.
 
 **Done when:**
-- each extra has a unit test for when it fires and when it stays quiet;
-- a low-confidence forecast produces no alert.
+- the commit has screenshots of every screen at both widths (in the commit message or a linked folder);
+- a search of UI strings finds no `!`, emoji, "unlock", "seamless", "supercharge" or "AI-powered";
+- every screen's empty, loading and error state has been seen in the browser.
 
-### [ ] P4-5 AG Grid dashboard and AG Charts forecast chart (Sat 7 to Mon 9 Nov)
+---
+
+## Person 2 (name to add): going live and finishing
+
+Setup (P2-1 to P2-3) is finished by about Sun 8 Nov.
+
+### [ ] P2-1 PayPal sandbox app, keys and the judges' buyer account (by Sat 7 Nov)
+- Create the PayPal sandbox app and keep its client id and secret out of the repo.
+- Create a separate sandbox buyer account just for judges. Only this buyer login may be published (AGENTS.md
+  section 6); the business account stays private.
+- Send P1 the buyer login for `/demo` (`SANDBOX_BUYER`) and `DEMO.md`.
+
+**Done when** the buyer account can log in on the PayPal sandbox, and the keys are stored somewhere private (never in
+git, logs or screenshots).
+
+### [ ] P2-2 Render deploy (by Sun 8 Nov; earlier is better)
+- A Render web service (free plan for now) in Frankfurt, close to the Supabase project in Paris. It deploys `main`,
+  runs `prisma migrate deploy`, and has every key from `.env.example`. Set `APP_URL` to its link.
+- Health check path: `/api/health`.
+
+**Done when** the Render URL loads every page on a phone and on a laptop, `/api/health` reports the database OK,
+and Chrome offers "Install" on it.
+
+### [ ] P2-3 Switch PayPal on (Sun 8 Nov, after P1-9)
+Follow `SWITCH-ON.md`: add the keys on Render, register the webhook for `APP_URL`, set `PAYPAL_WEBHOOK_ID`, and run
+one real sandbox payment end to end.
+
+**Done when:**
+- on Render, the judges' buyer pays on `/store` and the database shows the order captured, with its PayPal order
+  and capture IDs and the gross, fee and net amounts;
+- the payment produces a verified webhook event in the logs (event id shown);
+- with two browsers open, a payment in one changes only that browser's copy;
+- an approved reminder's link in Sent reminders can be paid by the buyer;
+- P1 has the real fee from the $72 capture for `DEMO.md`.
+
+### [ ] P2-4 Uptime pinger and paid Render plan (pinger by Sun 8 Nov; paid plan by Mon 30 Nov)
+- A free uptime pinger opens `<APP_URL>/api/health` every 10 minutes (keeps Render awake and Supabase from pausing).
+- Move the Render web service to a paid plan before judging starts, so it never sleeps.
+
+**Done when:**
+- the pinger shows the health check passing for a full day;
+- Render shows a paid plan;
+- a daily check through the end of judging confirms the hosted link loads and a reset works.
+
+### [ ] P2-5 AG Grid dashboard and AG Charts forecast chart (was P4-5; Mon 9 Nov)
 AG Grid has the biggest sponsor prize, so use it meaningfully:
 - **Dashboard:** a laptop dashboard with an orders and payments grid. It has sorting and filtering, plus custom
   cell renderers for money, state words and referee cards. It is styled in our design, not a stock-looking grid.
@@ -386,38 +350,35 @@ AG Grid has the biggest sponsor prize, so use it meaningfully:
 - the dashboard has empty, loading and error states;
 - AG Grid and AG Charts are not in the phone bundle.
 
-### [ ] P4-6 README AI section (Tue 10 Nov)
-Written in `lib/ai/README.md`: model choice, how to switch provider, the AI rules, fallbacks, and how AI is used
-meaningfully (a judging requirement). P2 merges it into `README.md`.
+### [ ] P2-6 End-to-end demo test on the live link (was P3-3; Tue 10 Nov)
+- Playwright: the 6 story steps with `PAYPAL_FAKE=1`, plus a two-browser check that copies stay separate.
+- The manual real-sandbox checklist in `DEMO.md`, run on the live link.
 
-**Done when** P2 has merged it and a teammate has switched provider by following it.
+**Done when:**
+- `npm run e2e` passes twice in a row, with a reset between runs;
+- the manual checklist in `DEMO.md` has been run once on Render and ticked, with the date.
+
+### [ ] P2-7 README, Devpost entry and video (was P2-4, P4-6, T-1; Tue 10 to Wed 11 Nov)
+- **README:** setup, env keys, run, test, deploy; Supabase setup and the uptime pinger; PayPal sandbox setup;
+  architecture, what's simulated, a link to `DEMO.md`; the AI section (model choice, how to switch provider, the AI
+  rules, fallbacks); and a "Built with" section listing every tool, including every AI tool used to build it, and
+  how we use PayPal and AI (a judging requirement).
+- **Devpost entry:** a description written for the five judging criteria, screenshots, the built-with list, the
+  public repo link, the hosted link and the judges' buyer login.
+- **Video:** a public YouTube demo under 3 minutes: draft Tue 10 Nov, final Wed 11 Nov.
+
+**Done when:**
+- someone follows the README on a clean clone and reaches a running app with the demo seed, without asking anyone;
+- the entry is submitted on Wed 11 Nov before midnight IST;
+- the hosted link, the repo (with its licence showing in About) and the video all open in a private browser window;
+- the video is under 3:00.
 
 ---
 
-## Team tasks
+## Both
 
-### [ ] T-1 Devpost entry and video (Tue 10 to Wed 11 Nov; owner: name needed, D10)
-- Project description written for the five judging criteria.
-- Screenshots, the built-with list, the public repo link and the hosted link.
-- The sandbox buyer login for judges.
-- A public YouTube demo video under 3 minutes: draft Tue 10 Nov, final Wed 11 Nov.
-
-**Done when:**
-- the entry is submitted on Wed 11 Nov before midnight IST;
-- the hosted link, the repo (with its licence showing in About) and the video all open in a private browser
-  window;
-- the video is under 3:00.
-
-### [ ] T-2 Cold test with an outsider (Tue 10 Nov evening; owner: name needed, D10)
+### [ ] T-2 Cold test with an outsider (Tue 10 Nov evening)
 Someone outside the team opens the Render link on a laptop and on a phone, and follows `/demo`.
 
 **Done when** they finish all 6 story steps without help, and every problem they hit is either fixed by Wed 11 Nov
 midday or written down.
-
-### [ ] T-3 Keep the app running through judging (until judging ends; owner: name needed, D10)
-- Move the Render web service to a paid plan before judging starts (by Mon 30 Nov) so it never sleeps.
-- Confirm the uptime pinger (P2-5) keeps passing.
-
-**Done when:**
-- Render shows a paid plan;
-- a daily check through the end of judging confirms the hosted link loads and a reset works.

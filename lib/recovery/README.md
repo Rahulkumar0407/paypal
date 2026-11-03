@@ -1,6 +1,6 @@
 # lib/recovery/
 
-**Owner:** Person 3. Task P3-2.
+**Owner:** Person 1. Task P1-8.
 
 **What goes here:** the Recovery agent. It finds abandoned or failed checkouts and PROPOSES reminders. It never
 sends anything: every proposal goes to the Margin Guard (`lib/guard`), and the Guard's executor writes approved

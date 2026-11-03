@@ -1,6 +1,6 @@
 # lib/shared/
 
-**Owner:** shared. Created by Person 1; after the foundation, changes go through Person 2.
+**Owner:** Person 1.
 
 **What goes here:** small utilities every module needs. There is **no index.ts**: import each file directly
 (`import { formatDollars } from "@/lib/shared/money"`). That keeps the database client out of browser bundles.

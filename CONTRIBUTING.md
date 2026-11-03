@@ -1,28 +1,31 @@
 # Contributing to NeverShort
 
-Four people, four different AI coding agents, one set of rules. The rules live in `AGENTS.md`; the tasks live in
+Two people, any AI coding agent, one set of rules. The rules live in `AGENTS.md`; the tasks live in
 `PLAN.md`. This page is the short version.
 
 ## Start every agent session with
 
-> Read AGENTS.md and PLAN.md. I am Person N.
+> Read AGENTS.md and PLAN.md. I am Person 1 (or Person 2).
 
-Then name the task (for example "P3-1"). Agents work on one task at a time.
+Then name the task (for example "P1-6"). Agents work on one task at a time.
 
 ## The rules
 
-1. **Push to `main` when it's ready and doesn't conflict.** Pull the latest `main` first; if the merge touches
-   someone else's files, stop and ask their owner. Run `npm run check` and push only if it passes. For bigger or
-   risky work, use a branch named `p<person>/<task-id>-<short-name>` (for example `p3/P3-1-forecast`) and a pull
-   request instead.
+1. **One after the other, straight to `main`.** We never work at the same time, so there are no branches or pull
+   requests.
+   - Before starting any work: `git pull` on `main`.
+   - Before pushing: run `npm run check`, and push only if it passes.
+   - Never force-push, and never rewrite `main`'s history.
+   - If a push is rejected because the other person pushed first: pull, fix any conflict, run `npm run check`
+     again, then push.
+   - Say in chat when you start and when you've pushed.
 2. **Only change your own folders.** The ownership table is in `AGENTS.md` section 10. If you need a change
-   somewhere else, write down exactly what and why, and ask the owner.
-3. **Never change `types/` or `prisma/` without Person 2.** They are the contract between everyone's modules.
-   Write down the exact change and let Person 2 make it.
+   somewhere else, write down exactly what and why, and ask the other person.
+3. **`types/` and `prisma/` are shared.** They are the contract between modules. Whoever changes one tells the other
+   person first, with the exact change and why.
 4. **Run `npm run check` before pushing.** It runs lint (including the import boundaries), the type check and the
-   unit tests. GitHub runs the same check on every pull request, and `main` must stay green.
-5. **No co-authors.** No `Co-authored-by` trailers, "Generated with" lines or other tool attribution in commits
-   or pull requests.
+   unit tests. GitHub runs the same check on every push to `main`, and `main` must stay green.
+5. **No co-authors.** No `Co-authored-by` trailers, "Generated with" lines or other tool attribution in commits.
 
 ## Setting up
 
@@ -41,7 +44,7 @@ Without a database the app still runs on the stubs' fake data, and `/demo` says 
 for a local Postgres) and puts its URLs in their own `.env`. Never point your `.env` at the shared database the
 hosted app uses: `npm run db:reset` deletes every demo copy in the database it runs against.
 
-**PayPal keys are optional.** Until Person 2 creates the sandbox app, leave the `PAYPAL_*` keys empty. The app
+**PayPal keys are optional.** Until Person 2 switches PayPal on (`SWITCH-ON.md`), leave the `PAYPAL_*` keys empty. The app
 runs, `/demo` says "PayPal isn't set up yet", and checkout is switched off. Tests use `PAYPAL_FAKE=1`.
 
 ## Replacing a stub
