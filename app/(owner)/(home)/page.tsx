@@ -1,7 +1,10 @@
+import { Suspense } from "react";
 import type { Forecast, FixOption, RecoveryCandidate, Alert, RecurringPayee, Due } from "@/types";
 import { BanknotePanel, ButtonLink, Card, CardTitle, EmptyState, HeadlineSentence, NOTE_ROOM, StatusChip } from "@/components/ui";
 import { ChartSlot } from "@/components/app/ChartSlot";
 import { DetectedPayees } from "@/components/app/DetectedPayees";
+import { ExplainedPayees } from "@/components/app/ExplainedPayees";
+import { ShortfallNote } from "@/components/app/ShortfallNote";
 import { FixOptions } from "@/components/app/FixOptions";
 import { ForecastStrip } from "@/components/app/ForecastStrip";
 import { UpcomingDues } from "@/components/app/UpcomingDues";
@@ -17,6 +20,7 @@ const CONFIDENCE_WORD = { high: "High confidence", medium: "Medium confidence", 
 const NOTE = "-mx-5 -mt-6 px-14 pt-24 pb-28 lg:-mx-12 lg:-mt-12 lg:px-24 lg:pt-[140px] lg:pb-[200px]";
 
 interface HomeData {
+  storeId: string;
   forecast: Forecast;
   dues: Due[];
   fixes: FixOption[];
@@ -36,7 +40,7 @@ async function load(): Promise<HomeData | null> {
       findRecoveryCandidates(storeId),
       getAlerts(storeId),
     ]);
-    return { forecast, dues, fixes, payees, candidates, alerts };
+    return { storeId, forecast, dues, fixes, payees, candidates, alerts };
   } catch (error) {
     console.error("[home] could not load the forecast:", error instanceof Error ? error.message : error);
     return null;
@@ -65,7 +69,7 @@ export default async function HomePage() {
     );
   }
 
-  const { forecast, dues, fixes, payees, candidates, alerts } = data;
+  const { storeId, forecast, dues, fixes, payees, candidates, alerts } = data;
   const headline = buildHeadline(forecast);
   const gap = forecast.firstShortfall;
   const tight = forecast.days.find((d) => d.state === "tight");
@@ -93,6 +97,11 @@ export default async function HomePage() {
               </StatusChip>
             )}
             <HeadlineSentence headline={headline} inverse />
+            {gap ? (
+              <Suspense fallback={null}>
+                <ShortfallNote forecast={forecast} />
+              </Suspense>
+            ) : null}
             {gap ? (
               <ButtonLink href="/fix" variant="secondary" className="min-h-12 px-5 text-[16px] font-semibold">
                 Fix the gap on {formatDay(gap.date)}
@@ -160,7 +169,9 @@ export default async function HomePage() {
 
           {suggestion ? (
             <section aria-label="A regular payment we found">
-              <DetectedPayees payees={[suggestion]} />
+              <Suspense fallback={<DetectedPayees payees={[suggestion]} />}>
+                <ExplainedPayees storeId={storeId} payees={[suggestion]} />
+              </Suspense>
             </section>
           ) : null}
 

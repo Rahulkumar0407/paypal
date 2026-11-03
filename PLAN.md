@@ -279,7 +279,11 @@ Built so it runs in fake PayPal mode now and uses the real sandbox automatically
 - unit test: capture-on-return and webhook arriving in either order give the same final state;
 - `SWITCH-ON.md` exists and P2 has read it.
 
-### [ ] P1-10 Gemini and Ask chat (was P4-1, P4-2; Sun 8 Nov)
+### [x] P1-10 Gemini and Ask chat (was P4-1, P4-2; Sun 8 Nov)
+_Status 3 Nov: done and tested with the AI SDK's mock model (live Gemini not checked yet, by choice: set AI_MODEL to
+switch it on). One provider file; Ask answers only through four tools and code checks every number; plain answers when
+AI is off, wrong, failing or over the per-visitor limit. AI drafts for reminders, the shortfall line and the found
+payment line, each with a template. Step 6 answers "Not yet: Mon 9 Nov ends at $808, Thu 12 Nov $144 short"._
 - `lib/ai/model.ts` (the only provider import), driven by `AI_MODEL`.
 - Read-only chat tools backed by `lib/forecast`, for example `canAfford`, `getForecast` and `listDues`.
 - The chat route and the `components/ask/` screen; a rate limit per visitor, and a calm fallback when AI fails.

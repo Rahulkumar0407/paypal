@@ -164,6 +164,6 @@ The judges' sandbox buyer login: _P2 adds it here and on `/demo` (task P2-1)._
 | 3 | Sent reminders | Open the payment link and pay as the test buyer. | The order is paid. $72.00 minus PayPal's $3.00 fee: $69.00 arrives. Today's sentence says Thu 12 Nov is $21 short. |
 | 4 | Sent reminders | Press **Send a follow-up** on Maya's reminder. | **Blocked**: "PayPal shows order #1258 already paid". Only rule 1 fails on its receipt. |
 | 5 | Fix the gap (`/fix`) | Pick **Set aside $11 a day**. | **Approved**. Thu 12 Nov closes at $156 and turns green; the sentence says clear for two weeks. |
-| 6 | Ask | Type "Can I afford a $200 order on Monday?" | Not yet: Mon 9 Nov ends at $807.93, but Thu 12 Nov would be $144 short. (Ask arrives in P1-10.) |
+| 6 | Ask | Press "Can I afford a $200 order on Monday?" | Not yet: Mon 9 Nov ends at $808 (exactly $807.93), but Thu 12 Nov would be $144 short. The facts under it list both. |
 
 Reset (on `/demo`) puts the copy back at step 1 with a new demo run id. Other visitors' copies are never touched.

@@ -11,7 +11,7 @@ type Answer = "confirm" | "dismiss";
  * "We think Volta is paid about $300 every 10 days, next on Thu 12 Nov." The owner answers once.
  * An answered payee stays on screen with what happened, even after the page's list moves on to the next one.
  */
-export function DetectedPayees({ payees }: { payees: RecurringPayee[] }) {
+export function DetectedPayees({ payees, explanations = {} }: { payees: RecurringPayee[]; explanations?: Record<string, string> }) {
   const [answered, setAnswered] = useState<{ payee: RecurringPayee; answer: Answer }[]>([]);
   const [failed, setFailed] = useState<{ id: string; message: string } | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -40,6 +40,7 @@ export function DetectedPayees({ payees }: { payees: RecurringPayee[] }) {
           <li key={p.id} className="rounded-tile bg-paper p-4 ring-1 ring-line ring-inset">
             <p className="text-[13px] text-ink-muted">Found from your payments</p>
             <p className="mt-1 text-[17px] leading-6 text-ink">{p.summary}</p>
+            {explanations[p.id] ? <p className="mt-1 text-[14px] leading-5 text-ink-muted">{explanations[p.id]}</p> : null}
             {result ? (
               <p role="status" className="mt-3 text-[15px] text-ink">
                 {result === "confirm"

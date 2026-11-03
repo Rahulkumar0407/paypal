@@ -2,7 +2,7 @@
  * lib/recovery: the Recovery agent. Owner: Person 1.
  * Finds abandoned or failed checkouts and PROPOSES reminders. It never sends anything itself: every proposal goes to
  * the Margin Guard (lib/guard), whose executor creates the fresh PayPal link and writes the simulated outbox.
- * Deterministic: a query and a template, no AI (P1-10 adds an AI draft with this template as its fallback).
+ * The search is a deterministic query. The message is drafted by lib/ai (checked by code, with a template fallback).
  */
 import { randomUUID } from "node:crypto";
 import type { ActionProposal, OutboxMessage, Receipt, RecoveryCandidate, StoreId } from "@/types";
@@ -11,9 +11,8 @@ import { submitProposal } from "@/lib/guard";
 import { atDemoDate, nowIso, realNow, today } from "@/lib/shared/clock";
 import { getDb, isDatabaseConfigured } from "@/lib/shared/db";
 import { nextProposalKey } from "@/lib/shared/keys";
-import { reminderTemplate } from "./draft";
+import { draftReminder } from "@/lib/ai";
 
-export { reminderTemplate, type DraftInput } from "./draft";
 
 const CONTACT_WINDOW_MS = 48 * 60 * 60 * 1000;
 
@@ -49,7 +48,7 @@ export async function proposeReminder(storeId: StoreId, orderId: string): Promis
   });
   if (!order) throw new Error(`Order ${orderId} isn't in store ${storeId}.`);
   const { idempotencyKey, sequence } = await nextProposalKey(storeId, "SEND_REMINDER", order.id);
-  const draft = reminderTemplate({
+  const draft = await draftReminder({
     firstName: order.customer.name.split(" ")[0] ?? order.customer.name,
     orderNumber: order.number,
     items: order.items.map((i) => i.product.name),

@@ -11,6 +11,7 @@ import { getDb } from "@/lib/shared/db";
 import { nextProposalKey } from "@/lib/shared/keys";
 import { formatDollars } from "@/lib/shared/money";
 import { fixOptionsFrom } from "./fixes";
+import { patternEvidenceFromRows, recentPaymentsFromRows, type PatternEvidence, type RecentPayment } from "./history";
 import { datesBetween } from "./detect";
 import {
   adjustmentsFor,
@@ -27,6 +28,7 @@ import { demoScenarioRows, loadStoreRows, readStoreRows, type DemoScenario } fro
 
 export { buildHeadline } from "./headline";
 export type { DemoScenario } from "./load";
+export type { PatternEvidence, RecentPayment } from "./history";
 
 async function inputFor(storeId: StoreId) {
   const day = today();
@@ -167,4 +169,35 @@ export async function canAfford(storeId: StoreId, amountCents: Cents, date: IsoD
 export function previewDemoForecast(scenario: DemoScenario = {}): Forecast {
   const day = today();
   return forecastFrom(inputFromRows(demoScenarioRows("st_preview", day, scenario), "st_preview", day));
+}
+
+/** Money that already moved in the last `days` days: payments out, and each day's sales after PayPal's fee. Newest first. */
+export async function listRecentPayments(storeId: StoreId, days = 30): Promise<RecentPayment[]> {
+  const day = today();
+  return recentPaymentsFromRows(await loadStoreRows(storeId, day), day, days);
+}
+
+/** What each found pattern rests on (count, dates, spread), for the plain-words explanation under it. */
+export async function getPatternEvidence(storeId: StoreId): Promise<PatternEvidence[]> {
+  const day = today();
+  return patternEvidenceFromRows(await loadStoreRows(storeId, day), day);
+}
+
+/**
+ * The demo store at a point in the story, everything worked out in memory from the seed (no database): the forecast,
+ * dues, found payees, recent payments, and "can I afford". The tests and /design use it.
+ */
+export function previewDemoStore(scenario: DemoScenario = {}) {
+  const day = today();
+  const rows = demoScenarioRows("st_preview", day, scenario);
+  const input = inputFromRows(rows, "st_preview", day);
+  return {
+    today: day,
+    forecast: forecastFrom(input),
+    dues: duesFrom(input),
+    payees: recurringPayeesFromRows(rows, "st_preview", day),
+    evidence: patternEvidenceFromRows(rows, day),
+    recentPayments: recentPaymentsFromRows(rows, day),
+    canAfford: (amountCents: Cents, date: IsoDate) => affordability(input, amountCents, date),
+  };
 }

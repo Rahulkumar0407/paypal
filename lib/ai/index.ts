@@ -1,39 +1,56 @@
 /**
- * lib/ai: Ask chat, explanations and reminder drafts. Owner: Person 4.
- * AI never calculates money and never calls PayPal (AGENTS.md sections 3 and 5).
- * Every function must fall back to calculated numbers or a template when the model fails.
- * Foundation stubs by Person 1 return FAKE data from mocks/.
+ * lib/ai: Ask chat, explanations and reminder drafts. Owner: Person 1.
+ * AI never calculates money and never calls PayPal (AGENTS.md sections 3 and 5): it answers through read-only tools
+ * that return numbers calculated by lib/forecast, and code checks every word it writes. Every function falls back to
+ * calculated numbers or a template when the model is off, slow, wrong or failing.
  */
-import type { ChatAnswer, Receipt, ReminderDraft, StoreId } from "@/types";
-import { mockAffordAnswer, MOCK_SUGGESTED_QUESTIONS } from "@/mocks/ask";
-import { mockReminderDraft } from "@/mocks/recovery";
+import type { ChatAnswer, Forecast, RecurringPayee, ReminderDraft, StoreId } from "@/types";
+import { canAfford, getDues, getForecast, getPatternEvidence, listRecentPayments, type PatternEvidence } from "@/lib/forecast";
+import { today } from "@/lib/shared/clock";
+import { answerWith, type AskData } from "./ask";
+import { explainRegularPayment as explainPayee, explainShortfall as explainGap } from "./explain";
+import { allowAiAnswer } from "./limit";
+import { getLanguageModel } from "./model";
+import { draftReminder as draft, type DraftInput } from "./reminder";
 
 export { getModelId, isAiConfigured } from "./model";
+export { SUGGESTED_QUESTIONS, type AskData } from "./ask";
+export { reminderTemplate, type DraftInput } from "./reminder";
+export { regularPaymentTemplate, shortfallTemplate } from "./explain";
 
-export const SUGGESTED_QUESTIONS: readonly string[] = MOCK_SUGGESTED_QUESTIONS;
+function liveData(storeId: StoreId): AskData {
+  return {
+    today: today(),
+    forecast: () => getForecast(storeId),
+    dues: () => getDues(storeId),
+    canAfford: (amountCents, date) => canAfford(storeId, amountCents, date),
+    recentPayments: () => listRecentPayments(storeId),
+  };
+}
 
-/** Answer an owner's question using read-only tools that return calculated numbers. */
+const LIMIT_NOTE = "You've asked a lot in a few minutes, so this answer comes straight from your numbers.";
+
+/** Answers an owner's question from their own numbers. Rate-limited per visitor; never throws for an AI problem. */
 export async function answerQuestion(storeId: StoreId, question: string): Promise<ChatAnswer> {
-  // TODO(Person 4): tool calling with lib/forecast canAfford / getForecast / getDues (P4-1).
-  void storeId;
-  return { ...mockAffordAnswer, question };
+  const model = getLanguageModel();
+  const note = model && !allowAiAnswer(storeId) ? LIMIT_NOTE : undefined;
+  return answerWith(question, liveData(storeId), model, note);
 }
 
-export interface ReminderDraftInput {
-  customerFirstName: string;
-  itemNames: string[];
-  storeName: string;
+/** A drafted reminder (checked by code), or the template. Code inserts the link at {checkout_link}. */
+export async function draftReminder(input: DraftInput): Promise<ReminderDraft> {
+  return draft(input, getLanguageModel());
 }
 
-/** Draft a reminder. The checkout link is inserted later by code as {checkout_link}. */
-export async function draftReminder(input: ReminderDraftInput): Promise<ReminderDraft> {
-  // TODO(Person 4): structured output validated with zod; voice and amount checks (P4-2).
-  void input;
-  return mockReminderDraft;
+/** One line on why the first short day is short, shown under the headline. Null when nothing is short. */
+export async function explainShortfall(forecast: Forecast): Promise<string | null> {
+  return explainGap(forecast, getLanguageModel());
 }
 
-/** One plain-words line explaining a receipt, shown under the code-built text. */
-export async function explainReceipt(receipt: Receipt): Promise<string | null> {
-  // TODO(Person 4): optional; return null when AI is unavailable.
-  return receipt.decision.headlineReason;
+/** One line per found payee on what the pattern rests on, keyed by payee id. */
+export async function explainRegularPayments(storeId: StoreId, payees: RecurringPayee[]): Promise<Record<string, string>> {
+  const evidence = new Map<string, PatternEvidence>((await getPatternEvidence(storeId).catch(() => [])).map((e) => [e.payeeId, e]));
+  const model = getLanguageModel();
+  const pairs = await Promise.all(payees.map(async (p) => [p.id, evidence.has(p.id) ? await explainPayee(p, evidence.get(p.id)!, model) : null] as const));
+  return Object.fromEntries(pairs.filter((x): x is [string, string] => x[1] !== null));
 }
