@@ -77,8 +77,8 @@ function buildSteps({ forecast, candidate, afford, monday }: StoryData): Step[] 
     },
     {
       title: "Send a payment reminder",
-      todo: `Open Approvals. NeverShort spotted ${who} unfinished ${amount} order and drafted a reminder to the customer.`,
-      see: "A green Approved card: the safety check said yes. The reminder appears under Sent reminders with a new PayPal payment link.",
+      todo: `Open Approvals. The reminder helper spots ${who} unfinished ${amount} order and drafts a reminder to the customer.`,
+      see: "Under Already decided, a green Approved card: the safety check said yes. The reminder appears under Sent reminders, labelled Simulated, with a new PayPal payment link.",
       uses: ["simulated", "sandbox"],
       link: { label: "Open Approvals", href: "/approvals" },
     },
@@ -94,10 +94,10 @@ function buildSteps({ forecast, candidate, afford, monday }: StoryData): Step[] 
     },
     {
       title: "See a second reminder get stopped",
-      todo: "NeverShort suggests another reminder for the same order. Open the blocked receipts.",
-      see: "A red Blocked card and a receipt stamped BLOCKED: PayPal shows the order is already paid, so the customer isn't bothered again.",
+      todo: "Back in Approvals, press Send a follow-up on the reminder: the reminder helper drafts a second one for the same order.",
+      see: "A red Blocked card, and a receipt stamped BLOCKED: PayPal shows the order is already paid, so the customer isn't bothered again.",
       uses: ["sandbox"],
-      link: { label: "Open blocked receipts", href: "/receipts?show=blocked" },
+      link: { label: "Open Sent reminders", href: "/approvals#outbox-title" },
     },
     {
       title: "Set a little aside each day",

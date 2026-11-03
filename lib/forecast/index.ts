@@ -4,10 +4,13 @@
  * The maths is pure (engine.ts, detect.ts); this file reads the store's rows and writes the owner's answers.
  */
 import type { ActionProposal, AffordabilityCheck, Cents, Due, FixOption, Forecast, IsoDate, RecurringPayee, StoreId } from "@/types";
-import { mockFixes } from "@/mocks/fixes";
-import { today } from "@/lib/shared/clock";
-import { addDays } from "@/lib/shared/dates";
+import { randomUUID } from "node:crypto";
+import { nowIso, today } from "@/lib/shared/clock";
+import { addDays, formatDay } from "@/lib/shared/dates";
 import { getDb } from "@/lib/shared/db";
+import { nextProposalKey } from "@/lib/shared/keys";
+import { formatDollars } from "@/lib/shared/money";
+import { fixOptionsFrom } from "./fixes";
 import { datesBetween } from "./detect";
 import {
   adjustmentsFor,
@@ -93,12 +96,57 @@ export async function dismissRecurringPayee(storeId: StoreId, payeeId: string): 
 
 /** Up to three ways to close the first shortfall. */
 export async function getFixOptions(storeId: StoreId): Promise<FixOption[]> {
-  // TODO(Person 1, P1-8): set-aside within the 30% cap, move a payment, simulated gap loan, from the real forecast.
-  // Until then the sample fixes are used, with "move a payment" pointed at the real supplier payment on that day.
-  const dues = await getDues(storeId);
-  return mockFixes.map((fix) =>
-    fix.kind === "MOVE_PAYMENT" ? { ...fix, dueId: dues.find((d) => d.dueOn === fix.forDate && d.kind === "SUPPLIER")?.id ?? fix.dueId } : fix,
-  );
+  return fixOptionsFrom(await inputFor(storeId));
+}
+
+/**
+ * The owner picked a fix: the matching Guard proposal, rebuilt from today's numbers on the server (never from the
+ * browser). Null when that fix isn't on offer any more. The Guard decides what happens to it.
+ */
+export async function proposeFix(storeId: StoreId, fixId: string): Promise<ActionProposal | null> {
+  const input = await inputFor(storeId);
+  const fix = fixOptionsFrom(input).find((f) => f.id === fixId);
+  if (!fix) return null;
+  const base = async (type: ActionProposal["type"], target: ActionProposal["target"]) => {
+    const { idempotencyKey, sequence } = await nextProposalKey(storeId, type, target.id);
+    return {
+      id: `prop_${randomUUID()}`,
+      storeId,
+      target,
+      amountCents: fix.amountCents,
+      proposedBy: { kind: "OWNER" } as const,
+      idempotencyKey,
+      sequence,
+      draftText: null,
+      createdAt: nowIso(),
+      demoDate: input.today,
+    };
+  };
+  switch (fix.kind) {
+    case "SET_ASIDE": {
+      const daily = fix.dailyAmountCents ?? 0;
+      const target = { kind: "STORE" as const, id: storeId, label: `${formatDollars(daily)} a day until ${formatDay(fix.forDate)}` };
+      return {
+        ...(await base("SET_ASIDE", target)),
+        type: "SET_ASIDE",
+        params: { dailyAmountCents: daily, startOn: input.today, endOn: addDays(fix.forDate, -1), forDate: fix.forDate },
+      };
+    }
+    case "MOVE_PAYMENT": {
+      const due = input.outs.find((d) => d.id === fix.dueId);
+      if (!due || !fix.moveToOn) return null;
+      const target = { kind: "DUE" as const, id: due.id, label: `${due.payeeName}, due ${formatDay(due.dueOn)}` };
+      return { ...(await base("MOVE_PAYMENT", target)), type: "MOVE_PAYMENT", params: { dueId: due.id, fromOn: due.dueOn, toOn: fix.moveToOn } };
+    }
+    case "GAP_LOAN": {
+      const target = { kind: "STORE" as const, id: storeId, label: `${formatDollars(fix.amountCents)}, for ${formatDay(fix.forDate)}` };
+      return {
+        ...(await base("GAP_LOAN", target)),
+        type: "GAP_LOAN",
+        params: { amountCents: fix.amountCents, feeCents: fix.loanFeeCents ?? 0, repayOn: fix.repayOn ?? fix.forDate },
+      };
+    }
+  }
 }
 
 /** The forecast as it would be if this action ran. The Guard uses it for rule 6. Throws if the action names a payment that isn't there. */

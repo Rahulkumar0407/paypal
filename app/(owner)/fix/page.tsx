@@ -7,7 +7,7 @@ import { FixChooser } from "@/components/app/FixChooser";
 import { getVisitorStoreId } from "@/lib/demo";
 import { getDues, getFixOptions, getForecast } from "@/lib/forecast";
 import { formatDay } from "@/lib/shared/dates";
-import { formatDollars, formatShortfall } from "@/lib/shared/money";
+import { formatCents, formatDollars, formatShortfall } from "@/lib/shared/money";
 import { sendFixToGuard } from "./actions";
 
 export const metadata: Metadata = { title: "Fix the gap" };
@@ -178,9 +178,9 @@ function facts(fix: FixOption, dues: Due[]): [string, string][] {
     }
     case "GAP_LOAN":
       return [
-        ["Paid in", `${formatDollars(fix.amountCents)} on ${formatDay(fix.forDate)}`],
-        ["Fee", formatDollars(fix.loanFeeCents ?? 0)],
-        ["Paid back", fix.repayOn ? `${formatDollars(fix.amountCents + (fix.loanFeeCents ?? 0))} on ${formatDay(fix.repayOn)}` : "Later"],
+        ["Paid in", `${formatDollars(fix.amountCents)} today`],
+        ["Fee", formatCents(fix.loanFeeCents ?? 0)],
+        ["Paid back", fix.repayOn ? `${formatCents(fix.amountCents + (fix.loanFeeCents ?? 0))} on ${formatDay(fix.repayOn)}` : "Later"],
       ];
   }
 }

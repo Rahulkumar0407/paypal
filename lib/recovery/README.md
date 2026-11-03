@@ -1,14 +1,20 @@
 # lib/recovery/
 
-**Owner:** Person 1. Task P1-8.
+**Owner:** Person 1. Task P1-8 (done).
 
-**What goes here:** the Recovery agent. It finds abandoned or failed checkouts and PROPOSES reminders. It never
-sends anything: every proposal goes to the Margin Guard (`lib/guard`), and the Guard's executor writes approved
-reminders to the simulated outbox.
+**What goes here:** the Recovery agent (the "reminder helper"). It finds abandoned or failed checkouts and PROPOSES
+reminders. It never sends anything: every proposal goes to the Margin Guard (`lib/guard`), and the Guard's executor
+creates the fresh PayPal link and writes approved reminders to the simulated outbox.
 
-**Must export (from `index.ts`):**
-- `findRecoveryCandidates(storeId): Promise<RecoveryCandidate[]>`: deterministic query, no AI.
-- `proposeReminder(storeId, orderId): Promise<ActionProposal>`: next sequence number, idempotency key, AI draft via `lib/ai` `draftReminder` (template fallback).
-- `listOutbox(storeId): Promise<OutboxMessage[]>`.
+**Exports (from `index.ts`):**
+- `findRecoveryCandidates(storeId)`: abandoned and failed orders (abandoned first, newest first), with consent and
+  reminders sent in the last 48 hours. Deterministic query, no AI.
+- `proposeReminder(storeId, orderId)`: a SEND_REMINDER proposal with the next sequence, its idempotency key and the
+  drafted message (`draft.ts` template; P1-10 adds an AI draft with this as its fallback).
+- `runRecoveryAgent(storeId)`: one first reminder per unfinished checkout not yet handled, each submitted to the Guard.
+  The Approvals page runs it when it opens.
+- `proposeFollowUp(storeId, orderId)`: the next reminder for the same order ("Send a follow-up"), judged by the Guard.
+  Story step 4: after the order is paid, it's blocked by rule 1.
+- `listOutbox(storeId)`: the simulated outbox, newest first.
 
-**Now:** stubs returning `mocks/recovery.ts` and `mocks/guard.ts` data, marked `TODO(Person 3)`.
+Tests: `draft.test.ts` (wording and voice rules).

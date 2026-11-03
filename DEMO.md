@@ -142,3 +142,28 @@ Asked after steps 1 to 5, as in the story:
 
 Asked before any fix (straight after a reset): Monday closes at $661.93 after the order, and Thu 12 Nov would be
 $290 short (10.00 − 200.00 = −190.00, which is 290.00 below the minimum).
+
+## 8. Fix the gap: the three options
+
+Worked out by `lib/forecast/fixes.ts` from the forecast, each one checked by running the forecast with it.
+
+| | At step 1 ($90 short) | At step 5 ($21 short) | Guard |
+|---|---|---|---|
+| Set aside a little each day (from the owner's transfer on Mon 9 Nov) | $20 a day for 7 days, $140: Thu 12 Nov closes at $150, covered | $11 a day for 7 days, $77: closes at $156, covered | $140: needs your OK (over $100). $77: approved |
+| Move a payment to the first later day the forecast covers (simulated) | Volta's $300 to Fri 13 Nov: Thu 12 Nov closes at $310 | Volta's $300 to Fri 13 Nov: closes at $379 | Always needs your OK |
+| Gap loan for the exact gap (simulated, 2% fee) | $90 today, $91.80 back on Fri 13 Nov: closes at $100, tight | $21 today, $21.42 back on Fri 13 Nov | Always needs your OK |
+
+## 9. Judge script
+
+The judges' sandbox buyer login: _P2 adds it here and on `/demo` (task P2-1)._
+
+| Step | Where | Do | Expect |
+|------|-------|----|--------|
+| 1 | Today (`/`) | Read the sentence on the green note. | "Clear until Wednesday. On Thu 12 Nov you'll be $90 short: the supplier order and rent land the same day." Thu 12 is the red $10 tile. |
+| 2 | Approvals | Open it. The reminder helper checks unfinished checkouts and the Guard decides each. | Maya's $72 reminder: **Approved**, and it appears under Sent reminders (Simulated) with a payment link. Hana's: **Blocked** (she didn't agree to contact). Sam's $119: **Needs your OK** (over $100). |
+| 3 | Sent reminders | Open the payment link and pay as the test buyer. | The order is paid. $72.00 minus PayPal's $3.00 fee: $69.00 arrives. Today's sentence says Thu 12 Nov is $21 short. |
+| 4 | Sent reminders | Press **Send a follow-up** on Maya's reminder. | **Blocked**: "PayPal shows order #1258 already paid". Only rule 1 fails on its receipt. |
+| 5 | Fix the gap (`/fix`) | Pick **Set aside $11 a day**. | **Approved**. Thu 12 Nov closes at $156 and turns green; the sentence says clear for two weeks. |
+| 6 | Ask | Type "Can I afford a $200 order on Monday?" | Not yet: Mon 9 Nov ends at $807.93, but Thu 12 Nov would be $144 short. (Ask arrives in P1-10.) |
+
+Reset (on `/demo`) puts the copy back at step 1 with a new demo run id. Other visitors' copies are never touched.

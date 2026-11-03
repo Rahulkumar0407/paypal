@@ -4,9 +4,10 @@ import { Card, EmptyState, ErrorState, PageSentence, SimulatedTag } from "@/comp
 import { InboxList } from "@/components/app/InboxList";
 import { getVisitorStoreId } from "@/lib/demo";
 import { listInbox } from "@/lib/guard";
-import { listOutbox } from "@/lib/recovery";
+import { listOutbox, runRecoveryAgent } from "@/lib/recovery";
+import { FollowUp } from "@/components/app/FollowUp";
 import { paypalSetup } from "@/components/app/PayPalStatus";
-import { decideEscalation } from "./actions";
+import { decideEscalation, sendFollowUp } from "./actions";
 
 export const metadata: Metadata = { title: "Approvals" };
 
@@ -14,6 +15,11 @@ const COUNT_WORD = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven",
 
 export default async function ApprovalsPage() {
   const storeId = await getVisitorStoreId();
+  // The reminder helper looks for unfinished checkouts first, so its proposals (and the Guard's decisions) show below.
+  // If it fails, the page still works: AI and agent failures are never app failures.
+  await runRecoveryAgent(storeId).catch((error: unknown) => {
+    console.error("[approvals] the reminder helper didn't run:", error instanceof Error ? error.message : error);
+  });
   const loaded = await Promise.all([listInbox(storeId), listOutbox(storeId)]).catch((error: unknown) => {
     console.error("[approvals] could not load the inbox:", error instanceof Error ? error.message : error);
     return null;
@@ -91,25 +97,29 @@ export default async function ApprovalsPage() {
             Reminders land here instead of a real email inbox, so you can see exactly what the customer gets. Open the link to pay as the test buyer.
           </p>
           {outbox.length > 0 ? (
-            outbox.map((m) => (
+            outbox.map((m, i) => (
               <Card key={m.id} tone="outline">
-                <p className="text-[13px] text-ink-muted">To {m.to}</p>
+                <div className="flex items-start justify-between gap-3">
+                  <p className="text-[13px] text-ink-muted">To {m.to}</p>
+                  <SimulatedTag />
+                </div>
                 <p className="mt-1 text-[16px] leading-6 font-semibold text-ink">{m.subject}</p>
-                <p className="mt-2 text-[15px] leading-6 whitespace-pre-line text-ink">{m.body.replace(m.checkoutUrl, "").trim()}</p>
-                {paypalSetup() === "sandbox" ? (
+                <p className="mt-2 text-[15px] leading-6 whitespace-pre-line text-ink">{m.checkoutUrl ? m.body.replace(m.checkoutUrl, "(link below)") : m.body}</p>
+                {m.checkoutUrl && paypalSetup() !== "not-configured" ? (
                   <a
                     href={m.checkoutUrl}
                     target="_blank"
                     rel="noreferrer"
                     className="mt-3 inline-flex min-h-11 items-center rounded-control bg-brand px-4 text-[15px] font-medium text-white hover:bg-ink"
                   >
-                    Open the PayPal checkout
+                    {paypalSetup() === "fake" ? "Open the checkout (fake PayPal)" : "Open the PayPal checkout"}
                   </a>
                 ) : (
                   <p className="mt-3 rounded-control bg-surface px-3 py-2 text-[14px] leading-5 text-ink-muted">
                     PayPal isn&apos;t set up yet, so this reminder has no live checkout link.
                   </p>
                 )}
+                {outbox.findIndex((x) => x.orderId === m.orderId) === i ? <FollowUp orderId={m.orderId} send={sendFollowUp} /> : null}
               </Card>
             ))
           ) : (

@@ -8,15 +8,17 @@
  *   executor.ts  the only code that carries out actions
  *   repo.ts      receipts in the database (append-only)
  */
-import type { ActionProposal, ActionType, GuardDecision, InboxItem, Receipt, StoreId } from "@/types";
+import type { ActionProposal, GuardDecision, InboxItem, Receipt, StoreId } from "@/types";
 import { nowIso, today } from "@/lib/shared/clock";
 import { getDb, isDatabaseConfigured } from "@/lib/shared/db";
 import { contextLoader } from "./context";
 import { createExecutor } from "./executor";
 import { createGuard, type Guard } from "./flow";
-import { nextKeyWith, prismaGuardRepo } from "./repo";
+import { prismaGuardRepo } from "./repo";
 
 export { GuardError } from "./flow";
+/** The idempotency key and sequence for a new proposal. */
+export { nextProposalKey } from "@/lib/shared/keys";
 
 let guard: Guard | null = null;
 
@@ -65,9 +67,4 @@ export async function approveEscalation(storeId: StoreId, receiptId: string): Pr
 /** The owner declines an ESCALATE. Throws GuardError if already decided. */
 export async function rejectEscalation(storeId: StoreId, receiptId: string): Promise<Receipt> {
   return realGuard().reject(storeId, receiptId);
-}
-
-/** The idempotency key and sequence for a new proposal: `<demo run id>:<action type>:<target id>:<sequence>`. */
-export async function nextProposalKey(storeId: StoreId, type: ActionType, targetId: string): Promise<{ idempotencyKey: string; sequence: number }> {
-  return nextKeyWith(getDb(), storeId, type, targetId);
 }

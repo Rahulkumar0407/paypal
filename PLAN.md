@@ -224,7 +224,13 @@ All per `AGENTS.md` section 4:
 
 And in the app (fake PayPal mode until P2-3): story steps 2 and 4 show the right referee card and receipt.
 
-### [ ] P1-8 Recovery agent, fix-the-gap maths and demo reset (was P3-2; Fri 6 Nov)
+### [x] P1-8 Recovery agent, fix-the-gap maths and demo reset (was P3-2; Fri 6 Nov)
+_Status 3 Nov: done. The reminder helper runs when Approvals opens and proposes a reminder per unfinished checkout
+(Maya's $72 approved, Hana's blocked for consent, Sam's $119 escalated); "Send a follow-up" proposes the next one.
+Fix the gap is real maths in lib/forecast/fixes.ts ($20 a day at step 1, $11 a day at step 5, move Volta to Fri 13
+Nov, an exact-gap simulated loan), and the fix-to-proposal code moved into lib/forecast (`proposeFix`). Tests cover
+the fixes, the template, reset twice giving identical data, a reset leaving other copies alone, and cleanup. DEMO.md
+has the fixes table and the judge script._
 - **Fix the gap:** up to three fixes with calculated amounts: a set-aside (kept from the owner's transfers, within
   the 30% cap), moving a payment to the first date sales can cover, and a simulated gap loan. Move the
   fix-to-proposal code from `app/(owner)/fix/actions.ts` into `lib/forecast`.

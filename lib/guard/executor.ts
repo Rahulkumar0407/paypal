@@ -63,7 +63,7 @@ export function createExecutor(db: PrismaClient) {
           proposalId: p.id,
           orderId: order.id,
           to: order.customer.email,
-          subject: `Your Loop Audio order #${order.number} is waiting`,
+          subject: p.sequence > 1 ? `A last reminder about Loop Audio order #${order.number}` : `Your Loop Audio order #${order.number} is waiting`,
           body,
           checkoutUrl: paypalOrder.approveUrl,
           paypalOrderId: paypalOrder.id,

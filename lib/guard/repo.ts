@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { Prisma, type PrismaClient } from "@/generated/prisma/client";
-import type { ActionProposal, ActionType, GuardDecision, Proposer, Receipt, ReceiptEvent, StoreId } from "@/types";
+import type { ActionProposal, GuardDecision, Proposer, Receipt, ReceiptEvent, StoreId } from "@/types";
 import { atDemoDate } from "@/lib/shared/clock";
 import type { GuardRepo } from "./flow";
 
@@ -223,16 +223,4 @@ export function prismaGuardRepo(db: PrismaClient): GuardRepo {
       return count === 1;
     },
   };
-}
-
-/** The idempotency key for a new proposal: `<demo run id>:<action type>:<target id>:<sequence>`, where the sequence is
- *  1 + how many times this action type has already been carried out on this target (AGENTS.md section 4). */
-export async function nextKeyWith(db: PrismaClient, storeId: StoreId, type: ActionType, targetId: string): Promise<{ idempotencyKey: string; sequence: number }> {
-  const [store, executed] = await Promise.all([
-    db.store.findUnique({ where: { id: storeId }, select: { demoRunId: true } }),
-    db.proposal.count({ where: { storeId, type, targetId, status: "EXECUTED" } }),
-  ]);
-  if (!store) throw new Error(`Store ${storeId} has no data yet.`);
-  const sequence = executed + 1;
-  return { idempotencyKey: `${store.demoRunId}:${type}:${targetId}:${sequence}`, sequence };
 }
