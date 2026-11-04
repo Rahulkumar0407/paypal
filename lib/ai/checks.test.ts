@@ -10,6 +10,8 @@ describe("checking AI text", () => {
   });
   it("rejects new numbers, exclamation marks, emoji and banned words", () => {
     expect(problemWith("You'll have $950.", allowed)).toContain("$950");
+    expect(problemWith("The paymentsTotal of $1,410 is too much.", allowed)).toContain("paymentsTotal");
+    expect(problemWith("The above_minimum is $1,410.", allowed)).toContain("above_minimum");
     expect(problemWith("Thu 12 Nov is $90 short!", allowed)).toBe("exclamation mark");
     expect(problemWith("All good on Thu 12 Nov 🎉", allowed)).toBe("emoji");
     expect(problemWith("Unlock your cash on Thu 12 Nov.", allowed)).toContain("unlock");

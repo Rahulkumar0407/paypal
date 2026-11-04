@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { DetectedPayees } from "@/components/app/DetectedPayees";
 import { ExplainedPayees } from "@/components/app/ExplainedPayees";
 import { DuesFilter } from "@/components/app/DuesFilter";
+import { TillDrawer } from "@/components/app/TillDrawer";
 import { duesInForecast } from "@/components/app/due-state";
 import { getVisitorStoreId } from "@/lib/demo";
 import { getDues, getForecast, getRecurringPayees } from "@/lib/forecast";
@@ -57,6 +58,8 @@ export default async function DuesPage() {
             ? "Every one is ready."
             : ""}
       </PageSentence>
+
+      <TillDrawer items={items} />
 
       <div className="grid gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-14">
         <section aria-labelledby="dues-list-title" className="rounded-card bg-paper p-5 ring-1 ring-ink/[0.06] lg:p-6">

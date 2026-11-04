@@ -19,6 +19,7 @@ export function ForecastStrip({
   minimumBalanceCents: number;
 }) {
   const [selected, setSelected] = useState(initialDate);
+  const justFixed = useJustFixed(days);
   const listRef = useRef<HTMLOListElement>(null);
   const day = days.find((d) => d.date === selected) ?? days[0]!;
 
@@ -51,7 +52,7 @@ export function ForecastStrip({
               onClick={() => setSelected(d.date)}
               className="block w-full rounded-tile text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
             >
-              <StripTileFace day={d} inverse selected={d.date === selected} />
+              <StripTileFace day={d} inverse selected={d.date === selected} justFixed={justFixed.has(d.date)} />
             </button>
           </li>
         ))}
@@ -61,4 +62,40 @@ export function ForecastStrip({
       </div>
     </div>
   );
+}
+
+const SEEN_KEY = "nevershort:strip-seen";
+
+/**
+ * Days that were short the last time this tab showed the strip and aren't any more: the gap was just fixed, so
+ * their COVERED stamp lands. Remembered for the tab only (sessionStorage); without it, nothing is stamped.
+ */
+function useJustFixed(days: ForecastDay[]): Set<string> {
+  const [fixed, setFixed] = useState<Set<string>>(() => new Set());
+  const signature = days.map((d) => `${d.date}:${d.state}`).join(",");
+  useEffect(() => {
+    let seen: Record<string, string> = {};
+    try {
+      seen = JSON.parse(sessionStorage.getItem(SEEN_KEY) ?? "{}") as Record<string, string>;
+    } catch {
+      seen = {};
+    }
+    const newly = signature
+      .split(",")
+      .map((pair) => pair.split(":") as [string, string])
+      .filter(([date, state]) => seen[date] === "short" && state !== "short")
+      .map(([date]) => date);
+    // Next frame: the strip paints first, then the stamp lands on it. What was seen is saved in the same frame, so an
+    // effect that is cancelled and run again (React does this in development) still finds the old states.
+    const frame = requestAnimationFrame(() => {
+      try {
+        sessionStorage.setItem(SEEN_KEY, JSON.stringify(Object.fromEntries(signature.split(",").map((pair) => pair.split(":")))));
+      } catch {
+        // Private mode: nothing is remembered and nothing is stamped.
+      }
+      if (newly.length > 0) setFixed((current) => new Set([...current, ...newly]));
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [signature]);
+  return fixed;
 }

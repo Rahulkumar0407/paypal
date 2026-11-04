@@ -255,7 +255,7 @@ export const NOTE_ROOM = "@min-[760px]:pr-[170px] @min-[940px]:pr-[290px]";
 /** The deep green note with the engraving behind its content. Content inside is white (use `inverse`). */
 export function BanknotePanel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <section className={`@container relative overflow-hidden bg-brand text-white ${className}`}>
+    <section className={`banknote @container relative overflow-hidden bg-brand text-white ${className}`}>
       <BanknoteArt />
       <div className="relative">{children}</div>
     </section>

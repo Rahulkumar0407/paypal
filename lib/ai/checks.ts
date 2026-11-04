@@ -42,6 +42,9 @@ export function problemWith(text: string, allowed: Allowed): string | null {
   const lower = text.toLowerCase();
   const banned = BANNED.find((w) => lower.includes(w));
   if (banned) return `banned word "${banned}"`;
+  // A field name from the input leaking into the prose ("the paymentsTotal of $1,500").
+  const field = text.match(/\b[a-z]+(?:[A-Z][a-z0-9]*)+\b|\b[a-z]+_[a-z0-9_]+\b/);
+  if (field) return `a code name: ${field[0]}`;
   const centForms = new Set([...allowed.cents].flatMap(dollarForms));
   for (const raw of text.match(NUMBER) ?? []) {
     const token = normal(raw);

@@ -37,27 +37,54 @@ export function StripTile({ day, inverse = false }: { day: ForecastDay; inverse?
   );
 }
 
-/** The inside of a tile: day, coloured block with the closing balance, condition word. Reused by tappable strips. */
-export function StripTileFace({ day, inverse = false, selected = false }: { day: ForecastDay; inverse?: boolean; selected?: boolean }) {
+/**
+ * The inside of a tile: the day, a ticket stub coloured by how the day looks with its closing balance, and the
+ * condition word. A short day carries a SHORT ink stamp; `justFixed` lands a COVERED stamp (the gap was just fixed).
+ * Reused by tappable strips.
+ */
+export function StripTileFace({
+  day,
+  inverse = false,
+  selected = false,
+  justFixed = false,
+}: {
+  day: ForecastDay;
+  inverse?: boolean;
+  selected?: boolean;
+  justFixed?: boolean;
+}) {
   const condition = day.state === "short" ? `${formatShortfall(day.shortByCents)} short` : DAY_WORD[day.state];
-  const ring = selected ? (inverse ? "ring-2 ring-white ring-offset-2 ring-offset-brand" : "ring-2 ring-ink ring-offset-2") : "";
+  const label = day.isToday ? "Today" : (
+    <>
+      {weekdayShort(day.date)} <span className="tabular">{dayOfMonth(day.date)}</span>
+    </>
+  );
   return (
     <>
-      <p className={`text-[13px] leading-5 whitespace-nowrap ${inverse ? "text-white/80" : "text-ink-muted"} ${selected ? "font-semibold" : ""}`}>
-        {day.isToday ? (
-          <span className={`font-semibold ${inverse ? "text-white" : "text-ink"}`}>Today</span>
-        ) : (
-          <>
-            {weekdayShort(day.date)} <span className="tabular">{dayOfMonth(day.date)}</span>
-          </>
-        )}
-      </p>
-      <div
-        className={`strip-block mt-1 flex h-[68px] items-end rounded-tile px-2.5 pb-2 lg:h-[84px] lg:px-3 lg:pb-2.5 ${DAY_FILL[day.state]} ${ring}`}
-      >
-        <span className="font-serif text-[21px] leading-none font-bold tracking-[-0.02em] whitespace-nowrap text-ink tabular lg:text-[27px] lg:font-semibold">
-          {formatDollars(day.closingCents)}
+      <p className="text-[13px] leading-5 whitespace-nowrap">
+        <span
+          className={`inline-block rounded-full px-1.5 -mx-1.5 ${
+            selected ? (inverse ? "bg-white font-semibold text-ink on-paper" : "bg-ink font-semibold text-white") : day.isToday ? `font-semibold ${inverse ? "text-white" : "text-ink"}` : inverse ? "text-white/80" : "text-ink-muted"
+          }`}
+        >
+          {label}
         </span>
+      </p>
+      <div className="ticket-wrap mt-1" data-selected={selected}>
+        <div className={`strip-block ticket flex h-[76px] items-end rounded-tile px-2.5 pb-2 lg:h-[92px] lg:px-3 lg:pb-2.5 ${DAY_FILL[day.state]}`}>
+          <span className="font-serif text-[21px] leading-none font-bold tracking-[-0.02em] whitespace-nowrap text-ink tabular lg:text-[27px] lg:font-semibold">
+            {formatDollars(day.closingCents)}
+          </span>
+          {day.state === "short" ? (
+            <span aria-hidden className="ticket-stamp ticket-stamp-short">
+              Short
+            </span>
+          ) : justFixed ? (
+            <span aria-hidden className="ticket-stamp ticket-stamp-covered ticket-stamp-land">
+              Covered
+            </span>
+          ) : null}
+        </div>
       </div>
       <p
         className={`mt-1.5 text-[13px] leading-4 whitespace-nowrap ${

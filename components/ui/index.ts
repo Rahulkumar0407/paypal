@@ -2,7 +2,7 @@
 export { HeadlineSentence, PageSentence } from "./HeadlineSentence";
 export { MoneyStrip, StripTile, StripTileFace } from "./MoneyStrip";
 export { StatusChip } from "./StatusChip";
-export { PaperBackdrop, RopeRule } from "./Paper";
+export { MatBackdrop, RopeRule } from "./Paper";
 export { RefereeCard } from "./RefereeCard";
 export { Receipt } from "./Receipt";
 export { BanknotePanel, BanknoteArt, NOTE_ROOM } from "./Banknote";

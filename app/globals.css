@@ -63,8 +63,408 @@
   }
 }
 
+/*
+ * --- The counting mat ------------------------------------------------------------------
+ * Every owner page sits on a near-black green felt mat, like a bank teller's counting mat. Things you read sit on
+ * paper (cards, receipts, tiles) above it. Text placed straight on the mat turns light by itself: the mat swaps the
+ * ink tokens, and every paper or meaning-coloured surface swaps them back. So `text-ink` is right everywhere.
+ */
+/*
+ * --- The money desk -------------------------------------------------------------------------
+ * Three objects, not a colour: the dark desk (.mat, the page itself), the till on it (.till-body, holding the keys)
+ * and a green felt counting mat (.mat-surface, its stitched edge drawn by MatBackdrop). Paper, notes, receipts and
+ * the till drawer lie on the mat with real shadows. Text tokens are light here; paper resets them (below).
+ */
+.mat {
+  /* Paper on the mat is banknote paper, a soft green-grey, so it doesn't glare against the felt. */
+  --color-paper: #edf0e9;
+  --color-ink: #eef1ec;
+  --color-ink-muted: rgb(238 241 236 / 0.76);
+  --color-line: rgb(238 241 236 / 0.18);
+  background-color: #0a0f0d;
+  color: var(--color-ink);
+}
+.mat-surface {
+  background-color: #2a5a46;
+  /* Felt grain, then a fine twill weave like card-table cloth. */
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.93 0 0 0 0 0.95 0 0 0 0 0.92 0 0 0 0.16 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23f)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6'%3E%3Cpath d='M-1 1L1 -1M0 6L6 0M5 7L7 5' stroke='%23000' stroke-opacity='.16' stroke-width='1.3'/%3E%3Cpath d='M-1 4L4 -1M2 7L7 2' stroke='%23fff' stroke-opacity='.045'/%3E%3C/svg%3E");
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.1),
+    inset 0 0 0 1px rgb(0 0 0 / 0.28),
+    0 0 0 1px rgb(0 0 0 / 0.6);
+}
+.till-body {
+  background-color: #161f1b;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.09),
+    inset 0 0 0 1px rgb(255 255 255 / 0.035),
+    inset 0 -2px 0 rgb(0 0 0 / 0.45),
+    0 0 0 1px rgb(0 0 0 / 0.7),
+    0 22px 44px -22px #000;
+}
+/* A slotted screw holding the till panel down. */
+.screw {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #2b3631;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.2),
+    inset 0 -1px 0 rgb(0 0 0 / 0.5),
+    0 1px 0 rgb(255 255 255 / 0.05);
+}
+.screw::after {
+  content: "";
+  position: absolute;
+  inset: 4px 1.5px auto;
+  height: 1px;
+  background: rgb(0 0 0 / 0.65);
+  transform: rotate(var(--turn, 35deg));
+}
+/* The banknote is a thick object on the mat too. */
+.mat .banknote {
+  box-shadow:
+    0 1px 0 rgb(0 0 0 / 0.4),
+    0 3px 5px rgb(0 0 0 / 0.3),
+    0 26px 50px -22px rgb(0 0 0 / 0.85);
+}
+.mat :focus-visible {
+  outline-color: #eef1ec;
+}
+:is(.bg-paper, .bg-surface, .bg-paper\/70, .bg-green, .bg-amber, .bg-red, .receipt-paper, .on-paper) {
+  --color-ink: #14201b;
+  --color-ink-muted: #56605b;
+  --color-line: #dce1dd;
+  color: var(--color-ink);
+}
+:is(.bg-paper, .bg-surface, .bg-paper\/70, .on-paper) :focus-visible {
+  outline-color: var(--color-brand);
+}
+/* Paper lying on the mat: a soft contact shadow and a long, faint one. */
+.mat :is(.rounded-card.bg-paper, .rounded-card.bg-surface) {
+  box-shadow:
+    0 1px 0 rgb(0 0 0 / 0.25),
+    0 2px 4px rgb(0 0 0 / 0.18),
+    0 16px 34px -18px rgb(0 0 0 / 0.55);
+}
+
+/*
+ * --- Register keys: the owner's menu -------------------------------------------------------
+ * Chunky ivory till keys standing on the mat. Hover lowers a key a little; the current page's key stays pressed
+ * down, its face the note's green. Labels are words (the key is never the only signal).
+ */
+.key {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  min-height: 62px;
+  padding: 8px 12px 11px;
+  border-radius: 10px;
+  /* The cap's sloped sides; the dished face is ::before. */
+  background: #c9d0c8;
+  color: #14201b;
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.75),
+    inset 0 -1px 0 rgb(0 0 0 / 0.14),
+    0 4px 0 #87918a,
+    0 5px 0 #040706,
+    0 10px 14px -4px rgb(0 0 0 / 0.8);
+  transform: translateY(0);
+  transition:
+    transform 110ms var(--ease-land),
+    box-shadow 110ms var(--ease-land);
+}
+.key::before {
+  content: "";
+  position: absolute;
+  inset: 3px 4px 6px;
+  z-index: -1;
+  border-radius: 8px 8px 9px 9px;
+  background: #f5f7f3;
+  box-shadow:
+    inset 0 2px 4px rgb(20 32 27 / 0.12),
+    inset 0 -1px 0 rgb(255 255 255 / 0.9);
+  transition: background-color 140ms ease;
+}
+.key:hover {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.75),
+    inset 0 -1px 0 rgb(0 0 0 / 0.14),
+    0 2px 0 #87918a,
+    0 3px 0 #040706,
+    0 6px 10px -4px rgb(0 0 0 / 0.75);
+}
+.key:active,
+.key[aria-current="page"] {
+  transform: translateY(4px);
+  background: #072219;
+  color: #ffffff;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.1),
+    0 1px 0 #040706,
+    0 2px 4px rgb(0 0 0 / 0.6);
+}
+.key:active::before,
+.key[aria-current="page"]::before {
+  background: #0e3b2c;
+  box-shadow:
+    inset 0 2px 5px rgb(0 0 0 / 0.4),
+    inset 0 -1px 0 rgb(255 255 255 / 0.07);
+}
+/* The number printed on the keycap: also its keyboard shortcut. */
+.key .key-num {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: rgb(20 32 27 / 0.48);
+  font-variant-numeric: tabular-nums;
+}
+.key[aria-current="page"] .key-num {
+  color: rgb(255 255 255 / 0.6);
+}
+/* The phone's row of keys: shorter, the word centred, no number. */
+.key.key-sm {
+  min-height: 50px;
+  padding: 6px 4px 9px;
+  justify-content: center;
+  align-items: center;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+}
+/*
+ * --- The till drawer (To pay) -----------------------------------------------------------------
+ * One slot per payment; a stack of notes under a spring clip is how much of it is ready. Dashed outlines are the
+ * notes still missing (red when the payment is short, with the words "$90 short" beside it).
+ */
+.till-tray {
+  border-radius: 18px;
+  padding: 12px;
+  background: #111a16;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.08),
+    inset 0 0 0 1px rgb(255 255 255 / 0.03),
+    0 0 0 1px rgb(0 0 0 / 0.55),
+    0 22px 40px -18px rgb(0 0 0 / 0.85);
+}
+.till-slot {
+  border-radius: 11px;
+  padding: 14px 16px 14px;
+  background: #070d0b;
+  box-shadow:
+    inset 0 3px 10px rgb(0 0 0 / 0.85),
+    inset 0 0 0 1px rgb(0 0 0 / 0.6),
+    0 1px 0 rgb(255 255 255 / 0.05);
+}
+.cash-stack {
+  position: relative;
+  display: block;
+  padding-top: calc(100% / 2.35 + 35px);
+}
+.cash-note,
+.cash-ghost {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: block;
+  aspect-ratio: 2.35;
+  border-radius: 3px;
+}
+.cash-note {
+  background: #cfd9cf;
+  box-shadow:
+    0 0 0 0.5px rgb(14 59 44 / 0.45),
+    0 1px 1px rgb(0 0 0 / 0.45);
+}
+.cash-note:nth-child(even) {
+  background: #dde5dc;
+}
+.cash-note-top {
+  overflow: hidden;
+  background: #eef2ec !important;
+  box-shadow:
+    inset 0 0 0 4px #eef2ec,
+    inset 0 0 0 5px rgb(14 59 44 / 0.55),
+    inset 0 0 0 7px #eef2ec,
+    inset 0 0 0 7.6px rgb(14 59 44 / 0.28),
+    0 0 0 0.5px rgb(14 59 44 / 0.45),
+    0 2px 3px rgb(0 0 0 / 0.5);
+}
+.cash-ghost {
+  border: 1.5px dashed rgb(238 241 236 / 0.35);
+}
+.cash-ghost-short {
+  border-color: #e5484d;
+  background: rgb(229 72 77 / 0.08);
+}
+.cash-medallion {
+  position: absolute;
+  top: 54%;
+  left: 74%;
+  width: 24%;
+  aspect-ratio: 0.82;
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+  box-shadow:
+    inset 0 0 0 1px rgb(14 59 44 / 0.5),
+    inset 0 0 0 4px #eef2ec,
+    inset 0 0 0 4.6px rgb(14 59 44 / 0.3);
+}
+.cash-maker {
+  position: absolute;
+  top: 8px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 6px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgb(14 59 44 / 0.6);
+}
+.cash-figure {
+  position: absolute;
+  left: 11px;
+  bottom: 8px;
+  font-family: var(--font-serif);
+  font-size: 17px;
+  line-height: 1;
+  color: #0e3b2c;
+}
+.till-clip {
+  position: absolute;
+  z-index: 10;
+  left: -8px;
+  right: -8px;
+  height: 12px;
+  border-radius: 6px;
+  background: #9aa39d;
+  box-shadow:
+    inset 0 4px 0 #c9d0cb,
+    inset 0 -3px 0 #6e7771,
+    0 3px 5px rgb(0 0 0 / 0.55);
+  transition: top 420ms var(--ease-land);
+}
+@keyframes note-in {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.note-in {
+  animation: note-in 420ms var(--ease-land) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .note-in {
+    animation: none;
+  }
+  .till-clip {
+    transition: none;
+  }
+}
+/* The till's display window: recessed into the mat. */
+.till-display {
+  border-radius: 10px;
+  background: rgb(0 0 0 / 0.32);
+  box-shadow:
+    inset 0 2px 6px rgb(0 0 0 / 0.55),
+    inset 0 0 0 1px rgb(238 241 236 / 0.08),
+    0 1px 0 rgb(238 241 236 / 0.06);
+}
+
 @utility tabular {
   font-variant-numeric: tabular-nums lining-nums;
+}
+
+/*
+ * --- Day tickets ---------------------------------------------------------------------------
+ * Each day of the strip is a tear-off ticket stub: two round notches and a dotted tear line near the top, the
+ * day's closing balance below. The notches are a mask (a shape, not a colour gradient); the lift and shadow live on
+ * the wrapper so the mask never clips them.
+ */
+.ticket-wrap {
+  position: relative;
+  filter: drop-shadow(0 1px 0 rgb(0 0 0 / 0.28)) drop-shadow(0 6px 10px rgb(0 0 0 / 0.22));
+  transition: transform 220ms var(--ease-land);
+}
+.ticket-wrap[data-selected="true"] {
+  transform: translateY(-4px);
+}
+.ticket {
+  --notch: 6px;
+  --tear: 15px;
+  position: relative;
+  -webkit-mask:
+    radial-gradient(circle var(--notch) at 0 var(--tear), #0000 97%, #000) left / 51% 100% no-repeat,
+    radial-gradient(circle var(--notch) at 100% var(--tear), #0000 97%, #000) right / 51% 100% no-repeat;
+  mask:
+    radial-gradient(circle var(--notch) at 0 var(--tear), #0000 97%, #000) left / 51% 100% no-repeat,
+    radial-gradient(circle var(--notch) at 100% var(--tear), #0000 97%, #000) right / 51% 100% no-repeat;
+}
+.ticket::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--notch) + 3px);
+  right: calc(var(--notch) + 3px);
+  top: calc(var(--tear) - 1px);
+  border-top: 2px dotted rgb(20 32 27 / 0.42);
+}
+/* An ink stamp pressed onto a ticket: SHORT in red ink, COVERED in green ink. Decorative: the word under the
+   ticket says the same thing. */
+.ticket-stamp {
+  position: absolute;
+  right: 4px;
+  top: 21px;
+  padding: 1px 5px;
+  border: 2px solid currentColor;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  transform: rotate(-9deg);
+  background: rgb(255 255 255 / 0.82);
+  mix-blend-mode: multiply;
+}
+.ticket-stamp-short {
+  color: #b42318;
+  background: rgb(255 255 255 / 0.88);
+}
+.ticket-stamp-covered {
+  color: #0e3b2c;
+}
+@keyframes ticket-stamp-land {
+  0% {
+    opacity: 0;
+    transform: rotate(-9deg) scale(2.2);
+  }
+  60% {
+    opacity: 1;
+    transform: rotate(-9deg) scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(-9deg) scale(1);
+  }
+}
+.ticket-stamp-land {
+  animation: ticket-stamp-land 460ms var(--ease-land) both;
 }
 
 /* --- Money strip: a tile turns green when its day is fixed ------------------------ */
@@ -123,12 +523,17 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .strip-block {
+  .strip-block,
+  .key {
     transition: none;
   }
   .stamp-animate,
-  .headline-settle {
+  .headline-settle,
+  .ticket-stamp-land {
     animation: none;
+  }
+  .ticket-wrap {
+    transition: none;
   }
 }
 
