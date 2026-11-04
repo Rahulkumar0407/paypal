@@ -1,6 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { MockLanguageModelV4 } from "ai/test";
+import { forgetAiTextsForTests } from "./run";
 import { draftReminder, reminderTemplate } from "./reminder";
+
+beforeEach(() => forgetAiTextsForTests());
 
 const BANNED = ["!", "unlock", "seamless", "supercharge", "AI-powered"];
 

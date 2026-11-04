@@ -51,10 +51,10 @@ export async function explainShortfall(forecast: Forecast, model: LanguageModel 
   const template = shortfallTemplate(forecast);
   const facts = shortfallFacts(forecast);
   if (!template || !facts || !model) return template;
-  return shortfallMemo(`${forecast.storeId}:${JSON.stringify(facts)}`, async () => {
+  return shortfallMemo(JSON.stringify(facts), async () => {
     const text = await aiText(model, `${STYLE} Explain why that day is short.`, JSON.stringify(facts));
     return text && problemWith(text, allowedFrom([facts])) === null ? text : template;
-  });
+  }, (text) => text !== template);
 }
 
 export function regularPaymentTemplate(e: PatternEvidence): string {
@@ -78,10 +78,10 @@ export async function explainRegularPayment(payee: RecurringPayee, evidence: Pat
     typical: formatDollars(evidence.typicalCents),
     summary: payee.summary,
   };
-  return payeeMemo(`${payee.id}:${JSON.stringify(facts)}`, async () => {
+  return payeeMemo(JSON.stringify(facts), async () => {
     const text = await aiText(model, `${STYLE} Say what this regular payment was found from.`, JSON.stringify(facts));
     return text && problemWith(text, allowedFrom([facts])) === null ? text : template;
-  });
+  }, (text) => text !== template);
 }
 
 export interface RiskFacts {
@@ -105,5 +105,5 @@ export async function explainRisk(r: RiskFacts, model: LanguageModel | null): Pr
   return riskMemo(JSON.stringify(facts), async () => {
     const text = await aiText(model, `${STYLE} Say why this order looks risky, calmly, without accusing the customer.`, JSON.stringify(facts));
     return text && problemWith(text, allowedFrom([facts])) === null ? text : template;
-  });
+  }, (text) => text !== template);
 }

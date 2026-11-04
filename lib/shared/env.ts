@@ -23,7 +23,12 @@ const envSchema = z.object({
   /** Set by Next.js and Node. Fake PayPal mode is refused when this is "production". */
   NODE_ENV: z.enum(["development", "production", "test"]).optional(),
 
+  /** One model id, or several separated by commas (tried in that order when one is out of quota). */
   AI_MODEL: z.string().min(1).optional(),
+  /** The app's own budget per key and model, kept under Google's free limits (aistudio.google.com/rate-limit). */
+  AI_MAX_REQUESTS_PER_MINUTE: z.coerce.number().int().positive().default(8),
+  AI_MAX_REQUESTS_PER_DAY: z.coerce.number().int().positive().default(200),
+  /** One Gemini key, or several separated by commas: requests are shared between them. */
   GOOGLE_GENERATIVE_AI_API_KEY: z.string().min(1).optional(),
   OPENROUTER_API_KEY: z.string().min(1).optional(),
 });

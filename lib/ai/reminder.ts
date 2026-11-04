@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { LanguageModel } from "ai";
 import type { ReminderDraft } from "@/types";
 import { allowedFrom, problemWith } from "./checks";
-import { aiObject } from "./run";
+import { aiObject, memo } from "./run";
 
 /**
  * Reminder messages. `draftReminder` asks the model for a short, polite message; code checks it (voice rules, no
@@ -53,10 +53,16 @@ const SYSTEM = [
   "For a follow-up (sequence 2 or more), say it is the last reminder and that there is no need to reply.",
 ].join("\n");
 
+const drafts = memo<ReminderDraft>();
+
 /** A drafted reminder ("Drafted for you"), or the template when AI is off, fails, or writes something the checks reject. */
 export async function draftReminder(input: DraftInput, model: LanguageModel | null): Promise<ReminderDraft> {
+  if (!model) return reminderTemplate(input);
+  return drafts(JSON.stringify(input), () => draftWith(input, model), (d) => d.source === "ai");
+}
+
+async function draftWith(input: DraftInput, model: LanguageModel): Promise<ReminderDraft> {
   const fallback = reminderTemplate(input);
-  if (!model) return fallback;
   const facts = { customerFirstName: input.firstName, orderNumber: input.orderNumber, items: input.items, sequence: input.sequence };
   const draft = await aiObject(model, DRAFT, SYSTEM, JSON.stringify(facts));
   if (!draft) return fallback;

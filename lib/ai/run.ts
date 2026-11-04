@@ -29,15 +29,28 @@ export async function aiObject<T>(model: LanguageModel, schema: z.ZodType<T>, sy
   }
 }
 
-/** Remembers recent explanations for an hour, so a page reload doesn't ask the model again (and the demo replays). */
-export function memo<T>(limit = 200, ttlMs = 60 * 60 * 1000) {
+/**
+ * Remembers AI texts for a day, keyed by the facts they were written from. Every visitor's copy of the demo store has
+ * the same facts at the same story step, so after the first visitor, the rest cost no Gemini requests (and the demo
+ * replays word for word).
+ */
+const memories: Map<string, unknown>[] = [];
+
+/** `keep` decides what is worth remembering: only what the AI actually wrote, never a fallback (so it's retried). */
+export function memo<T>(limit = 500, ttlMs = 24 * 60 * 60 * 1000) {
   const entries = new Map<string, { value: T; at: number }>();
-  return async (key: string, work: () => Promise<T>): Promise<T> => {
+  memories.push(entries);
+  return async (key: string, work: () => Promise<T>, keep: (value: T) => boolean = () => true): Promise<T> => {
     const hit = entries.get(key);
     if (hit && Date.now() - hit.at < ttlMs) return hit.value;
     const value = await work();
-    entries.set(key, { value, at: Date.now() });
+    if (keep(value)) entries.set(key, { value, at: Date.now() });
     if (entries.size > limit) entries.delete(entries.keys().next().value!);
     return value;
   };
+}
+
+/** Tests only: forget every remembered AI text. */
+export function forgetAiTextsForTests(): void {
+  for (const m of memories) m.clear();
 }

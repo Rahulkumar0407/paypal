@@ -36,8 +36,11 @@ What P2 (and P2's agent) needs to know:
 - **P2-6:** `tests/e2e/smoke.spec.ts` (P2's file) has 8 failing checks from old wording: the "closes at $150" text
   on Home, 6 sample receipts on `/receipts` (a fresh copy has none until something is decided), and the `/approvals`
   and `/demo` headings. Update them to the current screens, then add the 6-step story with `PAYPAL_FAKE=1`.
-- **P2-7 README:** copy the AI section from `lib/ai/README.md` (default model `gemini-3.5-flash`; with no
-  `AI_MODEL` or key, every AI feature uses its plain fallback). Live Gemini hasn't been tried yet.
+- **P2-7 README:** copy the AI section from `lib/ai/README.md` (default model `gemini-3.5-flash-lite`; several keys
+  comma-separated share the load within a per-key budget; with no `AI_MODEL` or key, every AI feature uses its plain
+  fallback). Live Gemini hasn't been tried yet.
+- **Render env for AI:** `AI_MODEL=gemini-3.5-flash-lite`, `GOOGLE_GENERATIVE_AI_API_KEY=key1,key2,...`, and optionally
+  `AI_MAX_REQUESTS_PER_MINUTE` / `AI_MAX_REQUESTS_PER_DAY` set just under what aistudio.google.com/rate-limit shows.
 - **Running locally:** `npm run dev`. Pages take seconds because the database is in Paris; on Render (Frankfurt) it
   should be quick. Approvals runs the reminder helper and the risk check each time it opens.
 
