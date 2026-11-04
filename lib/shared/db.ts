@@ -35,8 +35,12 @@ export function createPrismaClient(connectionString: string): PrismaClient {
     // Supabase requires TLS. Its pooler certificate is not in Node's default trust store,
     // so verify encryption but not the chain, unless the URL sets sslmode itself.
     ssl: sslInUrl || isLocalHost(connectionString) ? undefined : { rejectUnauthorized: false },
-    max: 5,
+    // Ten connections: a page's forecast reads ~10 small queries at once, so they go in one wave, not two.
+    max: 10,
     connectionTimeoutMillis: 8_000,
+    // Keep connections open between visits: opening a new TLS connection to Supabase costs a second or two.
+    idleTimeoutMillis: 5 * 60 * 1000,
+    keepAlive: true,
   });
   return new PrismaClient({ adapter });
 }
