@@ -3,7 +3,7 @@ import { formatDay } from "@/lib/shared/dates";
 import { formatCents } from "@/lib/shared/money";
 
 /**
- * The Margin Guard's 8 rules (AGENTS.md section 4). Pure: (proposal, context) -> PASS | FAIL | N/A with a plain reason.
+ * The Margin Guard's 9 rules (AGENTS.md section 4). Pure: (proposal, context) -> PASS | FAIL | N/A with a plain reason.
  * The context loader (context.ts) gathers the facts first. Anything it couldn't check arrives as "unknown", and the
  * rule FAILS: the Guard fails closed.
  */
@@ -13,6 +13,9 @@ export const OWNER_APPROVAL_LIMIT_CENTS: Cents = 10_000;
 /** A set-aside may keep at most this share of a day's expected sales (rule 7), as tenths: 3 = 30%. */
 const SET_ASIDE_CAP_TENTHS = 3;
 const MAX_REMINDERS_48H = 2;
+/** Rule 9: money out through supplier payments, refunds and loans in any 7 days, before the owner is asked. */
+export const SPENDING_LIMIT_CENTS: Cents = 50_000;
+export const SPENDING_WINDOW_DAYS = 7;
 
 export interface OrderFacts {
   id: string;
@@ -48,6 +51,8 @@ export interface GuardContext {
   /** Another proposal already uses this idempotency key. */
   duplicate: boolean | null;
   forecast: ForecastFacts;
+  /** Rule 9: what supplier payments, refunds and loans moved or asked for in the last 7 days, not counting this one. */
+  spentLast7DaysCents: number | null;
 }
 
 interface RuleDef {
@@ -201,13 +206,26 @@ export const RULES: readonly RuleDef[] = [
       return ["PASS", `${formatCents(p.amountCents)} is within the ${formatCents(OWNER_APPROVAL_LIMIT_CENTS)} NeverShort can do on its own.`];
     },
   },
+  {
+    number: 9,
+    id: "TOTAL_SPENDING",
+    name: "Total spending",
+    onFail: "ESCALATE",
+    appliesTo: ["PAY_SUPPLIER", "REFUND", "GAP_LOAN"],
+    check: (p, { spentLast7DaysCents: spent }) => {
+      if (spent === null) return ["FAIL", "Couldn't add up this week's spending, so you decide."];
+      const total = spent + p.amountCents;
+      const within = `${formatCents(total)} in ${SPENDING_WINDOW_DAYS} days with this one, against a limit of ${formatCents(SPENDING_LIMIT_CENTS)}`;
+      return total > SPENDING_LIMIT_CENTS ? ["FAIL", `That makes ${within}, so you decide.`] : ["PASS", `That makes ${within}.`];
+    },
+  },
 ];
 
 function cap(text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-/** All 8 rules, in order, each PASS, FAIL or N/A with a plain reason. */
+/** All 9 rules, in order, each PASS, FAIL or N/A with a plain reason. */
 export function runRules(proposal: ActionProposal, ctx: GuardContext): RuleResult[] {
   return RULES.map((rule) => {
     const applies = rule.appliesTo === "ALL" || rule.appliesTo.includes(proposal.type);

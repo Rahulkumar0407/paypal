@@ -3,7 +3,7 @@ import type { ActionProposal, ActionType, PayPalOrderRef } from "@/types";
 import { getOrder } from "@/lib/paypal";
 import { getForecast, simulateAction } from "@/lib/forecast";
 import { realNow } from "@/lib/shared/clock";
-import type { ForecastFacts, GuardContext, OrderFacts, PayPalFacts } from "./rules";
+import { SPENDING_WINDOW_DAYS, type ForecastFacts, type GuardContext, type OrderFacts, type PayPalFacts } from "./rules";
 
 /**
  * The context loader: gathers every fact the rules need before they run. It never throws for a fact it can't get;
@@ -14,6 +14,7 @@ import type { ForecastFacts, GuardContext, OrderFacts, PayPalFacts } from "./rul
 const ORDER_ACTIONS: readonly ActionType[] = ["SEND_REMINDER", "REFUND", "HOLD_ORDER"];
 const FORECAST_ACTIONS: readonly ActionType[] = ["PAY_SUPPLIER", "REFUND", "MOVE_PAYMENT", "GAP_LOAN", "SET_ASIDE"];
 const CONTACT_WINDOW_MS = 48 * 60 * 60 * 1000;
+const SPENDING_ACTIONS = ["PAY_SUPPLIER", "REFUND", "GAP_LOAN"] as const;
 
 function orderIdOf(proposal: ActionProposal): string | null {
   switch (proposal.type) {
@@ -80,15 +81,38 @@ export function contextLoader(db: PrismaClient) {
     }
   }
 
+  /** Rule 9: what spending actions moved or asked for in the last 7 days (approved, done, or waiting), not this one. */
+  async function spentLast7Days(proposal: ActionProposal): Promise<number | null> {
+    try {
+      const since = new Date(realNow().getTime() - SPENDING_WINDOW_DAYS * 24 * 60 * 60 * 1000);
+      const { _sum } = await db.proposal.aggregate({
+        where: {
+          storeId: proposal.storeId,
+          id: { not: proposal.id },
+          type: { in: [...SPENDING_ACTIONS] },
+          status: { in: ["APPROVED", "ESCALATED", "OWNER_APPROVED", "EXECUTED"] },
+          createdAt: { gte: since },
+        },
+        _sum: { amountCents: true },
+      });
+      return _sum.amountCents ?? 0;
+    } catch (error) {
+      console.error("[guard] spending total failed:", error instanceof Error ? error.message : error);
+      return null;
+    }
+  }
+
   return async function facts(proposal: ActionProposal): Promise<Omit<GuardContext, "duplicate">> {
     const orderId = orderIdOf(proposal);
     const reminder = proposal.type === "SEND_REMINDER";
-    const [found, reminders, forecast] = await Promise.all([
+    const spending = (SPENDING_ACTIONS as readonly string[]).includes(proposal.type);
+    const [found, reminders, forecast, spent] = await Promise.all([
       orderId && ORDER_ACTIONS.includes(proposal.type) ? order(proposal.storeId, orderId) : Promise.resolve(null),
       reminder && orderId ? remindersLast48h(proposal.storeId, orderId) : Promise.resolve(0),
       FORECAST_ACTIONS.includes(proposal.type) ? forecastFacts(proposal) : Promise.resolve<ForecastFacts>({ kind: "NOT_NEEDED" }),
+      spending ? spentLast7Days(proposal) : Promise.resolve(0),
     ]);
     const paypal: PayPalFacts = reminder && found ? await checkPayPal(found.paypalOrderId, getOrder) : { kind: "NOT_NEEDED" };
-    return { order: found, orderMissing: orderId !== null && found === null, paypal, remindersLast48h: reminders, forecast };
+    return { order: found, orderMissing: orderId !== null && found === null, paypal, remindersLast48h: reminders, forecast, spentLast7DaysCents: spent };
   };
 }

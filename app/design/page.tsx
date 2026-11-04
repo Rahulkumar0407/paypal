@@ -103,7 +103,7 @@ export default function DesignPage() {
 
         <Section
           title="Receipts"
-          note="Every decision prints as a thermal shop receipt: mono, dashed dividers, zig-zag edges, PASS, FAIL or N/A for each of the 8 rules. A BLOCKED stamp lands on a blocked receipt, the other animation."
+          note="Every decision prints as a thermal shop receipt: mono, dashed dividers, zig-zag edges, PASS, FAIL or N/A for each of the 9 rules. A BLOCKED stamp lands on a blocked receipt, the other animation."
         >
           <div className="grid justify-items-center gap-10 rounded-card bg-surface px-4 py-10 md:grid-cols-2 xl:grid-cols-3">
             <Receipt receipt={mockReceiptReminderApproved} />

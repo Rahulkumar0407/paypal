@@ -24,7 +24,7 @@ const PARAMS = {
 const RULES = z.array(
   z.object({
     number: z.number().int(),
-    id: z.enum(["ALREADY_PAID", "CONSENT", "CONTACT_FREQUENCY", "RISK_HOLD", "DUPLICATE", "MINIMUM_BALANCE", "SET_ASIDE_CAP", "OWNER_APPROVAL"]),
+    id: z.enum(["ALREADY_PAID", "CONSENT", "CONTACT_FREQUENCY", "RISK_HOLD", "DUPLICATE", "MINIMUM_BALANCE", "SET_ASIDE_CAP", "OWNER_APPROVAL", "TOTAL_SPENDING"]),
     name: z.string(),
     outcome: z.enum(["PASS", "FAIL", "N/A"]),
     onFail: z.enum(["BLOCK", "ESCALATE"]),

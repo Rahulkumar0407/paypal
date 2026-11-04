@@ -49,8 +49,8 @@ describe("mock forecast tells the demo story", () => {
     expect(mockAffordability.shortfallAfter?.amountCents).toBe(29_000);
   });
 
-  it("prints every receipt with all 8 rules in order", () => {
-    for (const r of mockReceipts) expect(r.decision.rules.map((x) => x.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+  it("prints every receipt with all 9 rules in order", () => {
+    for (const r of mockReceipts) expect(r.decision.rules.map((x) => x.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
     const blocked = mockReceipts.find((r) => r.decision.decision === "BLOCK")!;
     expect(blocked.decision.rules.filter((x) => x.outcome === "FAIL").map((x) => x.id)).toEqual(["ALREADY_PAID"]);
   });

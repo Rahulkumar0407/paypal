@@ -144,8 +144,9 @@ Lives in `lib/guard/` (P1). Plain TypeScript. No AI. Fully unit-tested.
 | 6 | Minimum balance | PAY_SUPPLIER, REFUND, MOVE_PAYMENT, GAP_LOAN, SET_ASIDE | After the action, some day in the 14-day forecast is below the owner's minimum balance **and** lower than it was before the action. | BLOCK |
 | 7 | Set-aside cap | SET_ASIDE | The daily set-aside is more than 30% of that day's expected sales. | BLOCK |
 | 8 | Owner approval | GAP_LOAN, MOVE_PAYMENT, REFUND always; any action whose amount is over $100.00 | (always triggers when it applies) | ESCALATE |
+| 9 | Total spending | PAY_SUPPLIER, REFUND, GAP_LOAN | With this action, the money these actions moved or asked for in the last 7 days (approved, done, or waiting for the owner) comes to more than $500.00. Many small actions can't add up unnoticed. | ESCALATE |
 
-**Action amount** (rule 8): the money the action moves or asks for. Reminder: the order total. Set-aside: the total
+**Action amount** (rules 8 and 9): the money the action moves or asks for. Reminder: the order total. Set-aside: the total
 over all its days. Hold: the order total. Move payment: the payment's amount.
 
 ### How a decision is made
@@ -181,7 +182,7 @@ Every decision saves a receipt. Receipts are append-only: later events (owner de
 never edited in. A receipt holds:
 
 - the request: action type, target, amount, who proposed it (which agent, or the owner), any AI-drafted text;
-- all 8 rules, each PASS, FAIL or N/A, with a plain reason;
+- all 9 rules, each PASS, FAIL or N/A, with a plain reason;
 - the final decision and the headline reason;
 - every PayPal ID checked or created (order, capture, refund, payout batch);
 - the idempotency key and timestamps (demo date and real time);

@@ -16,6 +16,7 @@ const RULES: readonly { id: RuleId; name: string; onFail: "BLOCK" | "ESCALATE" }
   { id: "MINIMUM_BALANCE", name: "Minimum balance", onFail: "BLOCK" },
   { id: "SET_ASIDE_CAP", name: "Set-aside cap", onFail: "BLOCK" },
   { id: "OWNER_APPROVAL", name: "Owner approval", onFail: "ESCALATE" },
+  { id: "TOTAL_SPENDING", name: "Total spending", onFail: "ESCALATE" },
 ];
 
 type RuleInput = Partial<Record<RuleId, [RuleOutcome, string]>>;

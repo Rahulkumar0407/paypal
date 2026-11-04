@@ -2,14 +2,14 @@
 
 **Owner:** Person 1. Task P1-7 (done). Rules and semantics: AGENTS.md section 4.
 
-**What goes here:** the Margin Guard (8 deterministic rules, no AI), receipts (append-only), the approval inbox, and
+**What goes here:** the Margin Guard (9 deterministic rules, no AI), receipts (append-only), the approval inbox, and
 the executor: the only code that carries out actions, and one of the few allowed to import `@/lib/paypal`.
 
 ## Files
 
 | File | What it does |
 |------|--------------|
-| `rules.ts` | Pure. The 8 rules, `runRules`, `decide` (BLOCK > ESCALATE > APPROVE), `recheckBlockingRules`. |
+| `rules.ts` | Pure. The 9 rules, `runRules`, `decide` (BLOCK > ESCALATE > APPROVE), `recheckBlockingRules`. |
 | `flow.ts` | The order of events: submit, approve, reject, inbox. No database, so it's tested in memory. |
 | `context.ts` | Gathers the facts the rules need: the order, PayPal's status, recent reminders, the forecast before and after. Never throws: a fact it can't get is unknown, and the rule that needs it fails. |
 | `executor.ts` | Carries out all 7 action types. PayPal calls go through `lib/paypal` with the idempotency key. |
@@ -30,7 +30,7 @@ Tests: `rules.test.ts` (each rule passing and failing, N/A, precedence, the demo
 
 ## How it works
 
-- **Submit:** the facts are gathered, all 8 rules run, the receipt is saved with a DECIDED event. On APPROVE the
+- **Submit:** the facts are gathered, all 9 rules run, the receipt is saved with a DECIDED event. On APPROVE the
   executor runs and EXECUTED (or EXECUTION_FAILED) is added. ESCALATE waits in the inbox. BLOCK stops.
 - **Repeats:** a proposal whose key is already used is BLOCKED by rule 5. Its receipt is filed against the stored
   proposal (the key is unique in the database), and nothing runs twice. A double submit that races is caught the same way.

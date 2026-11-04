@@ -6,7 +6,7 @@
 types (AGENTS.md section 9). One file: `index.ts`.
 
 **Must export:** `Cents`, `IsoDate`, `StoreId`, `ForecastDay`, `Forecast`, `Due`, `Shortfall`, `FixOption`,
-`AffordabilityCheck`, `ActionProposal` (one shape per `ActionType`), `GuardDecision` with `RuleResult[]` (all 8 rules),
+`AffordabilityCheck`, `ActionProposal` (one shape per `ActionType`), `GuardDecision` with `RuleResult[]` (all 9 rules),
 `Receipt`, `InboxItem`, `RiskFlag`, `Alert`, `ChatAnswer`, `RecoveryCandidate`, `OutboxMessage`, `PayPalCapture`, and the
 store shapes (`Product`, `Order`, `StoreSettings`).
 

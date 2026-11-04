@@ -42,7 +42,7 @@ export default async function ReceiptsPage({ searchParams }: { searchParams: Pro
       <div className="space-y-4">
         <PageSentence>Every safety check NeverShort ran, and why it said yes, wait or no.</PageSentence>
         <p className="max-w-[62ch] text-[16px] leading-7 text-ink-muted">
-          Before NeverShort does anything with money, the Margin Guard checks it against eight fixed rules. Each check prints a
+          Before NeverShort does anything with money, the Margin Guard checks it against nine fixed rules. Each check prints a
           receipt, like a shop till, so you can see exactly why.
         </p>
       </div>

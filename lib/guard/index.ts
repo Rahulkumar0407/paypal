@@ -2,7 +2,7 @@
  * lib/guard: the Margin Guard, receipts, the approval inbox and the executor. Owner: Person 1.
  * Plain TypeScript, no AI (AGENTS.md section 4). Nothing happens to money without passing through here.
  *
- *   rules.ts     the 8 rules and the decision (pure)
+ *   rules.ts     the 9 rules and the decision (pure)
  *   flow.ts      submit / approve / reject: the order of events (no database)
  *   context.ts   gathers the facts the rules need (read-only, fails closed)
  *   executor.ts  the only code that carries out actions
@@ -35,7 +35,7 @@ function realGuard(): Guard {
   return guard;
 }
 
-/** Run the 8 rules on a proposal. Saves nothing and runs nothing. */
+/** Run the 9 rules on a proposal. Saves nothing and runs nothing. */
 export async function evaluateProposal(proposal: ActionProposal): Promise<GuardDecision> {
   return realGuard().evaluate(proposal);
 }

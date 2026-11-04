@@ -66,6 +66,7 @@ function setup() {
     orderMissing: false,
     paypal: { kind: "NO_PAYPAL_ORDER" },
     remindersLast48h: 0,
+    spentLast7DaysCents: 0,
     forecast: { kind: "READY", before: previewDemoForecast({ recovered: true }), after: previewDemoForecast({ recovered: true, setAsideDailyCents: 1_100 }) },
   };
   const ran: string[] = [];

@@ -105,7 +105,7 @@ export function createGuard(deps: GuardDeps) {
   }
 
   return {
-    /** Runs the 8 rules and returns the decision. Saves nothing and runs nothing. */
+    /** Runs the 9 rules and returns the decision. Saves nothing and runs nothing. */
     async evaluate(proposal: ActionProposal): Promise<GuardDecision> {
       const existing = await repo.findByKey(proposal.storeId, proposal.idempotencyKey);
       return (await decision(proposal, existing !== null)).decision;

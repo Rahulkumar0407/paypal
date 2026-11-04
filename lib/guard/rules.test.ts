@@ -4,7 +4,7 @@ import { previewDemoForecast } from "@/lib/forecast";
 import { decide, judge, recheckBlockingRules, runRules, type GuardContext, type OrderFacts } from "./rules";
 
 /**
- * The 8 rules, one at a time, with fixed facts. Rules 6 and 7 use the demo store's real forecast:
+ * The 9 rules, one at a time, with fixed facts. Rules 6 and 7 use the demo store's real forecast:
  * after the $72 payment, Thu 12 Nov closes at $79.00 ($21 short); with $11 a day set aside it closes at $156.00.
  */
 
@@ -23,6 +23,7 @@ const ctx = (over: Partial<GuardContext> = {}): GuardContext => ({
   remindersLast48h: 0,
   duplicate: false,
   forecast: { kind: "NOT_NEEDED" },
+  spentLast7DaysCents: 0,
   ...over,
 });
 const ready = (before = recovered, after = setAside): GuardContext["forecast"] => ({ kind: "READY", before, after });
@@ -204,12 +205,44 @@ describe("rule 8: owner approval", () => {
   });
 });
 
+describe("rule 9: total spending", () => {
+  const payVolta = (amountCents: number): ActionProposal => ({
+    ...base,
+    id: "prop_pay",
+    type: "PAY_SUPPLIER",
+    target: { kind: "PAYEE", id: "volta", label: "Volta Audio Parts" },
+    amountCents,
+    idempotencyKey: "run_a:PAY_SUPPLIER:volta:1",
+    params: { payeeId: "volta", dueId: null },
+  });
+
+  it("passes while the week's spending stays at or under $500, counting this action", () => {
+    expect(rule(payVolta(9_000), ctx({ spentLast7DaysCents: 41_000, forecast: ready() }), "TOTAL_SPENDING")).toMatchObject({
+      outcome: "PASS",
+      reason: "That makes $500.00 in 7 days with this one, against a limit of $500.00.",
+    });
+  });
+
+  it("asks the owner when many small actions add up past $500, even though each is under $100", () => {
+    const small = payVolta(9_000);
+    const r = rule(small, ctx({ spentLast7DaysCents: 45_000, forecast: ready() }), "TOTAL_SPENDING");
+    expect(r).toMatchObject({ outcome: "FAIL", onFail: "ESCALATE", reason: "That makes $540.00 in 7 days with this one, against a limit of $500.00, so you decide." });
+    expect(rule(small, ctx({ spentLast7DaysCents: 45_000, forecast: ready() }), "OWNER_APPROVAL").outcome).toBe("PASS");
+    expect(judge(small, ctx({ spentLast7DaysCents: 45_000, forecast: ready() }), AT)).toMatchObject({ decision: "ESCALATE", headlineRule: "TOTAL_SPENDING" });
+  });
+
+  it("asks the owner when the total can't be added up (fails safe), and doesn't apply to reminders, set-asides or holds", () => {
+    expect(rule(payVolta(1_000), ctx({ spentLast7DaysCents: null, forecast: ready() }), "TOTAL_SPENDING").outcome).toBe("FAIL");
+    for (const p of [reminder(), setAsideProposal(1_100), hold]) expect(rule(p, ctx({ spentLast7DaysCents: 99_999 }), "TOTAL_SPENDING").outcome).toBe("N/A");
+  });
+});
+
 describe("which rules apply", () => {
-  it("marks rules that don't apply as N/A, in order, all 8 every time", () => {
-    expect(outcomes(reminder(), ctx())).toEqual(["PASS", "PASS", "PASS", "PASS", "PASS", "N/A", "N/A", "PASS"]);
-    expect(outcomes(hold, ctx())).toEqual(["N/A", "N/A", "N/A", "N/A", "PASS", "N/A", "N/A", "FAIL"]);
+  it("marks rules that don't apply as N/A, in order, all 9 every time", () => {
+    expect(outcomes(reminder(), ctx())).toEqual(["PASS", "PASS", "PASS", "PASS", "PASS", "N/A", "N/A", "PASS", "N/A"]);
+    expect(outcomes(hold, ctx())).toEqual(["N/A", "N/A", "N/A", "N/A", "PASS", "N/A", "N/A", "FAIL", "N/A"]);
     expect(runRules(hold, ctx())[0]!.reason).toBe("Doesn't apply to a hold.");
-    expect(runRules(refund, ctx({ forecast: ready() })).map((r) => r.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+    expect(runRules(refund, ctx({ forecast: ready() })).map((r) => r.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
   });
 });
 
@@ -246,7 +279,7 @@ describe("the demo story's decisions", () => {
   it("step 5: setting aside $11 a day ($77) is approved", () => {
     const d = judge(setAsideProposal(1_100), ctx({ order: null, forecast: ready() }), AT);
     expect(d).toMatchObject({ decision: "APPROVE" });
-    expect(d.rules.map((r) => r.outcome)).toEqual(["N/A", "N/A", "N/A", "N/A", "PASS", "PASS", "PASS", "PASS"]);
+    expect(d.rules.map((r) => r.outcome)).toEqual(["N/A", "N/A", "N/A", "N/A", "PASS", "PASS", "PASS", "PASS", "N/A"]);
   });
 
   it("a gap loan always waits for the owner, however small", () => {

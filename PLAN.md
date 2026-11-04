@@ -31,6 +31,10 @@ What P2 (and P2's agent) needs to know:
   payment). `PAYPAL_FAKE` must stay unset on Render. Migrations: `npm run db:migrate`.
 - **Shared change:** `prisma/schema.prisma` gained `PaymentAttempt` (migration `20261103120000_payment_attempts`,
   already applied to Supabase).
+- **Agreed change (Wed 4 Nov), team files:** the Margin Guard has a **9th rule, "Total spending"** (AGENTS.md
+  section 4): if supplier payments, refunds and loans in the last 7 days (approved, done or waiting) would pass $500
+  with this action, the owner decides. `types/` `RuleId` gained `TOTAL_SPENDING`; every receipt now lists 9 rules.
+  Any test of yours that counts rules should expect 9.
 - **P2-5:** `lib/store` `listRecentOrders`, `lib/forecast` `getForecast` / `getDues` / `listRecentPayments` and
   `lib/guard` `listReceipts` are real now: build the dashboard and chart on them.
 - **P2-6:** `tests/e2e/smoke.spec.ts` (P2's file) has 8 failing checks from old wording: the "closes at $150" text

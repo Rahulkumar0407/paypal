@@ -246,10 +246,11 @@ export type RuleId =
   | "DUPLICATE"
   | "MINIMUM_BALANCE"
   | "SET_ASIDE_CAP"
-  | "OWNER_APPROVAL";
+  | "OWNER_APPROVAL"
+  | "TOTAL_SPENDING";
 
 export interface RuleResult {
-  /** 1 to 8, as numbered in AGENTS.md section 4. */
+  /** 1 to 9, as numbered in AGENTS.md section 4. */
   number: number;
   id: RuleId;
   name: string;
@@ -266,7 +267,7 @@ export interface GuardDecision {
   /** The lowest-numbered failing rule that produced the decision, or null for APPROVE. */
   headlineRule: RuleId | null;
   headlineReason: string;
-  /** Always all 8 rules, in order. */
+  /** Always all 9 rules, in order. */
   rules: RuleResult[];
   paypalIdsChecked: string[];
   decidedAt: IsoDateTime;
