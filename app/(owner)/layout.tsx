@@ -1,4 +1,6 @@
+import { after } from "next/server";
 import { AppShell } from "@/components/app/AppShell";
+import { agentsHaveRun, runAgents } from "./agents";
 import { ensureStore, getVisitorStoreId } from "@/lib/demo";
 import { today } from "@/lib/shared/clock";
 
@@ -6,7 +8,9 @@ import { today } from "@/lib/shared/clock";
 export default async function OwnerLayout({ children }: { children: React.ReactNode }) {
   const storeId = await getVisitorStoreId();
   try {
-    await ensureStore(storeId);
+    const copy = await ensureStore(storeId);
+    // Once the page is sent, let the reminder helper and the risk check do their round, so Approvals is ready.
+    if (copy !== null && !agentsHaveRun(storeId)) after(() => runAgents(storeId));
   } catch (error) {
     // The pages still render from the module stubs; /demo and /api/health show the database problem.
     console.error(`[demo] could not prepare store ${storeId}:`, error instanceof Error ? error.message : error);

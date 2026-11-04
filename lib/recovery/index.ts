@@ -84,10 +84,9 @@ export async function runRecoveryAgent(storeId: StoreId): Promise<Receipt[]> {
     getDb().proposal.findMany({ where: { storeId, type: "SEND_REMINDER" }, select: { targetId: true } }),
   ]);
   const done = new Set(proposed.map((p) => p.targetId));
+  // One at a time: each decision takes a few database trips, and the database has a small pool of connections.
   const receipts: Receipt[] = [];
-  for (const c of candidates.filter((x) => !done.has(x.orderId))) {
-    receipts.push(await submitProposal(await proposeReminder(storeId, c.orderId)));
-  }
+  for (const c of candidates.filter((x) => !done.has(x.orderId))) receipts.push(await submitProposal(await proposeReminder(storeId, c.orderId)));
   return receipts;
 }
 

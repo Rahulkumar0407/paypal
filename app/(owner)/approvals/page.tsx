@@ -4,8 +4,8 @@ import { Card, EmptyState, ErrorState, PageSentence, SimulatedTag } from "@/comp
 import { InboxList } from "@/components/app/InboxList";
 import { getVisitorStoreId } from "@/lib/demo";
 import { listInbox } from "@/lib/guard";
-import { listOutbox, runRecoveryAgent } from "@/lib/recovery";
-import { runRiskCheck } from "@/lib/risk";
+import { listOutbox } from "@/lib/recovery";
+import { runAgents } from "../agents";
 import { FollowUp } from "@/components/app/FollowUp";
 import { paypalSetup } from "@/components/app/PayPalStatus";
 import { decideEscalation, sendFollowUp } from "./actions";
@@ -18,13 +18,9 @@ export default async function ApprovalsPage() {
   const storeId = await getVisitorStoreId();
   // The reminder helper looks for unfinished checkouts first, so its proposals (and the Guard's decisions) show below.
   // If it fails, the page still works: AI and agent failures are never app failures.
-  await runRecoveryAgent(storeId).catch((error: unknown) => {
-    console.error("[approvals] the reminder helper didn't run:", error instanceof Error ? error.message : error);
-  });
-  // Then the risk check: a hold for each order the rules flag, decided by the Guard like everything else.
-  await runRiskCheck(storeId).catch((error: unknown) => {
-    console.error("[approvals] the risk check didn't run:", error instanceof Error ? error.message : error);
-  });
+  // The reminder helper and the risk check: usually finished already (they start in the background on the first
+  // visit); if not, wait for them. Their failures are logged, never shown as a broken page.
+  await runAgents(storeId);
   const loaded = await Promise.all([listInbox(storeId), listOutbox(storeId)]).catch((error: unknown) => {
     console.error("[approvals] could not load the inbox:", error instanceof Error ? error.message : error);
     return null;

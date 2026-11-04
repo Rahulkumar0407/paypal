@@ -143,12 +143,13 @@ export function prismaGuardRepo(db: PrismaClient): GuardRepo {
   };
   /** Two decisions at once can pick the same receipt number; the loser simply tries again. */
   const withRetry = async <T>(work: () => Promise<T>, keyTaken: () => Promise<boolean>): Promise<T | null> => {
-    for (let attempt = 0; attempt < 4; attempt++) {
+    for (let attempt = 0; attempt < 10; attempt++) {
       try {
         return await work();
       } catch (error) {
         if (!isUniqueViolation(error)) throw error;
         if (await keyTaken()) return null;
+        await new Promise((resolve) => setTimeout(resolve, 15 + Math.floor(Math.random() * 60) * (attempt + 1)));
       }
     }
     throw new Error("Couldn't number the receipt after several tries.");

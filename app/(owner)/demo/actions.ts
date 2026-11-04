@@ -1,6 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
+import { forgetAgents, runAgents } from "../agents";
 import { getVisitorStoreId, resetStore } from "@/lib/demo";
 import { isDatabaseConfigured } from "@/lib/shared/db";
 
@@ -15,6 +17,8 @@ export async function resetMyCopy(previous: ResetResult): Promise<ResetResult> {
   const storeId = await getVisitorStoreId();
   try {
     const runId = await resetStore(storeId);
+    forgetAgents(storeId);
+    after(() => runAgents(storeId));
     revalidatePath("/", "layout");
     return { status: "done", runId };
   } catch (error) {

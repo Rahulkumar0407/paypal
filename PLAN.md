@@ -19,7 +19,7 @@ Status: `[ ]` not started, `[~]` in progress, `[x]` done (test run and passed).
 
 **P1's build tasks are in (P1-6 to P1-11, all pushed).** The forecast, Margin Guard, reminder helper, fix the gap,
 PayPal checkout and webhooks, Ask chat and the risk check are real code with 195 unit tests (`npm run check`).
-Next for P1: the 6-step click-through after P1-11 (Wed 4 Nov), then the design pass (P1-12).
+All 6 story steps were clicked through on Wed 4 Nov (fake PayPal mode). Next for P1: the design pass (P1-12).
 
 What P2 (and P2's agent) needs to know:
 - **PayPal sandbox works.** A US business sandbox app and a US personal buyer exist (P1 made them; keys are in P1's
@@ -325,12 +325,13 @@ payment line, each with a template. Step 6 answers "Not yet: Mon 9 Nov ends at $
 - with the AI down, the recovery flow still completes using the template;
 - switching to OpenRouter by editing only `model.ts` has been shown working locally once.
 
-### [~] P1-11 Risk check; extras only if time allows (was P4-3, P4-4; Mon 9 Nov)
-_Status 3 Nov: built and unit-tested. Fixed rules (lib/shared/risk.ts) flag an unusual amount, a new buyer's big
-order and repeated failed attempts; a flagged order never counts as money in until the owner clears it (declines the
-hold), and Approvals proposes a HOLD_ORDER through the Guard with one line on why. Seed: Isla Moreno's $894 pending
-order added; store software went up from $89 to $99. Extras done: price-rise alert, slow-week warning, quiet when
-unsure. Every page opened without errors in fake mode. Left: the full 6-step click-through on /demo._
+### [x] P1-11 Risk check; extras only if time allows (was P4-3, P4-4; Mon 9 Nov)
+_Status 4 Nov: done. Fixed rules (lib/shared/risk.ts) flag an unusual amount, a new buyer's big order and repeated
+failed attempts; a flagged order never counts as money in until the owner clears it, and a HOLD_ORDER goes through the
+Guard with one line on why. Seed: Isla Moreno's $894 pending order; store software up from $89 to $99. Extras:
+price-rise alert, slow-week warning, quiet when unsure. All 6 story steps clicked through on 4 Nov in fake mode. The
+reminder helper and risk check now start in the background on a visitor's first page (and after a reset), so Approvals
+opens in about 3 seconds here instead of 38._
 - Flags for an unusual amount, a brand-new buyer with a big order, and repeated failed attempts. Each flag creates
   a HOLD_ORDER proposal through the Guard. Held orders don't count as expected money.
 - Saving the Settings form (`saveStoreSettings` in `lib/store`), so the minimum balance can be edited.
