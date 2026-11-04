@@ -45,7 +45,7 @@ export function StampReplay({ receipt }: { receipt: ReceiptData }) {
 }
 
 const SCREENS = [
-  { path: "/", label: "Today" },
+  { path: "/today", label: "Today" },
   { path: "/dues", label: "Dues" },
   { path: "/approvals", label: "Approvals" },
   { path: "/receipts", label: "Receipts" },
@@ -58,7 +58,7 @@ const SCREENS = [
 
 /** The real pages, framed at phone (390px) and laptop (1280px) widths. */
 export function ScreenPreview() {
-  const [path, setPath] = useState("/");
+  const [path, setPath] = useState("/today");
   return (
     <div className="space-y-6">
       <div role="tablist" aria-label="Screen to preview" className="flex flex-wrap gap-2">

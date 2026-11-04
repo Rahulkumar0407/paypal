@@ -7,7 +7,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "NeverShort",
     short_name: "NeverShort",
     description: "A calm money forecast for a small online store: get paid, stay safe, never come up short.",
-    start_url: "/",
+    start_url: "/today",
     scope: "/",
     display: "standalone",
     background_color: "#0e3b2c",

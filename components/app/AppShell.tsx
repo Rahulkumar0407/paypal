@@ -21,7 +21,7 @@ export function AppShell({ today, storeName, children }: { today: string; storeN
           <span aria-hidden className="screw top-2.5 right-2.5" style={turn(-20)} />
           <span aria-hidden className="screw bottom-2.5 left-2.5" style={turn(80)} />
           <span aria-hidden className="screw right-2.5 bottom-2.5" style={turn(10)} />
-          <Link href="/" className="block px-1">
+          <Link href="/today" className="block px-1">
             <span className="block font-serif text-[30px] leading-none text-ink">NeverShort</span>
           </Link>
           <div className="till-display mt-5 px-4 py-3">
@@ -39,7 +39,7 @@ export function AppShell({ today, storeName, children }: { today: string; storeN
       <div className="min-w-0 lg:p-2.5">
         <DemoBanner today={today} />
         <header className="flex items-baseline justify-between px-5 pt-5 lg:hidden">
-          <Link href="/" className="font-serif text-[26px] leading-none text-ink">
+          <Link href="/today" className="font-serif text-[26px] leading-none text-ink">
             NeverShort
           </Link>
           <span className="text-[13px] font-semibold tracking-[0.12em] text-ink-muted uppercase">{storeName}</span>

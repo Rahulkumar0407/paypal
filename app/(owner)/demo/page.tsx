@@ -73,7 +73,7 @@ function buildSteps({ forecast, candidate, afford, monday }: StoryData): Step[] 
         ? `“${buildHeadline(forecast).text}” ${gapDay} is the red tile in the 14-day strip.`
         : `A sentence saying you'll be about $90 short on ${gapDay}, and a red tile on that day.`,
       uses: ["simulated"],
-      link: { label: "Open Today", href: "/" },
+      link: { label: "Open Today", href: "/today" },
     },
     {
       title: "Send a payment reminder",

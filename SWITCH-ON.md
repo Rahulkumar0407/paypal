@@ -65,7 +65,7 @@ Use a private browser window so you get a fresh copy of the demo store.
 3. Press it. PayPal's sandbox checkout opens. Log in as the **judges' buyer** and pay.
 4. You land on Loop Audio's "Paid" page: you paid $72.00, PayPal's fee, and what arrives. Note the real fee: P1 puts
    it in `DEMO.md` (it may differ from the $3.00 estimate).
-5. Open Today (`/`). Thu 12 Nov should now be about $21 short (the exact number depends on the real fee).
+5. Open Today (`/today`). Thu 12 Nov should now be about $21 short (the exact number depends on the real fee).
 6. In Approvals, press **Send a follow-up** on Maya's reminder: **Blocked**, "PayPal shows order #1258 already paid".
 7. Check the webhook arrived: developer.paypal.com > **Testing Tools > Webhooks events** (or Render's logs) shows a
    `PAYMENT.CAPTURE.COMPLETED` delivered with status 200.

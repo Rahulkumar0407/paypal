@@ -29,7 +29,7 @@ export async function sendFixToGuard(rawFixId: string): Promise<FixOutcome> {
       return { ok: false, fixId, message: "That option isn't on offer any more. Your forecast may have changed: reload to see today's options." };
     }
     const receipt = await submitProposal(proposal);
-    for (const path of ["/", "/fix", "/dues", "/approvals", "/receipts", "/dashboard"]) revalidatePath(path);
+    for (const path of ["/today", "/fix", "/dues", "/approvals", "/receipts", "/dashboard"]) revalidatePath(path);
     return { ok: true, fixId, decision: receipt.decision.decision, reason: receipt.decision.headlineReason, receiptId: receipt.id, receiptNumber: receipt.number };
   } catch (error) {
     console.error("[fix] could not send the fix to the Guard:", error instanceof Error ? error.message : error);

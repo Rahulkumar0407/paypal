@@ -49,7 +49,7 @@ export default function DesignPage() {
       <header className="border-b border-line px-5 py-5 lg:px-12">
         <div className="mx-auto flex max-w-[1240px] items-baseline justify-between gap-4">
           <p className="font-serif text-[26px] leading-none text-ink">NeverShort design system</p>
-          <Link href="/" className="text-[15px] text-ink underline decoration-ink/30 underline-offset-4">
+          <Link href="/today" className="text-[15px] text-ink underline decoration-ink/30 underline-offset-4">
             Back to the app
           </Link>
         </div>

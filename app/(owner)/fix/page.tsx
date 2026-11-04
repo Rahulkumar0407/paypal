@@ -56,7 +56,7 @@ export default async function FixPage() {
         <EmptyState
           title="No short days ahead."
           body={`Every day stays above your ${formatDollars(forecast.minimumBalanceCents)} minimum. If that changes, the ways to fix it show up here.`}
-          action={{ label: "Back to today", href: "/" }}
+          action={{ label: "Back to today", href: "/today" }}
         />
       </div>
     );
@@ -68,7 +68,7 @@ export default async function FixPage() {
   return (
     <div className="space-y-10 lg:space-y-12">
       <div className="space-y-4">
-        <Link href="/" className="text-[15px] text-ink-muted underline decoration-ink/30 underline-offset-4 hover:text-ink hover:decoration-ink">
+        <Link href="/today" className="text-[15px] text-ink-muted underline decoration-ink/30 underline-offset-4 hover:text-ink hover:decoration-ink">
           Back to today
         </Link>
         <PageSentence>

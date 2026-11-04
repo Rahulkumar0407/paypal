@@ -104,6 +104,9 @@ Should-have:
   updates the right copy.
 - **Demo page.** The demo guide (`/demo`) walks judges through the six story steps (each marked Simulated or PayPal
   sandbox), shows the sandbox buyer login and the demo date, and has the reset button.
+- **Routes.** The public landing page is `/` (P1-13): Loop Audio's next two weeks as a scroll time-lapse, a "fix it
+  yourself" slider judged by the real Guard rules, and real receipts, all from `lib/landing` with no database. The
+  owner's Today screen is `/today`.
 
 ---
 
@@ -271,11 +274,18 @@ The metaphor lives in the words and the colours, never in sun or cloud icons. No
    inside a deep green note engraved like real currency: a fine lathe tint, a rope border with a 14 in each corner,
    NEVERSHORT at the top, "This forecast is good for fourteen days" at the bottom, a rosette medallion, the Margin
    Guard seal, red serials and signatures. Use `BanknotePanel` from `components/ui/Banknote.tsx`; never redraw it.
-   The full note is for the home screen only. Precise, symmetric engraving only: no organic swirls.
-6. **Banknote paper** (every owner page). The background is `PaperBackdrop` (`components/ui/Paper.tsx`, set in
-   the app shell): the surface tone with a faint lathe engraving, one rosette watermark and a few security fibres.
-   Content sits on white cards (`Card`) above it; page sentences end with the engraved `RopeRule`. Receipts print on
-   a deep green counter. Don't put text straight onto the paper except page sentences and section headings.
+   The full note is for the home screen (Today) and the landing page only. Precise, symmetric engraving only: no
+   organic swirls.
+6. **The money desk** (every owner page; chosen 4 Nov). Three physical objects, set in `components/app/AppShell.tsx`:
+   - the **till** on the left: a screwed-down dark panel with a display window (shop and date) and square ivory
+     **register keycaps** (`.key` in `app/globals.css`), the current page's key pressed down in brand green, numbers
+     1 to 7 as keyboard shortcuts; on a phone the keys run along the bottom;
+   - the **counting mat**: green felt with a fine twill weave and a stitched edge (`MatBackdrop`,
+     `components/ui/Paper.tsx`). Text on the felt uses the light ink tokens that `.mat` sets;
+   - **banknote paper** cards on the mat (`--color-paper` is a soft green-grey there, not white), with soft shadows.
+   Day tiles are tear-off **ticket stubs** with a SHORT ink stamp; To pay opens with the **till drawer**
+   (`components/app/TillDrawer.tsx`): one slot per payment, the stack of notes is how much is ready.
+   The desk colours (desk, till, felt, paper) are surfaces, not accents; they live as hex values in `globals.css`.
 
 ### Colours
 
@@ -290,7 +300,8 @@ The metaphor lives in the words and the colours, never in sun or cloud icons. No
 | red | `#E5484D` | short, blocked |
 
 - Meaning colours carry meaning only. "Short" is red everywhere (strip, calendar, text).
-- No gradients. No other accent colours.
+- No colour gradients. No other accent colours. Light and shadow on a physical surface (a lamp's pool of light, a
+  book's spine shadow, ruled lines) are allowed, in neutral black or white only.
 - **Contrast (WCAG AA, measured).** Meaning colours are fills and marks, never text on white: green is 3.4:1,
   amber 2.0:1, red 3.9:1 against white. Text on a green or amber fill is ink (4.9:1 and 8.4:1). Ink on red is
   only 4.3:1, so text on a red fill must be large (24px+, or 19px+ bold). Small text goes on white or surface with
@@ -323,16 +334,18 @@ The metaphor lives in the words and the colours, never in sun or cloud icons. No
 - Dates read "Thu 12 Nov". Money in sentences and tiles is whole dollars, with shortfalls rounded up so a gap is
   never understated. Receipts and tables show cents.
 
-### Motion (small and meaningful only)
+### Motion (only when it shows something happening)
 
-- When a gap is fixed, that day's tile turns green and the headline sentence updates.
-- A BLOCKED stamp lands on a blocked receipt.
-- Nothing else moves for decoration. Respect `prefers-reduced-motion`.
+- Motion always shows something happening: a fixed day's tile turns green and a COVERED stamp lands, a BLOCKED
+  stamp lands on a blocked receipt, notes slide into the till drawer, a key presses down, tickets are dealt, the
+  landing page's time-lapse plays the days. Nothing moves just to decorate.
+- Always respect `prefers-reduced-motion`: show the final state instead.
 
 ### Never
 
 Purple or blue gradients, glassy cards, sparkle icons, icon-in-a-circle card grids, stock illustrations,
-lorem ipsum, unlabelled charts, a marketing-style hero section.
+lorem ipsum, unlabelled charts, a marketing-style hero inside the app screens. The landing page (`/`) may open with a
+hero, but its picture is the live product (the banknote with the real forecast), never stock art or a mockup.
 
 ### States
 
@@ -364,6 +377,8 @@ Every screen and every module component has a real empty state, loading state an
   design. Never import `ag-grid-enterprise`, `ag-charts-enterprise` or enterprise-only features.
 - **Heavy libraries stay off the phone.** AG Grid and AG Charts are laptop-only: load them with dynamic
   import on their own routes, never on phone screens.
+- **Landing motion:** GSAP (`gsap`, with ScrollTrigger; free "no charge" licence), dynamically imported on the landing
+  page only. Small motion elsewhere is plain CSS.
 - **Tests:** Vitest for unit tests, Playwright for the end-to-end demo test.
 - **Hosting:** Render web service in Frankfurt (moved to a paid plan before judging, so it never sleeps). Database
   on Supabase in Paris (above). Until the Render link exists, `APP_URL` is `http://localhost:3000`.

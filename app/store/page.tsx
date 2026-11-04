@@ -34,7 +34,7 @@ export default async function StorePage({ searchParams }: { searchParams: Promis
       <div className="bg-brand px-5 py-2 text-[13px] leading-5 text-white lg:px-12">
         <p className="mx-auto flex max-w-[1160px] flex-wrap justify-between gap-x-4">
           <span>{banner}</span>
-          <Link href="/" className="font-medium underline decoration-white/40 underline-offset-4 hover:decoration-white">
+          <Link href="/today" className="font-medium underline decoration-white/40 underline-offset-4 hover:decoration-white">
             Back to NeverShort
           </Link>
         </p>

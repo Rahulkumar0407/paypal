@@ -17,6 +17,9 @@ import { createGuard, type Guard } from "./flow";
 import { prismaGuardRepo } from "./repo";
 
 export { GuardError } from "./flow";
+/** The 9 rules on facts gathered by the caller (no database): for previews such as the landing page. */
+export { judge } from "./rules";
+export type { GuardContext } from "./rules";
 /** The idempotency key and sequence for a new proposal. */
 export { nextProposalKey } from "@/lib/shared/keys";
 

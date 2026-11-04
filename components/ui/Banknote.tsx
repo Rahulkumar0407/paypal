@@ -193,7 +193,7 @@ function Signature({ name, role, className }: { name: string; role: string; clas
   );
 }
 
-export function BanknoteArt() {
+export function BanknoteArt({ sealOnly = false }: { sealOnly?: boolean }) {
   return (
     <>
       <div aria-hidden className="absolute inset-0 bg-brand" />
@@ -238,9 +238,15 @@ export function BanknoteArt() {
 
       {/* Sized by the note's own width (container queries), not the window: wide note = medallion and seal,
           medium = the seal alone, narrow = neither. Content inside reserves room with NOTE_ROOM below. */}
-      <NoteMedallion className="top-[100px] right-[5%] hidden h-[230px] w-[230px] @min-[940px]:block" />
-      <GuardSeal className="top-[212px] right-[calc(5%-34px)] hidden h-[128px] w-[128px] @min-[940px]:block" />
-      <GuardSeal className="top-[96px] right-[6%] hidden h-[136px] w-[136px] @min-[760px]:block @min-[940px]:hidden" />
+      {sealOnly ? (
+        <GuardSeal className="top-[92px] right-[6%] hidden h-[136px] w-[136px] @min-[760px]:block" />
+      ) : (
+        <>
+          <NoteMedallion className="top-[100px] right-[5%] hidden h-[230px] w-[230px] @min-[940px]:block" />
+          <GuardSeal className="top-[212px] right-[calc(5%-34px)] hidden h-[128px] w-[128px] @min-[940px]:block" />
+          <GuardSeal className="top-[96px] right-[6%] hidden h-[136px] w-[136px] @min-[760px]:block @min-[940px]:hidden" />
+        </>
+      )}
 
       <Signature name="Margin Guard" role="KEEPER OF THE GUARD" className="bottom-[96px] left-[112px]" />
       <Signature name="Loop Audio" role="OWNER" className="right-[24%] bottom-[96px]" />
@@ -251,12 +257,18 @@ export function BanknoteArt() {
 
 /** Put on the content that sits beside the medallion or seal, so it never runs underneath them. */
 export const NOTE_ROOM = "@min-[760px]:pr-[170px] @min-[940px]:pr-[290px]";
+/** The same for a `sealOnly` note: the seal alone, at every width from 760px. */
+export const NOTE_ROOM_SEAL = "@min-[760px]:pr-[170px] @min-[760px]:min-h-[150px]";
 
 /** The deep green note with the engraving behind its content. Content inside is white (use `inverse`). */
-export function BanknotePanel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+/**
+ * `sealOnly`: the Margin Guard seal without the big medallion, for a short, wide note whose content runs the full
+ * width below the sentence (the landing page's one row of 14 days).
+ */
+export function BanknotePanel({ children, className = "", sealOnly = false }: { children: React.ReactNode; className?: string; sealOnly?: boolean }) {
   return (
     <section className={`banknote @container relative overflow-hidden bg-brand text-white ${className}`}>
-      <BanknoteArt />
+      <BanknoteArt sealOnly={sealOnly} />
       <div className="relative">{children}</div>
     </section>
   );

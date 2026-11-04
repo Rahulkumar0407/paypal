@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import type { ForecastDay } from "@/types";
 import { StripTileFace } from "@/components/ui/MoneyStrip";
 import { DayDetail } from "./DayDetail";
@@ -20,17 +20,7 @@ export function ForecastStrip({
 }) {
   const [selected, setSelected] = useState(initialDate);
   const justFixed = useJustFixed(days);
-  const listRef = useRef<HTMLOListElement>(null);
   const day = days.find((d) => d.date === selected) ?? days[0]!;
-
-  // On a phone, bring the starting day into view without moving the page.
-  useEffect(() => {
-    const list = listRef.current;
-    const button = list?.querySelector<HTMLElement>(`[data-date="${initialDate}"]`);
-    if (list && button && list.scrollWidth > list.clientWidth) {
-      list.scrollLeft = Math.max(0, button.offsetLeft - list.offsetLeft - 8);
-    }
-  }, [initialDate]);
 
   return (
     <div>
@@ -38,13 +28,12 @@ export function ForecastStrip({
         Choose a day to see its money in and out.
       </p>
       <ol
-        ref={listRef}
         aria-label="Your balance at the end of each of the next 14 days"
         aria-describedby="strip-hint"
-        className="flex snap-x gap-2 overflow-x-auto pb-1 [scrollbar-width:none] lg:grid lg:grid-cols-7 lg:gap-x-3 lg:gap-y-5 lg:overflow-visible"
+        className="grid grid-cols-4 gap-x-2 gap-y-3 sm:grid-cols-7 lg:gap-x-3 lg:gap-y-5"
       >
         {days.map((d) => (
-          <li key={d.date} className="w-[88px] shrink-0 snap-start lg:w-auto">
+          <li key={d.date} className="min-w-0">
             <button
               type="button"
               data-date={d.date}
@@ -52,7 +41,7 @@ export function ForecastStrip({
               onClick={() => setSelected(d.date)}
               className="block w-full rounded-tile text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
             >
-              <StripTileFace day={d} inverse selected={d.date === selected} justFixed={justFixed.has(d.date)} />
+              <StripTileFace day={d} inverse compact selected={d.date === selected} justFixed={justFixed.has(d.date)} />
             </button>
           </li>
         ))}

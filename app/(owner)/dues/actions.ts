@@ -24,6 +24,6 @@ export async function answerRegularPayment(payeeId: string, answer: "confirm" | 
     console.error("[dues] could not save the answer:", error instanceof Error ? error.message : error);
     return { ok: false, message: "Couldn't save your answer. Nothing has changed. Try again in a minute." };
   }
-  for (const path of ["/", "/dues", "/fix", "/dashboard"]) revalidatePath(path);
+  for (const path of ["/today", "/dues", "/fix", "/dashboard"]) revalidatePath(path);
   return { ok: true };
 }

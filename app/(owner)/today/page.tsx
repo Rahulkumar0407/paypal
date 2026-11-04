@@ -61,7 +61,7 @@ export default async function HomePage() {
             Your money hasn&apos;t moved: nothing is paid or sent without passing NeverShort&apos;s safety check. Try again in a minute.
           </p>
           <div className="mt-5">
-            <ButtonLink href="/" variant="secondary">
+            <ButtonLink href="/today" variant="secondary">
               Try again
             </ButtonLink>
           </div>
@@ -111,7 +111,7 @@ export default async function HomePage() {
           </div>
 
           {/* The clear window: a calm surface over the engraving, so every number reads easily in daylight. */}
-          <div className="rounded-[14px] bg-brand p-4 ring-1 ring-white/20 lg:p-6">
+          <div className="-mx-9 rounded-[14px] bg-brand p-3 ring-1 ring-white/20 sm:mx-0 sm:p-4 lg:p-6">
             {forecast.days.length > 0 ? (
               <ForecastStrip days={forecast.days} initialDate={startOn} minimumBalanceCents={forecast.minimumBalanceCents} />
             ) : (

@@ -22,6 +22,16 @@ PayPal checkout and webhooks, Ask chat and the risk check are real code with 195
 All 6 story steps were clicked through on Wed 4 Nov (fake PayPal mode). Next for P1: the design pass (P1-12).
 
 What P2 (and P2's agent) needs to know:
+- **New (Wed 4 Nov): landing page at `/`, Today moved to `/today`** (P1-13, agreed with the owner; tell P2).
+  `/` is a public page with no database: Loop Audio's two weeks as a scroll time-lapse, a "fix it yourself" slider
+  judged by the real Guard rules, and real receipts (`lib/landing`, `components/landing`). The app's look changed too
+  (P1-12 started): felt mat, till with register keys, banknote-paper cards, ticket stubs, a till drawer on To pay.
+  AGENTS.md section 7 was updated to match (landing hero allowed with the live product as its picture, banknote on
+  Today and the landing page, motion when it shows something happening, the money desk). New dependency: `gsap`
+  3.15.0 (landing page only).
+  P2's files that need the route change: `tests/e2e/smoke.spec.ts` (Today test: `goto("/today")`; add `/today` and
+  `/` to the pages list) and `README.md` (Today row is `/today`; add `/`, the landing page). Devpost and the video
+  should link the bare URL: it opens on the landing page.
 - **PayPal sandbox works.** A US business sandbox app and a US personal buyer exist (P1 made them; keys are in P1's
   local `.env`, never in git). One real sandbox payment went through on 3 Nov: $72.00 paid, $3.00 fee, $69.00 arrived,
   exactly the `DEMO.md` numbers. Accounts must be **United States**: an India account gets "This seller doesn't accept
@@ -350,7 +360,7 @@ opens in about 3 seconds here instead of 38._
 - any extra that ships has a unit test for when it fires and when it stays quiet, and a low-confidence forecast
   produces no alert.
 
-### [ ] P1-12 Design pass (was P1-6; Tue 10 Nov)
+### [~] P1-12 Design pass (was P1-6; Tue 10 Nov; started Wed 4 Nov with the money desk)
 Every screen at 390px and 1280px: voice, states, motion, "Simulated" labels, labelled charts. The laptop view gets
 the same care as the phone.
 
@@ -358,6 +368,15 @@ the same care as the phone.
 - the commit has screenshots of every screen at both widths (in the commit message or a linked folder);
 - a search of UI strings finds no `!`, emoji, "unlock", "seamless", "supercharge" or "AI-powered";
 - every screen's empty, loading and error state has been seen in the browser.
+
+### [~] P1-13 Landing page at `/` (Wed 4 Nov)
+The page is the demo, not an advert: hero with the live banknote, a scroll time-lapse of the 14 days (split-flap date,
+notes in and out of a till drawer, a narrator line, Thu 12 SHORT $90), "Now you fix it" (slider, live tickets, the
+Guard's card), money comes back (tap Pay with PayPal on a phone), the Guard's receipts, built-with receipt.
+Today moved to `/today`.
+
+**Done when:** a 10-second cold test (someone new says what it does); every section at 390 / 1280 / 1440; reduced
+motion shows the still version; no database queries from `/`; `npm run check` and `npm run e2e` pass.
 
 ---
 

@@ -159,7 +159,7 @@ The judges' sandbox buyer login: _P2 adds it here and on `/demo` (task P2-1)._
 
 | Step | Where | Do | Expect |
 |------|-------|----|--------|
-| 1 | Today (`/`) | Read the sentence on the green note. | "Clear until Wednesday. On Thu 12 Nov you'll be $90 short: the supplier order and rent land the same day." Thu 12 is the red $10 tile. |
+| 1 | Today (`/today`) | Read the sentence on the green note. | "Clear until Wednesday. On Thu 12 Nov you'll be $90 short: the supplier order and rent land the same day." Thu 12 is the red $10 tile. |
 | 2 | Approvals | Open it. The reminder helper checks unfinished checkouts and the risk check checks pending orders; the Guard decides each. | Maya's $72 reminder: **Approved**, and it appears under Sent reminders (Simulated) with a payment link. Hana's: **Blocked** (she didn't agree to contact). Waiting for your OK: Sam's $119 reminder, and holds on Jordan's $567, Isla's $894 and Sam's $119 orders (the risky ones, not counted in the forecast until you decide). |
 | 3 | Sent reminders | Open the payment link and pay as the test buyer. | The order is paid. $72.00 minus PayPal's $3.00 fee: $69.00 arrives. Today's sentence says Thu 12 Nov is $21 short. |
 | 4 | Sent reminders | Press **Send a follow-up** on Maya's reminder. | **Blocked**: "PayPal shows order #1258 already paid". Only rule 1 fails on its receipt. |

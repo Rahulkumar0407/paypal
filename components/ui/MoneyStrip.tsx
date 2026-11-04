@@ -47,11 +47,14 @@ export function StripTileFace({
   inverse = false,
   selected = false,
   justFixed = false,
+  compact = false,
 }: {
   day: ForecastDay;
   inverse?: boolean;
   selected?: boolean;
   justFixed?: boolean;
+  /** Below the laptop width, a smaller tile so all 14 days fit as a grid of 4 on a phone (no sideways scrolling). */
+  compact?: boolean;
 }) {
   const condition = day.state === "short" ? `${formatShortfall(day.shortByCents)} short` : DAY_WORD[day.state];
   const label = day.isToday ? "Today" : (
@@ -61,7 +64,7 @@ export function StripTileFace({
   );
   return (
     <>
-      <p className="text-[13px] leading-5 whitespace-nowrap">
+      <p className={`leading-5 whitespace-nowrap ${compact ? "text-[clamp(11px,3.1vw,12px)] lg:text-[13px]" : "text-[13px]"}`}>
         <span
           className={`inline-block rounded-full px-1.5 -mx-1.5 ${
             selected ? (inverse ? "bg-white font-semibold text-ink on-paper" : "bg-ink font-semibold text-white") : day.isToday ? `font-semibold ${inverse ? "text-white" : "text-ink"}` : inverse ? "text-white/80" : "text-ink-muted"
@@ -71,8 +74,14 @@ export function StripTileFace({
         </span>
       </p>
       <div className="ticket-wrap mt-1" data-selected={selected}>
-        <div className={`strip-block ticket flex h-[76px] items-end rounded-tile px-2.5 pb-2 lg:h-[92px] lg:px-3 lg:pb-2.5 ${DAY_FILL[day.state]}`}>
-          <span className="font-serif text-[21px] leading-none font-bold tracking-[-0.02em] whitespace-nowrap text-ink tabular lg:text-[27px] lg:font-semibold">
+        <div
+          className={`strip-block ticket flex items-end rounded-tile lg:h-[92px] lg:px-3 lg:pb-2.5 ${compact ? "h-[60px] px-1.5 pb-1.5" : "h-[76px] px-2.5 pb-2"} ${DAY_FILL[day.state]}`}
+        >
+          <span
+            className={`font-serif leading-none font-bold tracking-[-0.02em] whitespace-nowrap text-ink tabular lg:text-[27px] lg:font-semibold ${
+              compact ? (day.state === "short" ? "text-[19px]" : "text-[clamp(12.5px,3.8vw,15px)] tracking-[-0.03em]") : "text-[21px]"
+            }`}
+          >
             {formatDollars(day.closingCents)}
           </span>
           {day.state === "short" ? (
@@ -87,7 +96,7 @@ export function StripTileFace({
         </div>
       </div>
       <p
-        className={`mt-1.5 text-[13px] leading-4 whitespace-nowrap ${
+        className={`mt-1.5 leading-4 whitespace-nowrap ${compact ? "text-[clamp(11px,3.1vw,12px)] lg:text-[13px]" : "text-[13px]"} ${
           inverse ? (day.state === "covered" ? "text-white/80" : "font-semibold text-white") : day.state === "covered" ? "text-ink-muted" : "font-semibold text-ink"
         }`}
       >

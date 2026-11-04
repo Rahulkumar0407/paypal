@@ -29,7 +29,7 @@ export async function decideEscalation(receiptId: string, choice: "approve" | "d
     }
     const receipt =
       parsed.data.choice === "approve" ? await approveEscalation(storeId, parsed.data.receiptId) : await rejectEscalation(storeId, parsed.data.receiptId);
-    for (const path of ["/", "/fix", "/dues", "/approvals", "/receipts", "/dashboard"]) revalidatePath(path);
+    for (const path of ["/today", "/fix", "/dues", "/approvals", "/receipts", "/dashboard"]) revalidatePath(path);
 
     const last = receipt.events.at(-1);
     switch (last?.kind) {
@@ -67,7 +67,7 @@ export async function sendFollowUp(orderId: string): Promise<FollowUpOutcome> {
   const storeId = await getVisitorStoreId();
   try {
     const receipt = await proposeFollowUp(storeId, parsed.data);
-    for (const path of ["/", "/approvals", "/receipts"]) revalidatePath(path);
+    for (const path of ["/today", "/approvals", "/receipts"]) revalidatePath(path);
     return { ok: true, decision: receipt.decision.decision, reason: receipt.decision.headlineReason, receiptId: receipt.id, receiptNumber: receipt.number };
   } catch (error) {
     console.error("[approvals] could not propose the follow-up:", error instanceof Error ? error.message : error);

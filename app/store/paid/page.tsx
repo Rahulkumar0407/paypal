@@ -35,7 +35,7 @@ export default async function PaidPage({ searchParams }: { searchParams: Promise
           </>
         )}
         <div className="flex flex-wrap gap-4 text-[15px]">
-          <Link href="/" className="inline-flex min-h-11 items-center rounded-control bg-brand px-4 font-medium text-white hover:bg-ink">
+          <Link href="/today" className="inline-flex min-h-11 items-center rounded-control bg-brand px-4 font-medium text-white hover:bg-ink">
             See the forecast in NeverShort
           </Link>
           <Link href="/store" className="inline-flex min-h-11 items-center text-ink underline decoration-ink/30 underline-offset-4">
