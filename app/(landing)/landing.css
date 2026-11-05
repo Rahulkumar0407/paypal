@@ -1,9 +1,10 @@
 /*
- * The landing page (P1-13). Owner: Person 1. Motion here always shows something happening: tickets dealt onto the
- * note, the date flipping, money flying in and out of the drawer, a stamp landing. Reduced motion: final states.
+ * The landing page (P1-13). Owner: Person 1. A warm paper page with ink text; colour only where it means something;
+ * the green felt once, for the "Save Thursday" game. Motion always shows something happening (tickets dealt, a stamp
+ * landing, money arriving, a rule ticking) and prefers-reduced-motion shows the final state instead.
  */
 
-/* --- Hero ------------------------------------------------------------------------------------------- */
+/* --- Shared motion: rise, the deal of the tickets, the slider, referee cards, receipts printing ---------------------- */
 @keyframes rise {
   from {
     opacity: 0;
@@ -12,35 +13,6 @@
   to {
     opacity: 1;
     transform: none;
-  }
-}
-.hero-copy > * {
-  animation: rise 700ms var(--ease-land) both;
-}
-.hero-copy > :nth-child(2) {
-  animation-delay: 80ms;
-}
-.hero-copy > :nth-child(3) {
-  animation-delay: 160ms;
-}
-
-
-.hero-note {
-  transform: rotate(-0.6deg);
-  box-shadow:
-    0 1px 0 rgb(0 0 0 / 0.4),
-    0 4px 8px rgb(0 0 0 / 0.3),
-    0 40px 70px -30px rgb(0 0 0 / 0.9);
-  animation: note-land 800ms var(--ease-land) both;
-}
-@keyframes note-land {
-  from {
-    opacity: 0;
-    transform: translateY(30px) rotate(2deg);
-  }
-  to {
-    opacity: 1;
-    transform: rotate(-0.6deg);
   }
 }
 
@@ -73,553 +45,6 @@
   animation: ticket-stamp-land 460ms var(--ease-land) 1.95s both;
 }
 
-/* A short line with a dot running down it: "keep scrolling". */
-.scroll-cue {
-  position: relative;
-  width: 2px;
-  height: 26px;
-  border-radius: 2px;
-  background: rgb(238 241 236 / 0.25);
-  overflow: hidden;
-}
-.scroll-cue::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: -8px;
-  width: 2px;
-  height: 8px;
-  border-radius: 2px;
-  background: #eef1ec;
-  animation: cue 1.6s ease-in-out infinite;
-}
-@keyframes cue {
-  to {
-    transform: translateY(34px);
-  }
-}
-
-/* --- Split-flap board ---------------------------------------------------------------------------- */
-.split-flap {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 0.22em;
-  font-size: clamp(36px, 5.4vw, 78px);
-  font-family: var(--font-sans);
-  font-weight: 700;
-  letter-spacing: 0;
-}
-.flap-word {
-  display: inline-flex;
-  gap: 0.06em;
-}
-.flap-cell {
-  position: relative;
-  display: inline-block;
-  width: 0.74em;
-  height: 1.16em;
-  perspective: 400px;
-  border-radius: 0.08em;
-  box-shadow:
-    0 2px 0 #050807,
-    0 8px 14px -6px rgb(0 0 0 / 0.7);
-}
-.flap-cell::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: calc(50% - 0.5px);
-  height: 1px;
-  background: rgb(0 0 0 / 0.75);
-  z-index: 4;
-}
-.flap-half {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 50%;
-  overflow: hidden;
-  display: block;
-  color: #eef1ec;
-  background: #151e1a;
-  backface-visibility: hidden;
-}
-.flap-top {
-  top: 0;
-  border-radius: 0.08em 0.08em 0 0;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08);
-}
-.flap-bottom {
-  bottom: 0;
-  border-radius: 0 0 0.08em 0.08em;
-  background: #111814;
-}
-.flap-half > span {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 1.16em;
-  line-height: 1.16em;
-  text-align: center;
-}
-.flap-top > span {
-  top: 0;
-}
-.flap-bottom > span {
-  bottom: 0;
-}
-.flap-leaf-out {
-  z-index: 3;
-  transform-origin: bottom;
-  animation: flap-out 170ms ease-in both;
-}
-.flap-leaf-in {
-  z-index: 3;
-  transform-origin: top;
-  animation: flap-in 190ms ease-out 170ms both;
-}
-@keyframes flap-out {
-  from {
-    transform: rotateX(0deg);
-  }
-  to {
-    transform: rotateX(-90deg);
-  }
-}
-@keyframes flap-in {
-  from {
-    transform: rotateX(90deg);
-  }
-  to {
-    transform: rotateX(0deg);
-  }
-}
-
-/* --- The time-lapse ------------------------------------------------------------------------------- */
-.lapse-tick {
-  display: block;
-  height: 10px;
-  border-radius: 3px;
-  box-shadow: inset 0 0 0 1px rgb(238 241 236 / 0.32);
-  transition: background-color 260ms ease;
-}
-.lapse-tick-now {
-  outline: 2px solid #eef1ec;
-  outline-offset: 2px;
-}
-.lapse-short-figure {
-  color: var(--color-ink);
-  text-decoration: underline 5px #e5484d;
-  text-underline-offset: 12px;
-}
-
-.lapse-drawer {
-  position: relative;
-  height: 230px;
-}
-.lapse-tray {
-  position: absolute;
-  inset: 26px 0 0;
-  border-radius: 20px;
-  background: #111a16;
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.08),
-    inset 0 0 0 10px #111a16,
-    inset 0 0 0 11px rgb(0 0 0 / 0.6),
-    inset 0 14px 30px rgb(0 0 0 / 0.75),
-    0 0 0 1px rgb(0 0 0 / 0.55),
-    0 30px 50px -24px rgb(0 0 0 / 0.9);
-  transition: box-shadow 300ms ease;
-}
-.lapse-drawer-short .lapse-tray {
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.08),
-    inset 0 0 0 10px #111a16,
-    inset 0 0 0 11px rgb(0 0 0 / 0.6),
-    inset 0 14px 30px rgb(0 0 0 / 0.75),
-    0 0 0 3px #e5484d,
-    0 30px 50px -24px rgb(0 0 0 / 0.9);
-}
-.lapse-pile {
-  position: absolute;
-  left: 50%;
-  top: 57%;
-  width: 58%;
-  aspect-ratio: 2.35;
-  transform: translate(-50%, -50%);
-}
-.lapse-note {
-  position: absolute;
-  inset: 0;
-  border-radius: 4px;
-  background: #eef2ec;
-  box-shadow:
-    inset 0 0 0 4px #eef2ec,
-    inset 0 0 0 5px rgb(14 59 44 / 0.55),
-    inset 0 0 0 7px #eef2ec,
-    inset 0 0 0 7.6px rgb(14 59 44 / 0.28),
-    0 1px 0 rgb(14 59 44 / 0.4),
-    0 3px 6px rgb(0 0 0 / 0.45);
-  transition: transform 400ms var(--ease-land);
-}
-.lapse-empty {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  border: 2px dashed #e5484d;
-  border-radius: 4px;
-  color: rgb(238 241 236 / 0.7);
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-.lapse-flight {
-  position: absolute;
-  left: 50%;
-  top: 57%;
-  z-index: 4;
-  display: grid;
-  place-items: center;
-  width: 52%;
-  aspect-ratio: 2.35;
-  translate: -50% -50%;
-  border-radius: 4px;
-  background: #eef2ec;
-  box-shadow:
-    inset 0 0 0 4px #eef2ec,
-    inset 0 0 0 5px rgb(14 59 44 / 0.55),
-    0 10px 24px -6px rgb(0 0 0 / 0.7);
-  opacity: 0;
-}
-.lapse-flight-label {
-  padding: 0 12px;
-  color: #0e3b2c;
-  font-size: 17px;
-  font-weight: 700;
-  line-height: 1.2;
-  text-align: center;
-}
-.lapse-flight-in {
-  animation: fly-in 1000ms var(--ease-land) both;
-}
-.lapse-flight-out {
-  animation: fly-out 1300ms cubic-bezier(0.55, 0, 0.7, 0.2) both;
-}
-@keyframes fly-in {
-  0% {
-    opacity: 0;
-    transform: translate(60vw, -60px) rotate(16deg);
-  }
-  12% {
-    opacity: 1;
-  }
-  65% {
-    opacity: 1;
-    transform: translate(0, 0) rotate(-2deg);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(0, 8px) scale(0.94);
-  }
-}
-@keyframes fly-out {
-  0% {
-    opacity: 0;
-    transform: translate(0, 0);
-  }
-  8% {
-    opacity: 1;
-  }
-  40% {
-    opacity: 1;
-    transform: translate(0, -46px) rotate(-3deg);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(45vw, -75vh) rotate(22deg);
-  }
-}
-.lapse-stamp {
-  position: absolute;
-  top: 0;
-  right: 4%;
-  z-index: 5;
-  padding: 8px 16px 6px;
-  border: 4px solid #e5484d;
-  border-radius: 10px;
-  background: #111a16;
-  color: #e5484d;
-  font-size: 30px;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  transform: rotate(-8deg);
-  animation: lapse-stamp 520ms var(--ease-land) 900ms both;
-}
-@keyframes lapse-stamp {
-  0% {
-    opacity: 0;
-    transform: rotate(-8deg) scale(2.3);
-  }
-  60% {
-    opacity: 1;
-    transform: rotate(-8deg) scale(0.94);
-  }
-  100% {
-    opacity: 1;
-    transform: rotate(-8deg) scale(1);
-  }
-}
-.lapse-line {
-  display: block;
-  animation: rise 420ms var(--ease-land) both;
-}
-.lapse-saw {
-  opacity: 0;
-  transform: translateY(10px);
-  transition:
-    opacity 500ms ease,
-    transform 500ms var(--ease-land);
-}
-.lapse-saw-on {
-  opacity: 1;
-  transform: none;
-}
-
-@media (min-width: 1024px) {
-  .lapse-drawer {
-    height: 320px;
-  }
-  .lapse-flight-label {
-    font-size: 19px;
-  }
-  .lapse-stamp {
-    font-size: 40px;
-  }
-}
-
-/* --- The room: a felt mat on a dark desk, under a lamp; the money line across the bottom ------------- */
-.landing-desk {
-  background-color: #0a0f0d;
-}
-.landing-mat {
-  position: fixed;
-  inset: 10px 0 0;
-  z-index: -2;
-  overflow: hidden;
-  border-radius: 20px 20px 0 0;
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.1),
-    0 0 0 1px rgb(0 0 0 / 0.6);
-  transition: background-color 1.4s ease;
-  /* Its own layer: scrolling moves the page over it without repainting the felt. */
-  will-change: transform;
-  transform: translateZ(0);
-}
-[data-weather="dim"] .landing-mat {
-  background-color: #1d3a2f;
-}
-/* The lamp: a soft pool of light on the mat, the corners falling into shadow. */
-.landing-lamp {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 70% 60% at 62% 30%, rgb(255 255 255 / 0.12), rgb(255 255 255 / 0) 70%),
-    radial-gradient(ellipse 120% 100% at 50% 40%, rgb(0 0 0 / 0) 55%, rgb(0 0 0 / 0.42) 100%);
-  transition: opacity 1.4s ease;
-}
-[data-weather="dim"] .landing-lamp {
-  opacity: 0.4;
-}
-.landing-stitch {
-  position: absolute;
-  inset: 8px;
-  border: 2px dashed rgb(255 255 255 / 0.22);
-  border-radius: 14px;
-}
-@media (min-width: 1024px) {
-  .landing-mat {
-    inset: 18px;
-    border-radius: 30px;
-  }
-  .landing-stitch {
-    inset: 12px;
-    border-radius: 20px;
-  }
-}
-
-/* --- Scenes: each part of the story lies on the felt as its own object -------------------------------- */
-.scene {
-  position: relative;
-  margin: 14px 0;
-  border-radius: 18px;
-}
-@media (min-width: 1024px) {
-  .scene {
-    margin: 22px 30px;
-    border-radius: 26px;
-  }
-}
-/* The till drawer, pulled open: brushed dark metal, a deep tray, a metal lip along the top. */
-.scene-drawer {
-  background-color: #263b33;
-  background-image:
-    repeating-linear-gradient(0deg, rgb(255 255 255 / 0.022) 0 1px, rgb(0 0 0 / 0) 1px 3px),
-    repeating-linear-gradient(0deg, rgb(0 0 0 / 0.08) 0 1px, rgb(0 0 0 / 0) 1px 7px);
-  box-shadow:
-    inset 0 14px 18px -10px rgb(0 0 0 / 0.45),
-    inset 0 0 0 1px rgb(255 255 255 / 0.06),
-    0 0 0 1px rgb(0 0 0 / 0.6),
-    0 6px 14px rgb(0 0 0 / 0.35);
-}
-.scene-drawer::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto;
-  border-top-left-radius: inherit;
-  border-top-right-radius: inherit;
-  z-index: 1;
-  height: 14px;
-  background: #9aa39d;
-  box-shadow:
-    inset 0 4px 0 #c9d0cb,
-    inset 0 -3px 0 #6e7771,
-    0 6px 12px rgb(0 0 0 / 0.6);
-}
-.scene-drawer .lapse-tray {
-  background: #1a2a24;
-  outline: 1px solid rgb(238 241 236 / 0.1);
-  outline-offset: -1px;
-}
-/*
- * An accountant's columnar pad: green-tinted paper, a darker header band, green column rules (double at the margin)
- * and faint green ruled lines. The book's spine shadows the left edge.
- */
-.scene-ledger {
-  background-color: #c7d4c6;
-  background-image:
-    linear-gradient(90deg, rgb(0 0 0 / 0.16), rgb(0 0 0 / 0) 46px),
-    linear-gradient(180deg, rgb(14 59 44 / 0.1) 0 76px, rgb(14 59 44 / 0.38) 76px 78px, rgb(0 0 0 / 0) 78px),
-    linear-gradient(
-      90deg,
-      rgb(0 0 0 / 0) 66px,
-      rgb(14 59 44 / 0.32) 66px 67px,
-      rgb(0 0 0 / 0) 67px 70px,
-      rgb(14 59 44 / 0.32) 70px 71px,
-      rgb(0 0 0 / 0) 71px calc(100% - 330px),
-      rgb(14 59 44 / 0.22) calc(100% - 330px) calc(100% - 329px),
-      rgb(0 0 0 / 0) calc(100% - 329px) calc(100% - 220px),
-      rgb(14 59 44 / 0.22) calc(100% - 220px) calc(100% - 219px),
-      rgb(0 0 0 / 0) calc(100% - 219px) calc(100% - 110px),
-      rgb(14 59 44 / 0.22) calc(100% - 110px) calc(100% - 109px),
-      rgb(0 0 0 / 0) calc(100% - 109px)
-    ),
-    repeating-linear-gradient(180deg, rgb(0 0 0 / 0) 0 35px, rgb(14 59 44 / 0.16) 35px 36px);
-  box-shadow:
-    0 1px 0 rgb(0 0 0 / 0.3),
-    0 6px 14px rgb(0 0 0 / 0.35);
-}
-.scene-ledger .fix-board {
-  background: #1f3129;
-}
-/* Muted ink on the sage pad stays readable: lift it a touch darker than on white paper. */
-.scene-ledger {
-  --color-ink-muted: #46534d;
-}
-.scene-ledger .fix-range:focus-visible {
-  outline-color: #0e3b2c;
-}
-/* The Guard's desk: the banknote's own deep green, engraved with fine lathe lines, a lamp over the receipts. */
-.scene-counter {
-  background-color: #0e3b2c;
-  background-image:
-    radial-gradient(ellipse 60% 55% at 50% 45%, rgb(255 255 255 / 0.06), rgb(255 255 255 / 0) 70%),
-    url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27240%27%20height%3D%2716%27%3E%3Cpath%20d%3D%27M0%204.00L4%204.62L8%205.22L12%205.76L16%206.23L20%206.60L24%206.85L28%206.98L32%206.98L36%206.85L40%206.60L44%206.23L48%205.76L52%205.22L56%204.62L60%204.00L64%203.38L68%202.78L72%202.24L76%201.77L80%201.40L84%201.15L88%201.02L92%201.02L96%201.15L100%201.40L104%201.77L108%202.24L112%202.78L116%203.38L120%204.00L124%204.62L128%205.22L132%205.76L136%206.23L140%206.60L144%206.85L148%206.98L152%206.98L156%206.85L160%206.60L164%206.23L168%205.76L172%205.22L176%204.62L180%204.00L184%203.38L188%202.78L192%202.24L196%201.77L200%201.40L204%201.15L208%201.02L212%201.02L216%201.15L220%201.40L224%201.77L228%202.24L232%202.78L236%203.38L240%204.00M0%2012.00L4%2011.38L8%2010.78L12%2010.24L16%209.77L20%209.40L24%209.15L28%209.02L32%209.02L36%209.15L40%209.40L44%209.77L48%2010.24L52%2010.78L56%2011.38L60%2012.00L64%2012.62L68%2013.22L72%2013.76L76%2014.23L80%2014.60L84%2014.85L88%2014.98L92%2014.98L96%2014.85L100%2014.60L104%2014.23L108%2013.76L112%2013.22L116%2012.62L120%2012.00L124%2011.38L128%2010.78L132%2010.24L136%209.77L140%209.40L144%209.15L148%209.02L152%209.02L156%209.15L160%209.40L164%209.77L168%2010.24L172%2010.78L176%2011.38L180%2012.00L184%2012.62L188%2013.22L192%2013.76L196%2014.23L200%2014.60L204%2014.85L208%2014.98L212%2014.98L216%2014.85L220%2014.60L224%2014.23L228%2013.76L232%2013.22L236%2012.62L240%2012.00%27%20fill%3D%27none%27%20stroke%3D%27%23eef1ec%27%20stroke-opacity%3D%27.07%27%20stroke-width%3D%27.8%27/%3E%3C/svg%3E");
-  box-shadow:
-    inset 0 0 0 1px rgb(255 255 255 / 0.08),
-    inset 0 0 0 10px #0b3226,
-    inset 0 0 0 11px rgb(238 241 236 / 0.14),
-    0 0 0 1px rgb(0 0 0 / 0.6),
-    0 6px 14px rgb(0 0 0 / 0.35);
-}
-
-/* Money comes back: the tap cue on the phone's button, and the slot the money lands in. */
-.tap-cue {
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% + 12px);
-  z-index: 2;
-  padding: 5px 12px;
-  border-radius: 999px;
-  background: #e5484d;
-  color: #14201b;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  transform: translateX(-50%);
-  animation: tap-bob 1.4s ease-in-out infinite;
-}
-.tap-cue::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 100%;
-  border: 7px solid transparent;
-  border-top-color: #e5484d;
-  transform: translateX(-50%);
-}
-@keyframes tap-bob {
-  50% {
-    transform: translate(-50%, -5px);
-  }
-}
-.phone-pay {
-  animation: pay-glow 1.6s ease-in-out infinite;
-}
-.phone-tapped .phone-pay {
-  animation: none;
-}
-@keyframes pay-glow {
-  50% {
-    box-shadow:
-      0 4px 0 #06251b,
-      0 0 0 6px rgb(229 72 77 / 0.35);
-  }
-}
-.back-slot {
-  padding: 20px 22px;
-}
-.back-short {
-  animation: rise 420ms var(--ease-land) 1.4s both;
-}
-
-/* The hero note tilts toward the pointer. */
-.tilt {
-  transform: perspective(1400px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
-  transition: transform 400ms var(--ease-land);
-}
-
-/* The narrator types; a caret blinks at the end. */
-.lapse-caret {
-  display: inline-block;
-  width: 2px;
-  height: 1.05em;
-  margin-left: 2px;
-  vertical-align: -0.15em;
-  background: #eef1ec;
-  animation: caret 900ms steps(1) infinite;
-}
-@keyframes caret {
-  50% {
-    opacity: 0;
-  }
-}
 
 /* --- Fix it ------------------------------------------------------------------------------------- */
 .fix-range {
@@ -669,25 +94,7 @@
   outline-offset: 6px;
   border-radius: 8px;
 }
-.fix-board {
-  border-radius: 16px;
-  padding: 20px;
-  background: rgb(0 0 0 / 0.22);
-  box-shadow:
-    inset 0 2px 10px rgb(0 0 0 / 0.45),
-    0 1px 0 rgb(255 255 255 / 0.06);
-}
-.mini-lit {
-  transform: translateY(-6px) scale(1.06);
-  filter: drop-shadow(0 10px 12px rgb(0 0 0 / 0.55)) !important;
-}
-.guard-card {
-  transform-origin: left center;
-  animation: card-flip 520ms var(--ease-land) both;
-  box-shadow:
-    0 1px 0 rgb(0 0 0 / 0.25),
-    0 16px 34px -18px rgb(0 0 0 / 0.6);
-}
+
 @keyframes card-flip {
   from {
     opacity: 0;
@@ -719,104 +126,6 @@
   }
 }
 
-/* --- Money comes back ------------------------------------------------------------------------------ */
-.phone {
-  position: relative;
-  width: 280px;
-  margin-inline: auto;
-  padding: 14px;
-  border-radius: 40px;
-  background: #0b100e;
-  box-shadow:
-    inset 0 0 0 2px #26302b,
-    0 30px 60px -24px rgb(0 0 0 / 0.95);
-  transform: rotate(3deg);
-  transition: transform 500ms var(--ease-land);
-}
-.phone-tapped {
-  transform: rotate(0deg) translateY(-6px);
-}
-.phone-screen {
-  min-height: 470px;
-  border-radius: 28px;
-  padding: 34px 20px 20px;
-  background: var(--color-paper);
-}
-.phone-pay {
-  box-shadow: 0 4px 0 #06251b;
-  transition:
-    transform 120ms ease,
-    box-shadow 120ms ease;
-}
-.phone-tapped .phone-pay {
-  transform: translateY(4px);
-  box-shadow: 0 0 0 #06251b;
-}
-.phone-paid {
-  animation: rise 420ms var(--ease-land) both;
-}
-.phone-note {
-  position: absolute;
-  top: 46%;
-  left: 50%;
-  width: 120px;
-  height: 52px;
-  margin-left: -60px;
-  border-radius: 4px;
-  background: #eef2ec;
-  box-shadow:
-    inset 0 0 0 4px #eef2ec,
-    inset 0 0 0 5px rgb(14 59 44 / 0.55),
-    0 10px 20px -6px rgb(0 0 0 / 0.7);
-  opacity: 0;
-  animation: note-to-till 1100ms cubic-bezier(0.4, 0, 0.3, 1) both;
-}
-@keyframes note-to-till {
-  0% {
-    opacity: 0;
-    transform: translate(0, 0) scale(0.6);
-  }
-  20% {
-    opacity: 1;
-    transform: translate(0, -40px) scale(1) rotate(-6deg);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(330px, -10px) scale(0.7) rotate(14deg);
-  }
-}
-@media (max-width: 1023px) {
-  .phone-note {
-    animation-name: note-to-counter;
-  }
-  @keyframes note-to-counter {
-    0% {
-      opacity: 0;
-      transform: translate(0, 0) scale(0.6);
-    }
-    20% {
-      opacity: 1;
-      transform: translate(0, -30px) scale(1) rotate(-6deg);
-    }
-    100% {
-      opacity: 0;
-      transform: translate(-20px, 380px) scale(0.7) rotate(10deg);
-    }
-  }
-}
-.back-lines > div {
-  opacity: 0.35;
-  transition: opacity 500ms ease;
-}
-.back-lines-on > div {
-  opacity: 1;
-}
-.back-lines-on > div:nth-child(2) {
-  transition-delay: 300ms;
-}
-.back-lines-on > div:nth-child(3) {
-  transition-delay: 700ms;
-}
 
 /* --- The Guard's receipts drop in, one after another ------------------------------------------- */
 .receipt-drop {
@@ -910,6 +219,7 @@
   }
 }
 
+
 /* Now you fix it: a day that changes flips over; a hint rides the slider until the visitor takes over. */
 .fix-flip {
   animation: ticket-flip 520ms var(--ease-land) both;
@@ -970,127 +280,7 @@
   animation-delay: 270ms;
 }
 
-/* Money comes back: the phone slides in and buzzes, a notification drops, the till slot slides out. */
-.back-stage .phone {
-  opacity: 0;
-}
-.back-stage[data-inview] .phone {
-  opacity: 1;
-  animation:
-    phone-in 800ms var(--ease-land) 200ms backwards,
-    phone-buzz 420ms linear 1100ms 1;
-}
-@keyframes phone-in {
-  from {
-    opacity: 0;
-    transform: translateX(-90px) rotate(-10deg);
-  }
-}
-@keyframes phone-buzz {
-  0%,
-  100% {
-    translate: 0 0;
-  }
-  20% {
-    translate: -5px 0;
-  }
-  40% {
-    translate: 5px 0;
-  }
-  60% {
-    translate: -4px 0;
-  }
-  80% {
-    translate: 4px 0;
-  }
-}
-.phone-banner {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  right: 10px;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 12px;
-  border-radius: 14px;
-  background: #ffffff;
-  box-shadow: 0 8px 18px -6px rgb(0 0 0 / 0.45);
-  opacity: 0;
-  transform: translateY(-120%);
-}
-.back-stage[data-inview] .phone-banner {
-  animation: banner 3s var(--ease-land) 1s both;
-}
-@keyframes banner {
-  0% {
-    opacity: 0;
-    transform: translateY(-120%);
-  }
-  12%,
-  78% {
-    opacity: 1;
-    transform: none;
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-120%);
-  }
-}
-.phone-banner-app {
-  display: grid;
-  flex-shrink: 0;
-  width: 30px;
-  height: 30px;
-  place-items: center;
-  border-radius: 8px;
-  background: #0e3b2c;
-  color: #fff;
-  font-family: var(--font-serif);
-  font-size: 13px;
-}
-.back-stage .back-side {
-  opacity: 0;
-}
-.back-stage[data-inview] .back-side {
-  opacity: 1;
-  animation: rise 700ms var(--ease-land) 500ms backwards;
-}
-.back-stage[data-inview] .back-till {
-  animation: drawer-out 900ms var(--ease-land) 700ms backwards;
-}
-@keyframes drawer-out {
-  from {
-    opacity: 0;
-    transform: translateX(70px);
-    clip-path: inset(0 0 0 100%);
-  }
-  to {
-    clip-path: inset(0 -40px -40px -40px);
-  }
-}
 
-/* The end: the three till keys press down in turn; the built-with receipt prints out. */
-[data-inview].last-keys li:nth-child(1) .key {
-  animation: key-tap 520ms ease 1s;
-}
-[data-inview].last-keys li:nth-child(2) .key {
-  animation: key-tap 520ms ease 1.3s;
-}
-[data-inview].last-keys li:nth-child(3) .key {
-  animation: key-tap 520ms ease 1.6s;
-}
-@keyframes key-tap {
-  35% {
-    transform: translateY(4px);
-    box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 0.75),
-      0 0 0 #87918a,
-      0 1px 0 #040706,
-      0 2px 4px rgb(0 0 0 / 0.6);
-  }
-}
 .tools-receipt {
   clip-path: inset(0 0 100% 0);
 }
@@ -1107,21 +297,6 @@
     translate: 0 0;
   }
 }
-.receipt-clip {
-  position: absolute;
-  top: -12px;
-  left: 50%;
-  z-index: 2;
-  width: 64px;
-  height: 22px;
-  margin-left: -32px;
-  border-radius: 6px;
-  background: #9aa39d;
-  box-shadow:
-    inset 0 5px 0 #c9d0cb,
-    inset 0 -4px 0 #6e7771,
-    0 4px 6px rgb(0 0 0 / 0.5);
-}
 
 /* --- Built with: the receipt prints line by line ------------------------------------------------- */
 .tools-receipt {
@@ -1135,59 +310,1007 @@
   animation: rise 360ms var(--ease-land) both;
 }
 
+
 @media (prefers-reduced-motion: reduce) {
-  .hero-copy > *,
-  .hero-note,
   .deal,
   .deal-last .ticket-stamp,
-  .flap-leaf-out,
-  .flap-leaf-in,
-  .lapse-line,
-  .lapse-stamp,
-  .lapse-caret,
-  .guard-card,
   .ref-card,
-  .phone-paid,
-  .tap-cue,
-  .phone-pay,
   .fix-flip,
   .drag-hint,
-  .back-short,
   [data-inview] .receipt-drop,
   [data-inview] .tools-line,
   [data-inview] .tools-receipt,
   [data-inview] .printer-light,
   [data-inview].reveal > *,
-  [data-inview] .reveal > *,
-  .back-stage[data-inview] .phone,
-  .back-stage[data-inview] .phone-banner,
-  .back-stage[data-inview] .back-side,
-  .back-stage[data-inview] .back-till,
-  [data-inview].last-keys .key {
+  [data-inview] .reveal > * {
     animation: none !important;
   }
   .receipt-drop,
   .tools-line,
-  .reveal > *,
-  .back-stage .phone,
-  .back-stage .back-side {
+  .reveal > * {
     opacity: 1;
     transform: none;
   }
   .tools-receipt {
     clip-path: none;
   }
-  .tilt,
-  .phone {
+}
+
+/* --- The page --------------------------------------------------------------------------------------------------- */
+
+.landing-page {
+  --landing-paper: #f4f1ea;
+  --landing-sun: #e8e1d2;
+  min-height: 100vh;
+  background: var(--landing-paper);
+  color: #14201b;
+  overflow-x: clip;
+}
+
+/* Fraunces at its heaviest, fully soft and "wonky": a chunky, friendly display face from the font we already use. */
+.display {
+  font-family: var(--font-serif);
+  font-weight: 900;
+  font-variation-settings:
+    "SOFT" 100,
+    "WONK" 1;
+  letter-spacing: -0.035em;
+}
+
+.pill {
+  display: inline-block;
+  padding: 7px 14px;
+  border: 1.5px solid #14201b;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #14201b;
+  background: #fff;
+}
+.pill-dark {
+  color: #fff;
+  border-color: rgb(255 255 255 / 0.7);
+  background: transparent;
+}
+
+/* A highlighter stroke that is drawn across the words as the page opens. */
+.marker {
+  background-image: linear-gradient(transparent 58%, rgb(229 72 77 / 0.42) 58%, rgb(229 72 77 / 0.42) 92%, transparent 92%);
+  background-repeat: no-repeat;
+  background-size: 0% 100%;
+  animation: marker-draw 700ms var(--ease-land) 2.3s forwards;
+  box-decoration-break: clone;
+}
+@keyframes marker-draw {
+  to {
+    background-size: 100% 100%;
+  }
+}
+
+/* Chunky press-down button: the till's keys, in ink. */
+.btn-chunky {
+  display: inline-flex;
+  min-height: 56px;
+  align-items: center;
+  padding: 0 26px;
+  border-radius: 14px;
+  background: #14201b;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 600;
+  box-shadow:
+    0 4px 0 #000,
+    0 10px 18px -8px rgb(0 0 0 / 0.5);
+  transition: transform 110ms var(--ease-land), box-shadow 110ms var(--ease-land);
+}
+.btn-chunky:hover {
+  transform: translateY(-1px);
+}
+.btn-chunky:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 #000;
+}
+.btn-sm {
+  min-height: 44px;
+  padding: 0 18px;
+  font-size: 15px;
+  border-radius: 11px;
+}
+
+/* --- Hero scene: the owner behind the counter, a pale sun behind her ------------------------------------------ */
+.hero-scene {
+  padding-top: 70px;
+}
+.scene-sun {
+  position: absolute;
+  left: 50%;
+  bottom: 40px;
+  width: 92%;
+  aspect-ratio: 1;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: var(--landing-sun);
+}
+/* The owner is drawn down to the waist; the window ends behind the counter so nothing pokes out below it. */
+.scene-window {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  padding-top: 40px;
+  margin-top: -40px;
+  border-radius: 0 0 10px 10px;
+}
+.save-owner {
+  position: relative;
+}
+.save-owner-figure {
+  overflow: hidden;
+  padding-top: 30px;
+  border-radius: 0 0 10px 10px;
+}
+.save-owner .bubble {
+  top: -24px;
+}
+/* Phone: a small owner beside her words, so the slider and the tickets fit on one screen. */
+@media (max-width: 1023px) {
+  .save-owner {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+  }
+  .save-owner .bubble {
+    position: static;
+    order: 2;
+    flex: 1;
+    max-width: none;
+    margin-bottom: 30px;
+    font-size: 15px;
+  }
+  .save-owner-figure {
+    width: 112px;
+    flex-shrink: 0;
+  }
+  .save-owner-figure .counter {
+    height: 22px;
+    margin-top: -20px;
+    border-radius: 6px;
+  }
+}
+.counter {
+  position: relative;
+  z-index: 2;
+  height: 46px;
+  margin-top: -40px;
+  border-radius: 10px;
+  background: #14201b;
+  box-shadow: 0 14px 22px -12px rgb(0 0 0 / 0.55);
+}
+.counter::before {
+  content: "";
+  position: absolute;
+  inset: 8px 10px auto;
+  height: 3px;
+  border-radius: 2px;
+  background: rgb(255 255 255 / 0.12);
+}
+.counter-dark {
+  background: #10261d;
+}
+
+.bubble {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: 0;
+  max-width: 260px;
+  padding: 12px 16px;
+  border: 2px solid #14201b;
+  border-radius: 18px 18px 18px 4px;
+  background: #fff;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #14201b;
+  opacity: 0;
+  transform-origin: bottom left;
+}
+.bubble-in {
+  animation: bubble-pop 420ms var(--ease-land) both;
+}
+@keyframes bubble-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.bubble-light {
+  top: -20px;
+}
+
+/* The owner hops a little when her mood changes. */
+.peep {
+  display: block;
+  height: auto;
+}
+.peep-hop {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: peep-hop 460ms var(--ease-land);
+}
+@keyframes peep-hop {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  35% {
+    transform: translateY(-5%) scale(1.02, 0.99);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* The till board: where the days are dealt. */
+.till-board {
+  border-radius: 18px;
+  padding: 22px 20px 24px;
+  background: #14201b;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.06),
+    0 18px 30px -18px rgb(0 0 0 / 0.6);
+}
+@media (min-width: 1024px) {
+  .till-board {
+    padding: 26px 28px 30px;
+  }
+}
+
+/* --- How it works: three blocks, each colour is its meaning ---------------------------------------------------- */
+.how-block {
+  display: flex;
+  min-height: 420px;
+  flex-direction: column;
+  border-radius: 22px;
+  padding: 28px;
+  box-shadow: 0 18px 30px -22px rgb(0 0 0 / 0.55);
+}
+.how-ink {
+  background: #14201b;
+  color: #fff;
+}
+.how-red {
+  background: #e5484d;
+  color: #14201b;
+}
+.how-green {
+  background: #1e9e5e;
+  color: #14201b;
+}
+.how-num {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 800;
+}
+.how-tick {
+  height: 34px;
+  flex: 1;
+  border-radius: 4px;
+}
+.how-card {
+  display: block;
+  width: 34px;
+  height: 46px;
+  border-radius: 4px;
+  background: #fff;
+  border: 2px solid #14201b;
+  transform: rotate(-11deg);
+}
+
+/* --- Save Thursday: the one felt table on the page --------------------------------------------------------------- */
+.save-stage {
+  background-color: #2a5a46;
+  background-image: url("/felt.png");
+  box-shadow:
+    inset 0 18px 30px -20px rgb(0 0 0 / 0.6),
+    inset 0 -18px 30px -20px rgb(0 0 0 / 0.6);
+}
+.chip {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1.5px solid rgb(255 255 255 / 0.6);
+  border-radius: 999px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+}
+.chip:hover {
+  border-color: #fff;
+}
+.chip-on {
+  background: #fff;
+  color: #14201b;
+}
+.save-hint {
+  top: 17px;
+  margin-left: 44px;
+  background: #fff;
+  color: #14201b;
+}
+.save-hint::after {
+  border-right-color: #fff;
+}
+.guard-slip {
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: #f4f1ea;
+  box-shadow: 0 12px 22px -14px rgb(0 0 0 / 0.7);
+}
+
+/* --- How it works, in motion: each block acts out its step when it comes into view --------------------------------- */
+.how-row .how-block {
+  opacity: 0;
+}
+[data-inview].how-row .how-block {
+  animation: how-rise 750ms var(--ease-land) both;
+}
+[data-inview].how-row li.how-block:nth-child(2) {
+  animation-delay: 160ms;
+}
+[data-inview].how-row li.how-block:nth-child(3) {
+  animation-delay: 320ms;
+}
+@keyframes how-rise {
+  from {
+    opacity: 0;
+    transform: translateY(48px) rotate(-1.2deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 1: the 14 days are worked out one by one; the short one lands last, with a thump. */
+.how-tick {
+  transform: scaleY(0);
+  transform-origin: 50% 100%;
+}
+[data-inview] .how-tick {
+  animation: tick-grow 420ms var(--ease-land) both;
+}
+[data-inview] .how-tick-short {
+  animation: tick-thump 620ms var(--ease-land) both;
+}
+@keyframes tick-grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+@keyframes tick-thump {
+  0% {
+    transform: translateY(-40px) scale(1.3, 0);
+  }
+  55% {
+    transform: translateY(0) scale(1.15, 1.25);
+  }
+  75% {
+    transform: scale(0.95, 0.9);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* 2: the date flips in, the amount counts up (CountUp), the stamp slams on. */
+.how-flip {
+  transform-origin: 50% 100%;
+}
+[data-inview] .how-flip {
+  animation: date-flip 620ms var(--ease-land) 800ms both;
+}
+@keyframes date-flip {
+  from {
+    opacity: 0;
+    transform: perspective(600px) rotateX(-90deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.how-stamp {
+  position: absolute;
+  top: 28px;
+  right: 26px;
+  padding: 4px 12px;
+  border: 3px solid #14201b;
+  border-radius: 6px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #14201b;
+  opacity: 0;
+  transform: rotate(-12deg);
+}
+[data-inview] .how-stamp {
+  animation: stamp-slam 480ms var(--ease-land) 2.1s both;
+}
+@keyframes stamp-slam {
+  0% {
+    opacity: 0;
+    transform: rotate(-12deg) scale(2.4);
+  }
+  60% {
+    opacity: 1;
+    transform: rotate(-12deg) scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(-12deg) scale(1);
+  }
+}
+
+/* 3: nine rules tick one by one, then the referee card turns over. */
+.rule-box {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border: 2px solid #14201b;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 800;
+  color: transparent;
+}
+[data-inview] .rule-box {
+  animation: rule-tick 260ms var(--ease-land) both;
+}
+@keyframes rule-tick {
+  from {
+    background: transparent;
+    color: transparent;
+    transform: scale(0.8);
+  }
+  to {
+    background: #14201b;
+    color: #fff;
+    transform: none;
+  }
+}
+.how-card,
+.how-approved {
+  opacity: 0;
+}
+[data-inview] .how-card {
+  animation: card-turn 560ms var(--ease-land) 2.4s both;
+}
+[data-inview] .how-approved {
+  animation: rise 500ms var(--ease-land) 2.7s both;
+}
+@keyframes card-turn {
+  from {
+    opacity: 0;
+    transform: perspective(500px) rotateY(-100deg) rotate(-11deg);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-11deg);
+  }
+}
+
+/* --- Save Thursday, in motion ------------------------------------------------------------------------------------ */
+/* The owner pops up from behind the counter. */
+.save-owner-figure .peep {
+  transform: translateY(105%);
+}
+[data-inview] .save-owner-figure .peep {
+  animation: pop-up 700ms var(--ease-land) 350ms both;
+}
+@keyframes pop-up {
+  from {
+    transform: translateY(105%);
+  }
+  to {
+    transform: none;
+  }
+}
+.bubble-late {
+  animation-delay: 1s;
+}
+/* Thursday saved: three notes drop into its ticket. */
+.note-drop {
+  position: absolute;
+  z-index: 3;
+  top: 22px;
+  width: 30%;
+  height: 22px;
+  border-radius: 3px;
+  background: #e9efe6;
+  border: 1.5px solid #0e3b2c;
+  box-shadow: 0 4px 8px -3px rgb(0 0 0 / 0.6);
+  pointer-events: none;
+  animation: note-drop 900ms var(--ease-land) both;
+}
+@keyframes note-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-120px) rotate(-25deg);
+  }
+  25% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(14px) rotate(6deg) scale(0.9);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(26px) rotate(0) scale(0.6);
+  }
+}
+.slip-in {
+  transform-origin: left center;
+  animation: card-flip 480ms var(--ease-land) both;
+}
+.slip-shake {
+  animation: slip-shake 520ms ease-in-out both;
+}
+@keyframes slip-shake {
+  0%,
+  100% {
+    transform: none;
+  }
+  20% {
+    transform: translateX(-10px) rotate(-0.6deg);
+  }
+  40% {
+    transform: translateX(9px) rotate(0.5deg);
+  }
+  60% {
+    transform: translateX(-6px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
+}
+
+/* --- Money comes back -------------------------------------------------------------------------------------------- */
+.scene-sun-small {
+  width: 78%;
+  bottom: 30px;
+}
+.reminder {
+  position: relative;
+  z-index: 3;
+  width: min(330px, 92%);
+  margin: 0 auto -18px;
+  padding: 16px 16px 12px;
+  border: 2px solid #14201b;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 16px 28px -16px rgb(0 0 0 / 0.45);
+  rotate: -2deg;
+  opacity: 0;
+}
+[data-inview] .reminder {
+  animation: notify-pop 620ms var(--ease-land) 500ms both;
+}
+@keyframes notify-pop {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.reminder-tapped {
+  animation: none !important;
+  opacity: 1;
+  transform: scale(0.98);
+  transition: transform 160ms var(--ease-land);
+}
+.reminder-paid {
+  transform: none;
+}
+.paid-tag {
+  animation: rise 420ms var(--ease-land) both;
+}
+.tap-tag {
+  position: absolute;
+  z-index: 2;
+  right: 10px;
+  top: -34px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #14201b;
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 700;
+  pointer-events: none;
+  animation: tap-bob 1.2s ease-in-out infinite;
+}
+@keyframes tap-bob {
+  50% {
+    transform: translateY(-5px);
+  }
+}
+/* Three notes fly from Maya's payment to the shop (right on a laptop, down on a phone). */
+.fly-note {
+  position: absolute;
+  z-index: 4;
+  top: 150px;
+  left: 45%;
+  width: 54px;
+  height: 30px;
+  border-radius: 4px;
+  background: #e9efe6;
+  border: 2px solid #0e3b2c;
+  box-shadow: 0 6px 10px -4px rgb(0 0 0 / 0.5);
+  pointer-events: none;
+  animation: fly-down 1000ms cubic-bezier(0.45, 0, 0.3, 1) both;
+}
+@keyframes fly-down {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(0);
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(10px, 560px) rotate(200deg) scale(0.7);
+  }
+}
+@media (min-width: 1024px) {
+  /* Laptop: the reminder pops up beside Maya's head, not above it, so the whole scene fits in one screen. */
+  .back-scene {
+    padding-top: 30px;
+  }
+  .back-scene .scene-sun-small {
+    left: 36%;
+  }
+  .reminder {
+    position: absolute;
+    top: -14px;
+    right: -34px;
+    width: 268px;
+    margin: 0;
+  }
+  .fly-note {
+    top: 200px;
+    left: 70%;
+    animation-name: fly-left;
+  }
+  @keyframes fly-left {
+    0% {
+      opacity: 0;
+      transform: translate(0, 0) rotate(0);
+    }
+    15% {
+      opacity: 1;
+    }
+    85% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-640px, 230px) rotate(-220deg) scale(0.7);
+    }
+  }
+}
+/* Thursday's payment as a bar: what's ready, the new money sliding in, and the red gap that's left. */
+.gap-card {
+  padding: 22px 22px 20px;
+  border-radius: 18px;
+  background: #14201b;
+  box-shadow: 0 18px 30px -18px rgb(0 0 0 / 0.6);
+}
+.gap-bar {
+  position: relative;
+  height: 34px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: repeating-linear-gradient(-45deg, #e5484d 0 10px, #c93a3f 10px 20px);
+}
+.gap-ready,
+.gap-new {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+}
+.gap-ready {
+  background: #1e9e5e;
+}
+.gap-new {
+  background: #6fd39f;
+  border-left: 2px solid #14201b;
+  transition: width 900ms var(--ease-land) 900ms;
+}
+.gap-short {
+  animation: rise 420ms var(--ease-land) both;
+}
+
+/* --- The safety check: a sand surface so the white receipts stand out ------------------------------------------- */
+.safety-stage {
+  background: #e7e1d3;
+}
+
+/* --- Ending: one dark block -------------------------------------------------------------------------------------- */
+.finale {
+  background: #14201b;
+  color: #fff;
+}
+.btn-light {
+  background: #f4f1ea;
+  color: #14201b;
+  box-shadow:
+    0 4px 0 #9a9585,
+    0 10px 18px -8px rgb(0 0 0 / 0.6);
+}
+.btn-light:active {
+  box-shadow: 0 0 0 #9a9585;
+}
+.btn-ghost {
+  background: transparent;
+  border: 2px solid rgb(255 255 255 / 0.55);
+  box-shadow: none;
+}
+.btn-ghost:hover {
+  border-color: #fff;
+}
+
+/* Money comes back, in motion: Maya pops up, then her phone buzzes with the reminder; the shop's side slides in. */
+.pop-figure .peep {
+  transform: translateY(105%);
+}
+[data-inview] .pop-figure .peep {
+  animation: pop-up 700ms var(--ease-land) 250ms both;
+}
+[data-inview] .reminder:not(.reminder-tapped) {
+  animation:
+    notify-pop 620ms var(--ease-land) 1s both,
+    buzz 420ms ease-in-out 1.75s 2;
+}
+@keyframes buzz {
+  0%,
+  100% {
+    transform: none;
+  }
+  25% {
+    transform: translateX(-4px) rotate(-1deg);
+  }
+  75% {
+    transform: translateX(4px) rotate(1deg);
+  }
+}
+.back-side > :nth-child(1),
+.back-side > .gap-card {
+  opacity: 0;
+}
+[data-inview] .back-side > :nth-child(1) {
+  animation: slide-left 700ms var(--ease-land) 500ms both;
+}
+[data-inview] .back-side > .gap-card {
+  animation: slide-left 700ms var(--ease-land) 800ms both;
+}
+[data-inview] .back-side > .gap-card.gap-hit {
+  opacity: 1;
+  animation: gap-hit 700ms var(--ease-land) 850ms both;
+}
+@keyframes slide-left {
+  from {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* The notes land on Thursday's bar: it takes the hit and glows. */
+.gap-hit {
+  animation: gap-hit 700ms var(--ease-land) 850ms both;
+}
+@keyframes gap-hit {
+  0% {
+    transform: none;
+  }
+  30% {
+    transform: translateY(6px) scale(0.99);
+    box-shadow:
+      0 0 0 3px #6fd39f,
+      0 18px 30px -18px rgb(0 0 0 / 0.6);
+  }
+  100% {
+    transform: none;
+    box-shadow:
+      0 0 0 0 #6fd39f,
+      0 18px 30px -18px rgb(0 0 0 / 0.6);
+  }
+}
+.amount-land {
+  animation: amount-land 420ms var(--ease-land) both;
+}
+@keyframes amount-land {
+  40% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* The safety check, in motion: after each receipt prints, the referee's card slams onto it, then its caption. */
+.ref-chip {
+  position: absolute;
+  z-index: 4;
+  top: 12px;
+  right: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 8px;
+  border: 2px solid #14201b;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  color: #14201b;
+  box-shadow: 0 8px 14px -8px rgb(0 0 0 / 0.5);
+  opacity: 0;
+  rotate: 4deg;
+}
+.ref-chip-card {
+  display: block;
+  width: 14px;
+  height: 19px;
+  border-radius: 2px;
+  rotate: -11deg;
+  border: 1.5px solid #14201b;
+}
+[data-inview] .ref-chip {
+  animation: stamp-slam-flat 460ms var(--ease-land) both;
+}
+@keyframes stamp-slam-flat {
+  0% {
+    opacity: 0;
+    transform: scale(2.2) translateY(-20px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+.receipt-caption {
+  opacity: 0;
+}
+[data-inview] .receipt-caption {
+  animation: rise 500ms var(--ease-land) both;
+}
+
+/* The ending, in motion: the three keys pop up one after another, then the main one presses itself once. */
+.finale-keys > * {
+  opacity: 0;
+}
+[data-inview] .finale-keys > * {
+  animation: key-pop 520ms var(--ease-land) both;
+}
+[data-inview] .finale-keys > :nth-child(1) {
+  animation:
+    key-pop 520ms var(--ease-land) 700ms both,
+    key-press 360ms var(--ease-land) 2s;
+}
+[data-inview] .finale-keys > :nth-child(2) {
+  animation-delay: 850ms;
+}
+[data-inview] .finale-keys > :nth-child(3) {
+  animation-delay: 1000ms;
+}
+@keyframes key-pop {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes key-press {
+  40% {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 #9a9585;
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pop-figure .peep,
+  .back-side > *,
+  .gap-hit,
+  .amount-land,
+  .ref-chip,
+  .receipt-caption,
+  .finale-keys > * {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reminder,
+  .paid-tag,
+  .tap-tag,
+  .gap-short {
+    animation: none !important;
+    opacity: 1;
+  }
+  .gap-new {
     transition: none;
   }
-  .scroll-cue::after,
-  .lapse-flight {
+  .fly-note {
     display: none;
   }
-  .lapse-note,
-  .lapse-saw,
-  .lapse-tick {
-    transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marker {
+    animation: none;
+    background-size: 100% 100%;
+  }
+  .bubble-in,
+  .peep-hop,
+  .how-row .how-block,
+  .how-tick,
+  .how-flip,
+  .how-stamp,
+  .rule-box,
+  .how-card,
+  .how-approved,
+  .save-owner-figure .peep,
+  .slip-in,
+  .slip-shake {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+  .how-stamp,
+  .how-card {
+    transform: rotate(-12deg);
+  }
+  .rule-box {
+    background: #14201b;
+    color: #fff;
+  }
+  .note-drop {
+    display: none;
   }
 }

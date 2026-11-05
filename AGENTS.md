@@ -104,9 +104,9 @@ Should-have:
   updates the right copy.
 - **Demo page.** The demo guide (`/demo`) walks judges through the six story steps (each marked Simulated or PayPal
   sandbox), shows the sandbox buyer login and the demo date, and has the reset button.
-- **Routes.** The public landing page is `/` (P1-13): Loop Audio's next two weeks as a scroll time-lapse, a "fix it
-  yourself" slider judged by the real Guard rules, and real receipts, all from `lib/landing` with no database. The
-  owner's Today screen is `/today`.
+- **Routes.** The public landing page is `/` (P1-13): what NeverShort does in one sentence, how it works in three
+  steps, a "Can you save Thursday?" slider judged by the real Guard rules, Maya's reminder paid on screen, and real
+  receipts, all from `lib/landing` with no database. The owner's Today screen is `/today`.
 
 ---
 
@@ -274,7 +274,7 @@ The metaphor lives in the words and the colours, never in sun or cloud icons. No
    inside a deep green note engraved like real currency: a fine lathe tint, a rope border with a 14 in each corner,
    NEVERSHORT at the top, "This forecast is good for fourteen days" at the bottom, a rosette medallion, the Margin
    Guard seal, red serials and signatures. Use `BanknotePanel` from `components/ui/Banknote.tsx`; never redraw it.
-   The full note is for the home screen (Today) and the landing page only. Precise, symmetric engraving only: no
+   The full note is for the home screen (Today) only. Precise, symmetric engraving only: no
    organic swirls.
 6. **The money desk** (every owner page; chosen 4 Nov). Three physical objects, set in `components/app/AppShell.tsx`:
    - the **till** on the left: a screwed-down dark panel with a display window (shop and date) and square ivory
@@ -312,6 +312,8 @@ The metaphor lives in the words and the colours, never in sun or cloud icons. No
 ### Type
 
 - **Fraunces** (chosen; variable, softened with `"SOFT" 50`) for headline sentences, page sentences and big single amounts. Instrument Serif was tried first and read as too condensed.
+- **Landing page only:** big headlines use Fraunces at its heaviest, fully soft and "wonky" (the `display` class:
+  weight 900, `"SOFT" 100, "WONK" 1`), for a friendlier, chunkier first impression. App screens keep the calm serif.
 - Inter for interface text. JetBrains Mono for receipts only.
 - Tabular numbers for money in columns: the `tabular` utility (Inter). Big single amounts use the serif.
 - Fonts load through `next/font` in `app/layout.tsx`; tokens and the palette live in `app/globals.css`.
@@ -338,14 +340,19 @@ The metaphor lives in the words and the colours, never in sun or cloud icons. No
 
 - Motion always shows something happening: a fixed day's tile turns green and a COVERED stamp lands, a BLOCKED
   stamp lands on a blocked receipt, notes slide into the till drawer, a key presses down, tickets are dealt, the
-  landing page's time-lapse plays the days. Nothing moves just to decorate.
+  landing page's owner looks worried on the short day and relieved when it's saved. Nothing moves just to decorate.
 - Always respect `prefers-reduced-motion`: show the final state instead.
 
 ### Never
 
 Purple or blue gradients, glassy cards, sparkle icons, icon-in-a-circle card grids, stock illustrations,
 lorem ipsum, unlabelled charts, a marketing-style hero inside the app screens. The landing page (`/`) may open with a
-hero, but its picture is the live product (the banknote with the real forecast), never stock art or a mockup.
+hero built from the live product (the real forecast's tickets), never a mockup.
+
+**Exception, landing page only:** hand-drawn people from **Open Peeps** by Pablo Stanley (CC0, openpeeps.com), drawn
+in our ink: the shop's owner (`components/landing/Owner.tsx`) and Maya, the customer (`components/landing/Maya.tsx`).
+They are generated from the Open Peeps drawing data, never hand-edited, and credited in the page footer. Each one acts
+out the story (worried, relieved, paying). No other illustration sets.
 
 ### States
 
@@ -377,8 +384,7 @@ Every screen and every module component has a real empty state, loading state an
   design. Never import `ag-grid-enterprise`, `ag-charts-enterprise` or enterprise-only features.
 - **Heavy libraries stay off the phone.** AG Grid and AG Charts are laptop-only: load them with dynamic
   import on their own routes, never on phone screens.
-- **Landing motion:** GSAP (`gsap`, with ScrollTrigger; free "no charge" licence), dynamically imported on the landing
-  page only. Small motion elsewhere is plain CSS.
+- **Motion:** plain CSS animations everywhere, the landing page included (no animation library).
 - **Tests:** Vitest for unit tests, Playwright for the end-to-end demo test.
 - **Hosting:** Render web service in Frankfurt (moved to a paid plan before judging, so it never sleeps). Database
   on Supabase in Paris (above). Until the Render link exists, `APP_URL` is `http://localhost:3000`.

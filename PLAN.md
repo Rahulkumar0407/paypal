@@ -23,12 +23,13 @@ All 6 story steps were clicked through on Wed 4 Nov (fake PayPal mode). Next for
 
 What P2 (and P2's agent) needs to know:
 - **New (Wed 4 Nov): landing page at `/`, Today moved to `/today`** (P1-13, agreed with the owner; tell P2).
-  `/` is a public page with no database: Loop Audio's two weeks as a scroll time-lapse, a "fix it yourself" slider
-  judged by the real Guard rules, and real receipts (`lib/landing`, `components/landing`). The app's look changed too
+  `/` is a public page with no database (`lib/landing`, `components/landing`). **Redone Thu 5 Nov:** light paper page,
+  chunky headline, "How it works" in three blocks, a "Can you save Thursday?" slider judged by the real Guard rules,
+  Maya's reminder paid on screen, real receipts, and two Open Peeps cartoons (CC0; AGENTS.md section 7). The app's look changed too
   (P1-12 started): felt mat, till with register keys, banknote-paper cards, ticket stubs, a till drawer on To pay.
   AGENTS.md section 7 was updated to match (landing hero allowed with the live product as its picture, banknote on
-  Today and the landing page, motion when it shows something happening, the money desk). New dependency: `gsap`
-  3.15.0 (landing page only).
+  Today and the landing page, motion when it shows something happening, the money desk). `gsap` was added and then
+  removed again on Thu 5 Nov: the landing page's motion is plain CSS now (run `npm install` after pulling).
   P2's files that need the route change: `tests/e2e/smoke.spec.ts` (Today test: `goto("/today")`; add `/today` and
   `/` to the pages list) and `README.md` (Today row is `/today`; add `/`, the landing page). Devpost and the video
   should link the bare URL: it opens on the landing page.

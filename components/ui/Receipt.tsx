@@ -20,7 +20,7 @@ function timeOf(iso: string): string {
   return iso.slice(11, 16);
 }
 
-function Rule({ rule }: { rule: RuleResult }) {
+function Rule({ rule, compact }: { rule: RuleResult; compact: boolean }) {
   const mark =
     rule.outcome === "PASS"
       ? "bg-green"
@@ -30,7 +30,7 @@ function Rule({ rule }: { rule: RuleResult }) {
           : "bg-amber"
         : "border border-ink/40";
   return (
-    <li className="py-[3px]">
+    <li className={compact ? "py-px" : "py-[3px]"}>
       <div className="flex items-baseline gap-2">
         <span className="w-3 shrink-0 tabular">{rule.number}</span>
         <span className="min-w-0 flex-1 truncate">{rule.name}</span>
@@ -39,7 +39,7 @@ function Rule({ rule }: { rule: RuleResult }) {
           <span className={rule.outcome === "FAIL" ? "font-bold" : rule.outcome === "N/A" ? "text-ink-muted" : ""}>{rule.outcome}</span>
         </span>
       </div>
-      {rule.outcome !== "N/A" ? <p className="pl-5 text-ink-muted">{rule.reason}</p> : null}
+      {rule.outcome !== "N/A" && (!compact || rule.outcome === "FAIL") ? <p className="pl-5 text-ink-muted">{rule.reason}</p> : null}
     </li>
   );
 }
@@ -52,10 +52,14 @@ export function Receipt({
   receipt,
   storeName = "Loop Audio",
   animateStamp = true,
+  compact = false,
 }: {
   receipt: ReceiptData;
   storeName?: string;
   animateStamp?: boolean;
+  /** A shorter print for showing several side by side: every rule's result, but a reason only for a failing rule; no
+   * proposer, reference block or footer line. */
+  compact?: boolean;
 }) {
   const { proposal, decision } = receipt;
   const blocked = decision.decision === "BLOCK";
@@ -64,13 +68,21 @@ export function Receipt({
       className="receipt-shadow relative w-full max-w-[380px]"
       aria-label={`Receipt ${receipt.number}: ${ACTION_WORD[proposal.type]}, ${DECISION_LINE[decision.decision].toLowerCase()}`}
     >
-      <div className="receipt-paper px-5 pt-8 pb-9 font-mono text-[12.5px] leading-[1.55] text-ink sm:px-6">
-        <header className="text-center">
-          <p className="font-bold tracking-[0.06em] uppercase">{storeName}</p>
-          <p className="tracking-[0.06em] uppercase">Margin Guard receipt</p>
-          <p className="mt-1 whitespace-pre text-ink-muted">
-            {`No. ${String(receipt.number).padStart(4, "0")}  ${formatDayWithYear(decision.demoDate)}  ${timeOf(decision.decidedAt)}`}
-          </p>
+      <div className={`receipt-paper px-5 font-mono leading-[1.55] text-ink sm:px-6 ${compact ? "pt-6 pb-7 text-[12px]" : "pt-8 pb-9 text-[12.5px]"}`}>
+        <header className={compact ? "text-left" : "text-center"}>
+          {compact ? (
+            <p className="font-bold tracking-[0.06em] uppercase">
+              Margin Guard · No. {String(receipt.number).padStart(4, "0")}
+            </p>
+          ) : (
+            <>
+              <p className="font-bold tracking-[0.06em] uppercase">{storeName}</p>
+              <p className="tracking-[0.06em] uppercase">Margin Guard receipt</p>
+              <p className="mt-1 whitespace-pre text-ink-muted">
+                {`No. ${String(receipt.number).padStart(4, "0")}  ${formatDayWithYear(decision.demoDate)}  ${timeOf(decision.decidedAt)}`}
+              </p>
+            </>
+          )}
         </header>
 
         <Divider />
@@ -79,12 +91,12 @@ export function Receipt({
           <span className="font-bold tabular">{formatCents(proposal.amountCents)}</span>
         </div>
         <p>{proposal.target.label}</p>
-        <p className="text-ink-muted">Proposed by: {proposerName(proposal.proposedBy)}</p>
+        {compact ? null : <p className="text-ink-muted">Proposed by: {proposerName(proposal.proposedBy)}</p>}
 
         <Divider />
         <ol aria-label="Rules checked">
           {decision.rules.map((rule) => (
-            <Rule key={rule.id} rule={rule} />
+            <Rule key={rule.id} rule={rule} compact={compact} />
           ))}
         </ol>
 
@@ -95,7 +107,7 @@ export function Receipt({
         </div>
         <p className="mt-1">{decision.headlineReason}</p>
 
-        {receipt.events.length > 1 ? (
+        {receipt.events.length > 1 && !compact ? (
           <ul className="mt-2 text-ink-muted">
             {receipt.events.slice(1).map((e) => (
               <li key={`${e.kind}-${e.at}`}>
@@ -105,6 +117,8 @@ export function Receipt({
           </ul>
         ) : null}
 
+        {compact ? null : (
+          <>
         <Divider />
         <dl className="space-y-0.5 text-ink-muted">
           {receipt.paypalIds.checked.length > 0 ? (
@@ -125,6 +139,8 @@ export function Receipt({
           </div>
         </dl>
         <p className="mt-4 text-center text-ink-muted">No money moves without the Margin Guard.</p>
+          </>
+        )}
       </div>
 
       {blocked ? (

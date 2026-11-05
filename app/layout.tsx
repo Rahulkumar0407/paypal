@@ -4,7 +4,7 @@ import { ServiceWorker } from "@/components/app/ServiceWorker";
 import "./globals.css";
 
 // Fraunces: a wide, warm variable serif. Optical size follows the font size; SOFT is set in globals.css.
-const serif = Fraunces({ subsets: ["latin"], style: ["normal", "italic"], axes: ["opsz", "SOFT"], variable: "--font-fraunces", display: "swap" });
+const serif = Fraunces({ subsets: ["latin"], style: ["normal", "italic"], axes: ["opsz", "SOFT", "WONK"], variable: "--font-fraunces", display: "swap" });
 const sans = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains-mono", display: "swap" });
 
