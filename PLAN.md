@@ -18,10 +18,31 @@ Status: `[ ]` not started, `[~]` in progress, `[x]` done (test run and passed).
 ## Where things stand (Tue 3 Nov, night): read this first
 
 **P1's build tasks are in (P1-6 to P1-11, all pushed).** The forecast, Margin Guard, reminder helper, fix the gap,
-PayPal checkout and webhooks, Ask chat and the risk check are real code with 195 unit tests (`npm run check`).
+PayPal checkout and webhooks, Ask chat and the risk check are real code with 221 unit tests (`npm run check`, Thu 5 Nov).
 All 6 story steps were clicked through on Wed 4 Nov (fake PayPal mode). Next for P1: the design pass (P1-12).
 
 What P2 (and P2's agent) needs to know:
+- **The repo moved** to `github.com/Rahulkumar0407/paypal` (GitHub redirects the old `kritsii/paypal`). Point your
+  remote at it: `git remote set-url origin https://github.com/Rahulkumar0407/paypal`.
+- **New (Thu 5 Nov), all pushed; pull, then `npm install`:**
+  - **P2-5 is done** (built by P1 with the owner's OK, in P2's folders): `/dashboard` has the forecast in AG Charts and
+    the orders and money-out tables in AG Grid, laptop-only, with loading, empty and error states
+    (`components/dashboard/README.md`, `components/charts/README.md`). Restyle or extend freely.
+  - **`/try`** ("Try it with your own numbers"): a public page, no database. Balance, daily sales, minimum and up to 5
+    payments give the app's own forecast, fix ideas and the Guard's verdict. Add it to the smoke test's pages list and
+    the README's routes table.
+  - **Settings now saves** (minimum balance, warning zone, shop answers) to the visitor's copy; the forecast and the
+    Guard follow it. Reset on `/demo` restores $100 and $50.
+  - **First visit fixed:** `getVisitorStoreId()` now waits until the visitor's copy exists (a first page used to read
+    an empty shop).
+  - **Wording your smoke test may check** (old → new): tab title `Dues` → `To pay`; banner `Demo shop.` →
+    `Sample shop.`; Ask `Not yet.` → `No.`; `gap loan` → `short-term loan`; menu `Open the shop` →
+    `Loop Audio's store (buyer view)`, `Design system` removed from the menu (the page still exists); button
+    `Not regular` → `Not a regular payment`; Guard rule 8 reason now reads "$119.00 is more than $100.00, the most
+    NeverShort does without asking you."; rule 9 "With this one, $540.00 has gone out in 7 days. The limit is
+    $500.00, so you decide."; receipts label the key `Repeat-check ref`. Landing buttons say "sample shop".
+  - **Gemini works live** (`gemini-3.5-flash-lite`, thinking set to minimum in `lib/ai/model.ts`; time limits 20 s for
+    AI lines, 30 s for Ask). Pages never wait for it.
 - **New (Wed 4 Nov): landing page at `/`, Today moved to `/today`** (P1-13, agreed with the owner; tell P2).
   `/` is a public page with no database (`lib/landing`, `components/landing`). **Redone Thu 5 Nov:** light paper page,
   chunky headline, "How it works" in three blocks, a "Can you save Thursday?" slider judged by the real Guard rules,
@@ -46,14 +67,15 @@ What P2 (and P2's agent) needs to know:
   section 4): if supplier payments, refunds and loans in the last 7 days (approved, done or waiting) would pass $500
   with this action, the owner decides. `types/` `RuleId` gained `TOTAL_SPENDING`; every receipt now lists 9 rules.
   Any test of yours that counts rules should expect 9.
-- **P2-5:** `lib/store` `listRecentOrders`, `lib/forecast` `getForecast` / `getDues` / `listRecentPayments` and
-  `lib/guard` `listReceipts` are real now: build the dashboard and chart on them.
+- **P2-5:** done (above).
 - **P2-6:** `tests/e2e/smoke.spec.ts` (P2's file) has 8 failing checks from old wording: the "closes at $150" text
   on Home, 6 sample receipts on `/receipts` (a fresh copy has none until something is decided), and the `/approvals`
   and `/demo` headings. Update them to the current screens, then add the 6-step story with `PAYPAL_FAKE=1`.
 - **P2-7 README:** copy the AI section from `lib/ai/README.md` (default model `gemini-3.5-flash-lite`; several keys
   comma-separated share the load within a per-key budget; with no `AI_MODEL` or key, every AI feature uses its plain
-  fallback). Live Gemini hasn't been tried yet.
+  fallback). Live Gemini was tried on Thu 5 Nov and answers; the free tier is slow (1 to 16 s), which is fine.
+  Also say which sponsor tools are used and how: PayPal (Orders v2, Webhooks, Payouts, Payments; test mode), AG Grid
+  and AG Charts (the dashboard), and credit Open Peeps by Pablo Stanley (CC0) for the landing page's drawings.
 - **Render env for AI:** `AI_MODEL=gemini-3.5-flash-lite`, `GOOGLE_GENERATIVE_AI_API_KEY=key1,key2,...`, and optionally
   `AI_MAX_REQUESTS_PER_MINUTE` / `AI_MAX_REQUESTS_PER_DAY` set just under what aistudio.google.com/rate-limit shows.
 - **Running locally:** `npm run dev`. Pages take seconds because the database is in Paris; on Render (Frankfurt) it
