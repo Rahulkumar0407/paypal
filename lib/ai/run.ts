@@ -6,7 +6,11 @@ import type { z } from "zod";
  * failure or after a time limit, so the caller shows its template instead. AI failure is never app failure.
  */
 
-const TIME_LIMIT_MS = 8_000;
+/**
+ * Gemini's free tier answers in 1 to 16 s, unevenly. No page waits for these calls (explanations stream in through
+ * Suspense, reminder drafts run after the response), so the limit can be generous without slowing anything.
+ */
+const TIME_LIMIT_MS = 20_000;
 
 export async function aiText(model: LanguageModel, system: string, prompt: string): Promise<string | null> {
   try {

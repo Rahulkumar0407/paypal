@@ -296,7 +296,7 @@ export async function answerWith(question: string, data: AskData, model: Languag
   };
 
   try {
-    const result = await generateText({ model, system: system(data.today), prompt: question, tools, stopWhen: isStepCount(5), timeout: 15_000, maxRetries: 1, temperature: 0.2 });
+    const result = await generateText({ model, system: system(data.today), prompt: question, tools, stopWhen: isStepCount(5), timeout: 30_000, maxRetries: 1, temperature: 0.2 });
     const text = result.text.trim();
     const allowed = allowedFrom([question, calendar(data.today), ...used.map((u) => u.output)], used.flatMap((u) => u.cents));
     const problem = used.length === 0 ? "no tool was used" : problemWith(text, allowed);

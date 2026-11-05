@@ -16,7 +16,7 @@
  * instead of createGoogle, reading OPENROUTER_API_KEY. AI_MODEL is then an OpenRouter id, e.g. "google/gemini-3.5-flash-lite".
  */
 import { createGoogle } from "@ai-sdk/google";
-import type { LanguageModel } from "ai";
+import { defaultSettingsMiddleware, wrapLanguageModel, type LanguageModel } from "ai";
 import { getEnv } from "@/lib/shared/env";
 import { createPool, rotatingModel } from "./pool";
 
@@ -33,6 +33,25 @@ export function isAiConfigured(): boolean {
   return getModelId() !== null;
 }
 
+/**
+ * Gemini 3 and later "think" before answering by default, which took 11-16 s per reply and ran past the app's time
+ * limits. NeverShort's AI only words and explains numbers code already calculated, so it needs the least thinking.
+ * Gemini 3+ takes a thinking level; 2.5 Flash models take a budget (0 = off). Other models are left as they are.
+ */
+function thinkingFor(modelId: string): { thinkingLevel: "minimal" } | { thinkingBudget: 0 } | null {
+  const version = /^gemini-(\d+(?:\.\d+)?)/.exec(modelId)?.[1];
+  if (!version) return null;
+  if (Number(version) >= 3) return { thinkingLevel: "minimal" };
+  if (version === "2.5" && modelId.includes("flash")) return { thinkingBudget: 0 };
+  return null;
+}
+
+function quick<M extends Parameters<typeof wrapLanguageModel>[0]["model"]>(model: M, modelId: string) {
+  const thinkingConfig = thinkingFor(modelId);
+  if (!thinkingConfig) return model;
+  return wrapLanguageModel({ model, middleware: defaultSettingsMiddleware({ settings: { providerOptions: { google: { thinkingConfig } } } }) });
+}
+
 const cache = globalThis as unknown as { nevershortModel?: { signature: string; model: LanguageModel } };
 
 /** One model that shares requests across every key and model, within budget. Null when AI is not set up. */
@@ -45,7 +64,7 @@ export function getLanguageModel(): LanguageModel | null {
   const signature = JSON.stringify([models, keys.map((k) => k.slice(-6)), env.AI_MAX_REQUESTS_PER_MINUTE, env.AI_MAX_REQUESTS_PER_DAY]);
   if (cache.nevershortModel?.signature === signature) return cache.nevershortModel.model;
   // Model first, then key: every key's quota for the first model is used before falling back to the next model.
-  const slots = models.flatMap((modelId) => keys.map((apiKey, i) => ({ id: `${modelId}#key${i + 1}`, model: createGoogle({ apiKey })(modelId) })));
+  const slots = models.flatMap((modelId) => keys.map((apiKey, i) => ({ id: `${modelId}#key${i + 1}`, model: quick(createGoogle({ apiKey })(modelId), modelId) })));
   const pool = createPool(
     slots.map((s) => s.id),
     { perMinute: env.AI_MAX_REQUESTS_PER_MINUTE, perDay: env.AI_MAX_REQUESTS_PER_DAY },
