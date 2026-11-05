@@ -43,7 +43,7 @@ export default function LandingPage() {
         <SaveThursday days={days} steps={story.steps} bestStep={story.bestStep ?? 0} shortIndex={shortIndex} />
         {story.recovery.due ? (
           <ComesBack
-            label="Simulated here · a real PayPal sandbox payment in the live demo"
+            label="Simulated here · in the sample shop it's a real PayPal test payment"
             grossCents={story.recovery.grossCents}
             netCents={story.recovery.netCents}
             feeCents={story.recovery.feeCents}

@@ -23,7 +23,7 @@ export interface AskData {
 
 export const SUGGESTED_QUESTIONS = [
   "Can I afford a $200 order on Monday?",
-  "When is my next shortfall?",
+  "When is my next short day?",
   "What do I have to pay this week?",
   "How much do I usually pay Volta?",
 ] as const;
@@ -166,10 +166,10 @@ export async function plainAnswer(question: string, data: AskData): Promise<{ an
       const day = formatDay(date);
       const after = c.shortfallAfter && c.shortfallAfter.date >= date ? c.shortfallAfter : null;
       const answer = c.affordable
-        ? `Yes. ${day} ends at ${formatDollars(c.balanceAfterOnDateCents)} after it, and no day after it ends below your minimum.`
+        ? `Yes. After the order, ${day} ends at ${formatDollars(c.balanceAfterOnDateCents)}, and no later day drops below your minimum.`
         : after
-          ? `Not yet. ${day} itself ends at ${formatDollars(c.balanceAfterOnDateCents)}, but the order would leave ${formatDay(after.date)} ${formatShortfall(after.amountCents)} short.`
-          : `Not yet. ${day} ends at ${formatDollars(c.balanceAfterOnDateCents)} after it, and a day after it would end below your minimum.`;
+          ? `No. ${day} itself ends at ${formatDollars(c.balanceAfterOnDateCents)}, but the order would leave ${formatDay(after.date)} ${formatShortfall(after.amountCents)} short.`
+          : `No. After the order, ${day} ends at ${formatDollars(c.balanceAfterOnDateCents)}, and a later day would drop below your minimum.`;
       return { answer, used: [used] };
     } catch {
       return { answer: "I can only work that out for a date in the next 35 days. Try a day like Monday, or a date like 16 Nov.", used: [] };

@@ -21,7 +21,7 @@ export interface ShortDue {
 /**
  * "Money comes back": Maya left $72 in Loop Audio's cart; NeverShort's reminder pops up on her laptop. Tap "Pay"
  * (or wait) and she pays: notes fly across, the amount that actually arrived after PayPal's fee counts up, and it fills
- * part of Thursday's gap. SIMULATED here; the live demo uses a real PayPal sandbox payment. Every amount comes from the
+ * part of Thursday's gap. SIMULATED here; the sample shop uses a real PayPal sandbox payment. Every amount comes from the
  * forecast engine (lib/landing).
  */
 export function ComesBack({

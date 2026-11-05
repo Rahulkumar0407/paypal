@@ -18,7 +18,7 @@ const FILTERS: { id: Filter; label: string }[] = [
 
 const EMPTY: Record<Filter, { title: string; body: string }> = {
   all: { title: "Nothing due in the next two weeks.", body: "Bills and supplier orders show up here as soon as they're found in your payments." },
-  covered: { title: "Nothing is fully covered yet.", body: "Every payment in the next two weeks is tight or short. The home screen shows ways to fix it." },
+  covered: { title: "Nothing is fully covered yet.", body: "Every payment in the next two weeks is tight or short. Today shows ways to fix it." },
   tight: { title: "Nothing tight in the next two weeks.", body: "No payment leaves you just above your minimum." },
   short: { title: "Nothing short in the next two weeks.", body: "Every payment has the money ready on the day." },
 };

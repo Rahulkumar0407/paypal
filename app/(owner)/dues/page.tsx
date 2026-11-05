@@ -10,7 +10,7 @@ import { getVisitorStoreId } from "@/lib/demo";
 import { getDues, getForecast, getRecurringPayees } from "@/lib/forecast";
 import { formatShortfall } from "@/lib/shared/money";
 
-export const metadata: Metadata = { title: "Dues" };
+export const metadata: Metadata = { title: "To pay" };
 
 const COUNT_WORD = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
 
@@ -73,7 +73,7 @@ export default async function DuesPage() {
           <h2 id="detected-title" className="text-[20px] leading-7 font-semibold text-ink">
             Regular payments we found
           </h2>
-          <p className="text-[15px] leading-6 text-ink-muted">Confirm each one once and it goes into every forecast.</p>
+          <p className="text-[15px] leading-6 text-ink-muted">These already count in your forecast. Confirm the ones you recognise, or take out any that aren&apos;t regular.</p>
           {detected.length > 0 ? (
             <Suspense fallback={<DetectedPayees payees={detected} />}>
               <ExplainedPayees storeId={data.storeId} payees={detected} />

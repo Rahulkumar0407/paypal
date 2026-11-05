@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { FixStep } from "@/lib/landing";
 import { DECISION_FILL, DECISION_WORD } from "@/components/ui/meaning";
@@ -222,6 +223,13 @@ export function SaveThursday({ days, steps, bestStep, shortIndex }: { days: DayL
             )}
           </div>
         </div>
+        <p className="mt-10 text-[17px] text-white/85">
+          That was Loop Audio.{" "}
+          <Link href="/try" className="font-semibold text-white underline decoration-white/40 underline-offset-[5px] hover:decoration-white">
+            Now find your own shop&apos;s short day
+          </Link>
+          .
+        </p>
       </div>
     </section>
   );

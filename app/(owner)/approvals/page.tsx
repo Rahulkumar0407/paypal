@@ -34,7 +34,7 @@ export default async function ApprovalsPage() {
         <PageSentence>Your approvals.</PageSentence>
         <ErrorState
           title="Couldn't load your approvals."
-          body="Nothing waiting for you has happened: those only go ahead after you approve them. Try again in a minute."
+          body="Nothing that needs your OK has gone ahead. Try again in a minute."
           retryHref="/approvals"
         />
       </div>

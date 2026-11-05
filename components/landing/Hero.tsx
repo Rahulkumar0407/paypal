@@ -33,18 +33,25 @@ export function Hero({ story }: { story: LandingStory }) {
             Know the day your shop runs <span className="marker">out of money</span>.
           </h1>
           <p className="mt-6 max-w-[46ch] text-[19px] leading-8 text-ink">
-            NeverShort looks at your next 14 days, warns you about the short one{" "}
-            <strong className="font-semibold">two weeks early</strong>, and helps you fix it. Every money move passes a
+            NeverShort looks at your next 14 days, warns you about a day you&apos;ll be short{" "}
+            <strong className="font-semibold">up to two weeks ahead</strong>, and helps you fix it. Every money move passes a
             safety check first.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <Link href="/demo" className="btn-chunky">
-              Try the live demo
+              Try it on a sample shop
             </Link>
             <a href="#how" className="text-[17px] font-medium text-ink underline decoration-ink/30 underline-offset-[6px] hover:decoration-ink">
               How it works
             </a>
           </div>
+          <p className="mt-5 text-[16px] text-ink">
+            Or{" "}
+            <Link href="/try" className="font-semibold underline decoration-ink/30 underline-offset-[5px] hover:decoration-ink">
+              find your own shop&apos;s short day
+            </Link>{" "}
+            with a few numbers.
+          </p>
         </div>
 
         <div className="hero-scene relative mx-auto w-full max-w-[460px]">
@@ -64,7 +71,7 @@ export function Hero({ story }: { story: LandingStory }) {
       <div className="till-board mt-12 lg:mt-14">
         <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
           <p className="font-serif text-[1.25rem] leading-snug text-white sm:text-[1.5rem]">{story.headline.text}</p>
-          <p className="text-[13px] text-white/60">Loop Audio, a simulated shop · next 14 days</p>
+          <p className="text-[13px] text-white/60">Loop Audio, a sample shop · next 14 days</p>
         </div>
         <ol aria-label="Loop Audio's balance at the end of each of the next 14 days" className="mt-5 grid grid-cols-4 gap-x-2 gap-y-3 sm:grid-cols-7 lg:grid-cols-14 lg:gap-x-1.5">
           {story.forecast.days.map((day, i) => (

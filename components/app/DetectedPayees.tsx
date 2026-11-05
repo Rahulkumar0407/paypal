@@ -44,7 +44,7 @@ export function DetectedPayees({ payees, explanations = {} }: { payees: Recurrin
             {result ? (
               <p role="status" className="mt-3 text-[15px] text-ink">
                 {result === "confirm"
-                  ? "Confirmed. Its next payments are saved, and every forecast counts them."
+                  ? "Confirmed. Its next payments are kept in your forecast."
                   : "Got it. We won't treat it as a regular payment, so the forecast leaves it out."}
               </p>
             ) : (
@@ -54,7 +54,7 @@ export function DetectedPayees({ payees, explanations = {} }: { payees: Recurrin
                     {busy ? "Saving" : "Confirm"}
                   </Button>
                   <Button variant="secondary" onClick={() => answer(p, "dismiss")} disabled={busyId !== null}>
-                    Not regular
+                    Not a regular payment
                   </Button>
                 </div>
                 {failed?.id === p.id ? (

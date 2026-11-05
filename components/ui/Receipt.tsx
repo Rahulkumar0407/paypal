@@ -134,7 +134,7 @@ export function Receipt({
             </div>
           ) : null}
           <div>
-            <dt className="inline">Ref </dt>
+            <dt className="inline">Repeat-check ref </dt>
             <dd className="inline break-all">{proposal.idempotencyKey}</dd>
           </div>
         </dl>

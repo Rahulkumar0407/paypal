@@ -196,7 +196,7 @@ describe("rule 7: set-aside cap", () => {
 
 describe("rule 8: owner approval", () => {
   it("passes up to and including $100.00", () => {
-    expect(rule(reminder({ amountCents: 10_000 }), ctx(), "OWNER_APPROVAL")).toMatchObject({ outcome: "PASS", reason: "$100.00 is within the $100.00 NeverShort can do on its own." });
+    expect(rule(reminder({ amountCents: 10_000 }), ctx(), "OWNER_APPROVAL")).toMatchObject({ outcome: "PASS", reason: "$100.00 is within the $100.00 NeverShort may do without asking you." });
   });
   it("asks the owner above $100.00, and always for loans, moved payments and refunds", () => {
     expect(rule(reminder({ amountCents: 10_001 }), ctx(), "OWNER_APPROVAL")).toMatchObject({ outcome: "FAIL", onFail: "ESCALATE" });
@@ -219,14 +219,14 @@ describe("rule 9: total spending", () => {
   it("passes while the week's spending stays at or under $500, counting this action", () => {
     expect(rule(payVolta(9_000), ctx({ spentLast7DaysCents: 41_000, forecast: ready() }), "TOTAL_SPENDING")).toMatchObject({
       outcome: "PASS",
-      reason: "That makes $500.00 in 7 days with this one, against a limit of $500.00.",
+      reason: "With this one, $500.00 has gone out in 7 days. The limit is $500.00.",
     });
   });
 
   it("asks the owner when many small actions add up past $500, even though each is under $100", () => {
     const small = payVolta(9_000);
     const r = rule(small, ctx({ spentLast7DaysCents: 45_000, forecast: ready() }), "TOTAL_SPENDING");
-    expect(r).toMatchObject({ outcome: "FAIL", onFail: "ESCALATE", reason: "That makes $540.00 in 7 days with this one, against a limit of $500.00, so you decide." });
+    expect(r).toMatchObject({ outcome: "FAIL", onFail: "ESCALATE", reason: "With this one, $540.00 has gone out in 7 days. The limit is $500.00, so you decide." });
     expect(rule(small, ctx({ spentLast7DaysCents: 45_000, forecast: ready() }), "OWNER_APPROVAL").outcome).toBe("PASS");
     expect(judge(small, ctx({ spentLast7DaysCents: 45_000, forecast: ready() }), AT)).toMatchObject({ decision: "ESCALATE", headlineRule: "TOTAL_SPENDING" });
   });

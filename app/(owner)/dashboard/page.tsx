@@ -115,7 +115,7 @@ export default async function DashboardPage() {
                     </ul>
                     <p className="mt-3 text-[14px] text-ink">
                       {f.held ? (
-                        <RefereeCard decision="APPROVE" size="sm" label="Held, not counted as expected money" />
+                        <span className="inline-flex items-center gap-2 align-middle text-[13px] font-medium text-ink"><span aria-hidden className="inline-block size-2.5 rounded-[3px] border border-ink/60" />Held: not counted in your forecast</span>
                       ) : (
                         <RefereeCard decision="ESCALATE" size="sm" label="Hold waiting for your OK" />
                       )}

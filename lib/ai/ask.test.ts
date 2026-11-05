@@ -21,12 +21,12 @@ const say = (text: string): Content => ({ type: "text", text });
 const model = (...steps: Content[][]) => new MockLanguageModelV4({ doGenerate: steps.map(step) });
 
 describe("five sample questions, answered from the forecast's numbers (no AI)", () => {
-  it("step 6: 'Can I afford a $200 order on Monday?' Not yet: Mon 9 Nov ends at $808, Thu 12 Nov would be $144 short", async () => {
+  it("step 6: 'Can I afford a $200 order on Monday?' No: Mon 9 Nov ends at $808, Thu 12 Nov would be $144 short", async () => {
     const d = data(FIXED);
     const check = await d.canAfford(20_000, "2026-11-09");
     expect(check.balanceAfterOnDateCents).toBe(80_793);
     const a = await answerWith("Can I afford a $200 order on Monday?", d, null);
-    expect(a).toMatchObject({ source: "fallback", toolsUsed: ["canAfford"], answer: "Not yet. Mon 9 Nov itself ends at $808, but the order would leave Thu 12 Nov $144 short." });
+    expect(a).toMatchObject({ source: "fallback", toolsUsed: ["canAfford"], answer: "No. Mon 9 Nov itself ends at $808, but the order would leave Thu 12 Nov $144 short." });
     expect(a.facts).toEqual([
       { label: "Mon 9 Nov, after a $200 order", cents: 80_793, date: "2026-11-09" },
       { label: "Short on Thu 12 Nov with the order", cents: 14_400, date: "2026-11-12" },
@@ -88,7 +88,7 @@ describe("with the AI", () => {
   it("replaces an answer with a number no tool gave", async () => {
     const m = model([call("canAfford", { amountDollars: 200, date: "2026-11-09" })], [say("Yes, you'll have about $950 left on Monday.")]);
     const a = await answerWith("Can I afford a $200 order on Monday?", data(FIXED), m);
-    expect(a).toMatchObject({ source: "fallback", answer: "Not yet. Mon 9 Nov itself ends at $808, but the order would leave Thu 12 Nov $144 short." });
+    expect(a).toMatchObject({ source: "fallback", answer: "No. Mon 9 Nov itself ends at $808, but the order would leave Thu 12 Nov $144 short." });
   });
 
   it("replaces an answer that used no tool, or breaks the voice rules", async () => {

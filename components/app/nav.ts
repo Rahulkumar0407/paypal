@@ -19,9 +19,9 @@ export const SECONDARY_NAV: NavItem[] = [
 
 export const UTILITY_NAV: NavItem[] = [
   { href: "/demo", label: "Demo guide" },
+  { href: "/try", label: "Try your own numbers" },
   { href: "/", label: "About NeverShort" },
-  { href: "/store", label: "Open the shop" },
-  { href: "/design", label: "Design system" },
+  { href: "/store", label: "Loop Audio's store (buyer view)" },
 ];
 
 export function isActive(pathname: string, href: string): boolean {

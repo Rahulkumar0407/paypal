@@ -4,7 +4,7 @@ import { ReadyMeter, SimulatedTag } from "@/components/ui/Card";
 import { DAY_FILL, DAY_WORD } from "@/components/ui/meaning";
 import type { DueWithState } from "./due-state";
 
-const KIND_WORD = { SUPPLIER: "Supplier order", BILL: "Bill", OWNER_TRANSFER: "Your pay", LOAN: "Loan repayment" } as const;
+const KIND_WORD = { SUPPLIER: "Supplier order", BILL: "Bill", OWNER_TRANSFER: "To your bank", LOAN: "Loan repayment" } as const;
 
 /** Upcoming dues in date order: name, date, how much is ready, and a clear state word. */
 export function UpcomingDues({ items }: { items: DueWithState[] }) {

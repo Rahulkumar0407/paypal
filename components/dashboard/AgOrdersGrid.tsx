@@ -76,7 +76,11 @@ function RiskCell({ data }: CustomCellRendererProps<Row>) {
   if (!data || isTotals(data) || !data.risk) return null;
   return (
     <span title={data.risk.detail}>
-      {data.risk.held ? <RefereeCard decision="APPROVE" size="sm" label="Held" /> : <RefereeCard decision="ESCALATE" size="sm" label="Check it" />}
+      {data.risk.held ? (
+        <span className="inline-flex items-center gap-2"><span aria-hidden className="inline-block size-2.5 rounded-[3px] border border-ink/60" />Held</span>
+      ) : (
+        <RefereeCard decision="ESCALATE" size="sm" label="Looks risky" />
+      )}
     </span>
   );
 }
@@ -94,7 +98,7 @@ function NoOrders() {
   return (
     <div className="px-6 text-center">
       <p className="text-[16px] font-semibold text-ink">No orders here.</p>
-      <p className="mt-1 text-[14px] text-ink-muted">They appear as soon as someone checks out, or change the search.</p>
+      <p className="mt-1 text-[14px] text-ink-muted">Orders appear here when someone checks out. If you searched, try another search.</p>
     </div>
   );
 }

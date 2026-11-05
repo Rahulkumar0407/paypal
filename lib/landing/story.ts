@@ -85,7 +85,7 @@ function list(items: string[]): string {
 }
 
 function moveLabel(day: ForecastDay["dues"][number]): string {
-  return day.kind === "OWNER_TRANSFER" ? "Owner's pay to the bank" : day.payeeName;
+  return day.kind === "OWNER_TRANSFER" ? "Transfer to your bank" : day.payeeName;
 }
 
 function narrate(day: ForecastDay, isFirst: boolean, forecast: Forecast): string {

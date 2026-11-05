@@ -5,7 +5,7 @@ import { InView } from "./InView";
 
 const CAPTIONS = [
   "A $72 reminder, and Maya said the shop may contact her: it goes.",
-  "A $119 reminder is over the $100 NeverShort may do alone: it waits for the owner.",
+  "A $119 reminder is over $100, the most NeverShort does without asking: it waits for the owner.",
   "A second reminder after Maya already paid: never. Stopped.",
 ];
 

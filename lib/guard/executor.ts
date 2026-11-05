@@ -89,8 +89,8 @@ export function createExecutor(db: PrismaClient) {
       });
     });
     return paypalOrder
-      ? { detail: `Reminder to ${order.customer.name} placed in the simulated outbox, with a new PayPal checkout link for ${formatCents(order.totalCents)}.`, paypalIds: [paypalOrder.id] }
-      : { detail: `Reminder to ${order.customer.name} placed in the simulated outbox. PayPal isn't set up yet, so it has no payment link.`, paypalIds: [] };
+      ? { detail: `Reminder to ${order.customer.name} put in Sent reminders (simulated), with a new PayPal checkout link for ${formatCents(order.totalCents)}.`, paypalIds: [paypalOrder.id] }
+      : { detail: `Reminder to ${order.customer.name} put in Sent reminders (simulated). PayPal isn't set up yet, so it has no payment link.`, paypalIds: [] };
   }
 
   async function setAside(p: Proposal<"SET_ASIDE">): Promise<ExecutionResult> {

@@ -13,7 +13,7 @@ interface Result {
 }
 
 const METHODS = [
-  { value: "PAYPAL_PAYOUTS", label: "PayPal", hint: "Payouts" },
+  { value: "PAYPAL_PAYOUTS", label: "PayPal", hint: "Sent from your PayPal" },
   { value: "BANK_TRANSFER", label: "Bank transfer", hint: "From your bank" },
   { value: "CARD", label: "Card", hint: "Business card" },
 ] as const;
@@ -23,7 +23,7 @@ const field =
 const label = "block text-[16px] font-semibold text-ink";
 const hint = "mt-0.5 block text-[14px] leading-5 text-ink-muted";
 
-/** The short setup form: your safety line first, then a few words about the shop. */
+/** The short setup form: your minimum balance first, then a few words about the shop. */
 export function SettingsForm({ settings, action }: { settings: StoreSettings; action: (previous: Result, form: FormData) => Promise<Result> }) {
   const [result, formAction, pending] = useActionState(action, { status: "idle", message: "", errors: {}, values: null, attempt: 0 });
   const e = result.errors;
@@ -35,22 +35,22 @@ export function SettingsForm({ settings, action }: { settings: StoreSettings; ac
       <section aria-labelledby="line-title" className="space-y-6 rounded-card bg-paper p-5 ring-1 ring-ink/[0.06] lg:p-8">
         <div>
           <h2 id="line-title" className="text-[20px] leading-7 font-semibold text-ink">
-            Your safety line
+            Your minimum balance
           </h2>
           <p className="mt-1 text-[15px] leading-6 text-ink-muted">The forecast colours each day against these two numbers.</p>
         </div>
         <div className="grid gap-6 sm:grid-cols-2">
           <Money
             id="minimum"
-            title="Lowest balance you're happy with"
-            help="If a day ends below this, it shows as short (red)."
+            title="Minimum balance"
+            help="The lowest you're happy for the balance to go. A day that ends below it shows as short (red)."
             defaultValue={typed("minimum", (settings.minimumBalanceCents / 100).toFixed(0))}
             error={e.minimum}
           />
           <Money
             id="margin"
             title="Warning zone"
-            help="If a day ends this close to your lowest balance, it shows as tight (amber)."
+            help="If a day ends this close above your minimum balance, it shows as tight (amber)."
             defaultValue={typed("margin", (settings.tightMarginCents / 100).toFixed(0))}
             error={e.margin}
           />

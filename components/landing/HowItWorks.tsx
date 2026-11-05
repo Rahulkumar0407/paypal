@@ -61,7 +61,7 @@ export function HowItWorks({ shortLabel, shortByCents, why, states }: { shortLab
             <span className="how-num">3</span>
             <h3 className="display mt-6 text-[2rem] leading-[1.02] lg:text-[2.3rem]">It helps you fix it, safely.</h3>
             <p className="mt-4 text-[17px] leading-7">
-              It suggests fixes. Before any money moves, 9 safety rules check it. Big moves wait for your OK.
+              It suggests fixes. Before any money moves, 9 safety rules check each one. Big moves wait for your OK.
             </p>
             <div className="mt-auto pt-8">
               <ol aria-label="9 safety rules, all passed" className="flex gap-1.5">

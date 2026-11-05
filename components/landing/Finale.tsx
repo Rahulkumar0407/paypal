@@ -25,19 +25,22 @@ export function Finale() {
             Open Loop Audio&apos;s till and try it.
           </h2>
           <p className="mt-6 max-w-[46ch] text-[18px] leading-8 text-white/85">
-            The live demo is the real app, with its own copy of the shop just for you. Fix the gap, approve a reminder, pay
-            it as the PayPal sandbox buyer, and ask whether you can afford a $200 order on Monday.
+            Loop Audio is a sample shop with made-up sales. You get your own copy to run: fix the gap, approve a reminder,
+            pay it as the PayPal test buyer, and ask whether you can afford a $200 order on Monday.
           </p>
           <div className="finale-keys mt-9 flex flex-wrap gap-4">
             <Link href="/demo" className="btn-chunky btn-light">
-              Open the live demo
+              Open the sample shop
             </Link>
             <Link href="/today" className="btn-chunky btn-ghost">
-              See the app
+              Go straight to the app
             </Link>
             <a href="https://github.com/Rahulkumar0407/paypal" className="btn-chunky btn-ghost">
               Read the code
             </a>
+            <Link href="/try" className="btn-chunky btn-ghost">
+              Try your own numbers
+            </Link>
           </div>
         </InView>
 
@@ -56,8 +59,8 @@ export function Finale() {
               ))}
             </ul>
             <div aria-hidden className="my-3 border-t border-dashed border-ink/45" />
-            <p className="text-center">PayPal sandbox only · MIT licence</p>
-            <p className="text-center text-ink-muted">Loop Audio is a simulated shop</p>
+            <p className="text-center">PayPal test mode only · MIT licence</p>
+            <p className="text-center text-ink-muted">Loop Audio is a sample shop with made-up sales</p>
           </div>
         </InView>
       </div>

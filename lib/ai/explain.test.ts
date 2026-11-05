@@ -13,7 +13,7 @@ const store = previewDemoStore();
 describe("the shortfall explanation", () => {
   it("has a code-built line with the day's real numbers", () => {
     expect(shortfallTemplate(store.forecast)).toBe(
-      "On Thu 12 Nov there's $1,410 above your $100 minimum, but rent ($1,200) and the supplier order ($300) come to $1,500: $90 more than that.",
+      "On Thu 12 Nov you'll have $1,410 to spend above your $100 minimum, but rent ($1,200) and the supplier order ($300) come to $1,500. That's $90 too much.",
     );
     expect(shortfallTemplate(previewDemoStore({ recovered: true, setAsideDailyCents: 1_100 }).forecast)).toBeNull();
   });

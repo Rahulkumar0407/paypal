@@ -75,7 +75,7 @@ export default async function FixPage() {
           {forDay} is {formatShortfall(gap.amountCents)} short. {COUNT_WORD[fixes.length] ?? fixes.length} way{fixes.length === 1 ? "" : "s"} to cover it.
         </PageSentence>
         <p className="max-w-[60ch] text-[16px] leading-7 text-ink-muted">
-          {capitalise(gap.reason)}. Pick one. Before anything happens, NeverShort&apos;s safety check (the Margin Guard) looks at it, and anything over $100 waits for your OK.
+          {capitalise(gap.reason)}. Pick one. Before anything happens, NeverShort&apos;s safety check (the Margin Guard) looks at it. Loans, moved payments and anything over $100 wait for your OK.
         </p>
       </div>
 
@@ -192,7 +192,7 @@ function actionLabel(fix: FixOption): string {
     case "MOVE_PAYMENT":
       return fix.moveToOn ? `Move it to ${formatDay(fix.moveToOn)}` : "Move the payment";
     case "GAP_LOAN":
-      return `Take the ${formatDollars(fix.amountCents)} loan`;
+      return `Take the ${formatDollars(fix.amountCents)} short-term loan`;
   }
 }
 

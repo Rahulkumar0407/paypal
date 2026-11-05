@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Loop Audio store" };
 
 const NOTICE: Record<string, string> = {
   cancelled: "You cancelled at PayPal, so no payment was made.",
-  declined: "PayPal declined that payment, so nothing was taken. Try again, or use the other test card.",
+  declined: "PayPal declined that payment, so nothing was taken. Try again in a minute.",
   error: "That checkout didn't go through, and nothing was taken. Try again in a minute.",
   "paypal-off": "PayPal isn't set up yet, so checkout is switched off.",
 };
@@ -24,7 +24,7 @@ export default async function StorePage({ searchParams }: { searchParams: Promis
   const mode = storeMode();
   const banner =
     mode === "sandbox"
-      ? "Sandbox store: payments go through the PayPal sandbox, so no real money moves."
+      ? "Test store: payments use PayPal's test mode, so no real money moves."
       : mode === "fake"
         ? "Test store: PayPal is in fake mode, so payments are simulated and no money moves."
         : "Test store: PayPal isn't set up yet, so checkout is switched off.";

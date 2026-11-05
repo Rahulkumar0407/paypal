@@ -28,7 +28,7 @@ export function DayDetail({ day, minimumBalanceCents }: { day: ForecastDay; mini
       <dl className="divide-y divide-white/15 text-[15px]">
         <Row label="Starts the day with" value={formatDollars(day.openingCents)} muted />
         <Row label="In: expected sales" value={`+${formatDollars(day.expectedInCents)}`} />
-        {day.heldInCents > 0 ? <Row label="Held for a risk check, not counted" value={formatDollars(day.heldInCents)} muted /> : null}
+        {day.heldInCents > 0 ? <Row label="Held for a risk check: not counted" value={formatDollars(day.heldInCents)} muted /> : null}
         {day.dues.map((due) => (
           <Row
             key={due.id}

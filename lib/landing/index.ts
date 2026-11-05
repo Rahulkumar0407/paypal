@@ -4,3 +4,4 @@
  */
 export { buildLandingStory, MAX_DAILY_DOLLARS } from "./story";
 export type { FixStep, LandingStory, StoryDay, StoryMove } from "./story";
+export { judgeYourFix, type YourFixVerdict } from "./yours";

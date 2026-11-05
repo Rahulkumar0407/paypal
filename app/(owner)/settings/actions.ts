@@ -77,7 +77,7 @@ export async function checkSettings(previous: SettingsResult, form: FormData): P
       busySeasons: answers.busySeasons,
     });
     if (!kept) {
-      return { status: "invalid", message: "These look right, but this copy has no database to keep them in.", errors: {}, values, attempt };
+      return { status: "invalid", message: "These look right, but saving is off in this version of the demo. Nothing has changed.", errors: {}, values, attempt };
     }
   } catch (error) {
     console.error("[settings] could not save:", error instanceof Error ? error.message : error);

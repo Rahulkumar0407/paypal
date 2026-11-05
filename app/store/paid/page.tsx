@@ -23,7 +23,7 @@ export default async function PaidPage({ searchParams }: { searchParams: Promise
                 <Row term="Arrives in Loop Audio's PayPal" value={formatCents(paid.netCents)} strong />
               </dl>
               <p className="mt-4 text-[13px] leading-5 break-all text-ink-muted">
-                PayPal order {paid.paypalOrderId}, capture {paid.paypalCaptureId}
+                PayPal order {paid.paypalOrderId} · payment {paid.paypalCaptureId}
               </p>
             </div>
             <p className="text-[16px] leading-7 text-ink-muted">NeverShort&apos;s forecast now counts the {formatCents(paid.netCents)} that arrived.</p>
@@ -31,7 +31,7 @@ export default async function PaidPage({ searchParams }: { searchParams: Promise
         ) : (
           <>
             <h1 className="font-serif text-[2.5rem] leading-tight text-ink">We couldn&apos;t find that payment.</h1>
-            <p className="text-[16px] leading-7 text-ink-muted">If you just paid, PayPal may still be confirming it. Nothing was taken twice.</p>
+            <p className="text-[16px] leading-7 text-ink-muted">If you just paid, PayPal may still be confirming it. Wait a minute, then reload this page.</p>
           </>
         )}
         <div className="flex flex-wrap gap-4 text-[15px]">

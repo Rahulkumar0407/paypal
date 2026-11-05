@@ -12,7 +12,7 @@ export type ResetResult = { status: "idle" } | { status: "done"; runId: string }
 export async function resetMyCopy(previous: ResetResult): Promise<ResetResult> {
   void previous;
   if (!isDatabaseConfigured()) {
-    return { status: "failed", message: "No database is connected, so there's nothing to reset: the pages show sample data." };
+    return { status: "failed", message: "Saving is off in this version of the demo, so there's nothing to reset: the pages show sample data." };
   }
   const storeId = await getVisitorStoreId();
   try {

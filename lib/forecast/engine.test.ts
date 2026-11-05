@@ -208,7 +208,7 @@ describe("what counts as money out", () => {
     const r = rows();
     r.gapLoans = [{ id: "loan1", amountCents: 15_000, feeCents: 300, receivedOn: "2026-11-12", repayOn: "2026-11-14" }];
     expect(day(r, "2026-11-12")).toMatchObject({ expectedInCents: 35_000, closingCents: 15_000, state: "covered" });
-    expect(day(r, "2026-11-14").dues[0]).toMatchObject({ payeeName: "Gap loan repayment", amountCents: 15_300, simulated: true });
+    expect(day(r, "2026-11-14").dues[0]).toMatchObject({ payeeName: "Short-term loan repayment", amountCents: 15_300, simulated: true });
   });
 
   const pending = (over: Partial<PendingOrder>): PendingOrder => ({

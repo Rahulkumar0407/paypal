@@ -58,15 +58,18 @@ export function DemoBanner({ today }: { today: string }) {
     <div className="bg-brand px-5 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-2 text-[13px] leading-5 text-white lg:rounded-t-[22px] lg:px-12">
       <p className="mx-auto flex max-w-[1160px] flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
         <span>
-          Demo shop. In this demo, today is {formatDayWithYear(today)}.
+          Sample shop. In this demo, today is {formatDayWithYear(today)}.
           <span className="hidden sm:inline"> Past sales are made up; payments use PayPal&apos;s test mode.</span>
         </span>
-        <Link
-          href="/demo"
-          className="font-medium underline decoration-white/40 underline-offset-4 hover:decoration-white"
-        >
-          Demo guide
-        </Link>
+        <span className="flex gap-x-4">
+          <Link href="/try" className="font-medium underline decoration-white/40 underline-offset-4 hover:decoration-white">
+            <span className="sm:hidden">Your numbers</span>
+            <span className="hidden sm:inline">Try your own numbers</span>
+          </Link>
+          <Link href="/demo" className="font-medium underline decoration-white/40 underline-offset-4 hover:decoration-white">
+            Demo guide
+          </Link>
+        </span>
       </p>
     </div>
   );

@@ -101,7 +101,7 @@ function buildSteps({ forecast, candidate, afford, monday }: StoryData): Step[] 
     },
     {
       title: "Set a little aside each day",
-      todo: `Open the ways to cover ${gapDay} and pick “Set aside a little each day”.`,
+      todo: `Open the ways to cover ${gapDay}. Under “Set aside a little each day”, press the Set aside button.`,
       see: `A green Approved card. ${gapDay} turns green in the strip and the sentence at the top changes.`,
       uses: ["simulated"],
       link: { label: "Open the fixes", href: "/fix" },
@@ -123,8 +123,8 @@ function affordAnswer(afford: AffordabilityCheck, monday: string): string {
   if (afford.affordable) return `An answer from the store's numbers: yes. ${day} closes at ${after} after the order, and no day drops below the minimum.`;
   const gap = afford.shortfallAfter;
   return gap
-    ? `An answer from the store's numbers: not yet. ${day} itself closes at ${after}, but the order leaves ${formatDay(gap.date)} ${formatShortfall(gap.amountCents)} short.`
-    : `An answer from the store's numbers: not yet. ${day} closes at ${after} after the order, below the minimum.`;
+    ? `An answer from the store's numbers: no. ${day} itself closes at ${after}, but the order leaves ${formatDay(gap.date)} ${formatShortfall(gap.amountCents)} short.`
+    : `An answer from the store's numbers: no. ${day} closes at ${after} after the order, below the minimum.`;
 }
 
 /** The judges' guide: what NeverShort is, the sandbox buyer login, the six story steps, and a reset. */
@@ -133,13 +133,13 @@ export default async function DemoPage() {
   let status: DemoStoreStatus | null = null;
   let problem: string | null = null;
   if (!isDatabaseConfigured()) {
-    problem = "No database is connected, so the pages show sample data and there's nothing to reset. The steps below still work.";
+    problem = "Saving is off in this version of the demo, so the pages show sample data and there's nothing to reset. The steps below still work.";
   } else {
     try {
       status = await getDemoStoreStatus(storeId);
     } catch (error) {
       console.error("[demo] could not read the store status:", error instanceof Error ? error.message : error);
-      problem = "The database didn't answer, so the shop's details are missing. The steps below still work; try the reset again in a minute.";
+      problem = "The shop's details didn't load. The steps below still work; try the reset again in a minute.";
     }
   }
 
@@ -155,8 +155,15 @@ export default async function DemoPage() {
           never comes up short. AI only suggests. Before any money moves, a safety check called the Margin Guard tests each suggestion against fixed rules.
         </p>
         <p className="max-w-[62ch] text-[15px] leading-6 text-ink-muted">
-          You&apos;re running a demo shop called Loop Audio, which sells headphones. It&apos;s yours alone: nobody else sees what you
+          You&apos;re running a sample shop called Loop Audio, which sells headphones. It&apos;s yours alone: nobody else sees what you
           click, and Reset puts it back to the start.
+        </p>
+        <p className="max-w-[62ch] text-[15px] leading-6 text-ink">
+          Want to see your own shop instead?{" "}
+          <Link href="/try" className="font-semibold underline decoration-ink/30 underline-offset-4 hover:decoration-ink">
+            Try it with your own numbers
+          </Link>
+          : your balance, a normal day&apos;s sales and your bills give you your own two weeks. Nothing is saved.
         </p>
         <p className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[15px] leading-6 text-ink-muted">
           <span className="inline-flex items-center gap-2">
@@ -227,6 +234,18 @@ export default async function DemoPage() {
             </dl>
             <div className="mt-5">
               <ResetDemo action={resetMyCopy} startDay={formatDay(today())} disabled={!status} />
+            </div>
+          </Card>
+          <Card>
+            <CardTitle>Your own shop</CardTitle>
+            <p className="mt-1 text-[15px] leading-6 text-ink-muted">
+              Type your balance, a normal day&apos;s sales and your bills, and see your own next two weeks, with the short day
+              and ways to fix it. Same forecast, nothing saved.
+            </p>
+            <div className="mt-4">
+              <ButtonLink href="/try" variant="secondary">
+                Try your own numbers
+              </ButtonLink>
             </div>
           </Card>
           {problem ? <ErrorState title="The shop's details aren't available." body={problem} retryHref="/demo" /> : null}

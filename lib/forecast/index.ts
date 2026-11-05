@@ -27,6 +27,7 @@ import {
 import { demoScenarioRows, loadStoreRows, readStoreRows, type DemoScenario } from "./load";
 
 export { buildHeadline } from "./headline";
+export { yourFix, yourForecast, warningZoneFor, type YourFix, type YourNumbers, type YourPayment, type YourForecast } from "./yours";
 export type { DemoScenario } from "./load";
 export type { PatternEvidence, RecentPayment } from "./history";
 

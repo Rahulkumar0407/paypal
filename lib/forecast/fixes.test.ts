@@ -12,7 +12,7 @@ describe("fix the gap on the demo store", () => {
     expect(fixOptionsFrom(input()).map((f) => [f.kind, f.title, f.amountCents, f.resultingClosingCents, f.resultingState, f.simulated])).toEqual([
       ["SET_ASIDE", "Set aside $20 a day until Thu 12 Nov", 14_000, 15_000, "covered", false],
       ["MOVE_PAYMENT", "Move Volta Audio Parts' $300 payment to Fri 13 Nov", 30_000, 31_000, "covered", true],
-      ["GAP_LOAN", "Take a $90 gap loan", 9_000, 10_000, "tight", true],
+      ["GAP_LOAN", "Take a $90 short-term loan", 9_000, 10_000, "tight", true],
     ]);
   });
 

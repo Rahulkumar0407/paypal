@@ -114,7 +114,7 @@ export function fixOptionsFrom(input: ForecastInput): FixOption[] {
       id: "fix_gap_loan",
       kind: "GAP_LOAN",
       forDate,
-      title: `Take a ${formatDollars(amount)} gap loan`,
+      title: `Take a ${formatDollars(amount)} short-term loan`,
       detail: `Paid in today, ${formatCents(amount + fee)} back on ${formatDay(repayOn)}. Simulated: no real loan is made.`,
       amountCents: amount,
       loanFeeCents: fee,

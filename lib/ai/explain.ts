@@ -41,7 +41,7 @@ export function shortfallTemplate(forecast: Forecast): string | null {
   if (!f) return null;
   const what = list(f.payments.map((p) => `${p.name} (${p.amount})`));
   if (f.payments.length === 0) return `On ${f.day}, sales won't cover what has already gone out: ${f.shortBy} short of your ${f.minimum} minimum.`;
-  return `On ${f.day} there's ${f.aboveMinimum} above your ${f.minimum} minimum, but ${what} ${f.payments.length === 1 ? "is" : "come to"} ${f.paymentsTotal}: ${f.shortBy} more than that.`;
+  return `On ${f.day} you'll have ${f.aboveMinimum} to spend above your ${f.minimum} minimum, but ${what} ${f.payments.length === 1 ? "is" : "come to"} ${f.paymentsTotal}. That's ${f.shortBy} too much.`;
 }
 
 const shortfallMemo = memo<string | null>();

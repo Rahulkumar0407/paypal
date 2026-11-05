@@ -181,7 +181,7 @@ export default function DesignPage() {
             </Card>
             <Card tone="outline">
               <div className="flex items-center gap-2">
-                <CardTitle>Gap loan of $150</CardTitle>
+                <CardTitle>Short-term loan of $150</CardTitle>
                 <SimulatedTag />
               </div>
               <div className="mt-4 flex items-center gap-3">

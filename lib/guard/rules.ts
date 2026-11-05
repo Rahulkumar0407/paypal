@@ -201,9 +201,9 @@ export const RULES: readonly RuleDef[] = [
       const always = ALWAYS_ASK[p.type];
       if (always) return ["FAIL", always];
       if (p.amountCents > OWNER_APPROVAL_LIMIT_CENTS) {
-        return ["FAIL", `It's ${formatCents(p.amountCents)}, over the ${formatCents(OWNER_APPROVAL_LIMIT_CENTS)} NeverShort can do on its own.`];
+        return ["FAIL", `${formatCents(p.amountCents)} is more than ${formatCents(OWNER_APPROVAL_LIMIT_CENTS)}, the most NeverShort does without asking you.`];
       }
-      return ["PASS", `${formatCents(p.amountCents)} is within the ${formatCents(OWNER_APPROVAL_LIMIT_CENTS)} NeverShort can do on its own.`];
+      return ["PASS", `${formatCents(p.amountCents)} is within the ${formatCents(OWNER_APPROVAL_LIMIT_CENTS)} NeverShort may do without asking you.`];
     },
   },
   {
@@ -215,8 +215,8 @@ export const RULES: readonly RuleDef[] = [
     check: (p, { spentLast7DaysCents: spent }) => {
       if (spent === null) return ["FAIL", "Couldn't add up this week's spending, so you decide."];
       const total = spent + p.amountCents;
-      const within = `${formatCents(total)} in ${SPENDING_WINDOW_DAYS} days with this one, against a limit of ${formatCents(SPENDING_LIMIT_CENTS)}`;
-      return total > SPENDING_LIMIT_CENTS ? ["FAIL", `That makes ${within}, so you decide.`] : ["PASS", `That makes ${within}.`];
+      const sofar = `With this one, ${formatCents(total)} has gone out in ${SPENDING_WINDOW_DAYS} days. The limit is ${formatCents(SPENDING_LIMIT_CENTS)}`;
+      return total > SPENDING_LIMIT_CENTS ? ["FAIL", `${sofar}, so you decide.`] : ["PASS", `${sofar}.`];
     },
   },
 ];

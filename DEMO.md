@@ -9,7 +9,7 @@ these numbers; `lib/forecast/demo-story.test.ts` checks every one.
 - **PayPal's fee:** 3.49% + $0.49 per capture, PayPal's published US rate. **Confirmed** by a real sandbox capture of
   the $72 order on 3 Nov 2026: gross $72.00, fee $3.00, net $69.00.
 
-The judge script (step by step, with the buyer login) is added in P1-8 and P2-1.
+The step-by-step judge script is on the demo guide page (`/demo`) and in section 9 below.
 
 ---
 
@@ -138,7 +138,7 @@ Asked after steps 1 to 5, as in the story:
   Short by 100.00 − (−44.00) =                                          144.00
 ```
 
-**Answer: not yet.** Monday itself is fine ($807.93 after the order), but Thu 12 Nov would be $144 short.
+**Answer: no.** Monday itself is fine ($807.93 after the order), but Thu 12 Nov would be $144 short.
 
 Asked before any fix (straight after a reset): Monday closes at $661.93 after the order, and Thu 12 Nov would be
 $290 short (10.00 − 200.00 = −190.00, which is 290.00 below the minimum).
@@ -151,7 +151,7 @@ Worked out by `lib/forecast/fixes.ts` from the forecast, each one checked by run
 |---|---|---|---|
 | Set aside a little each day (from the owner's transfer on Mon 9 Nov) | $20 a day for 7 days, $140: Thu 12 Nov closes at $150, covered | $11 a day for 7 days, $77: closes at $156, covered | $140: needs your OK (over $100). $77: approved |
 | Move a payment to the first later day the forecast covers (simulated) | Volta's $300 to Fri 13 Nov: Thu 12 Nov closes at $310 | Volta's $300 to Fri 13 Nov: closes at $379 | Always needs your OK |
-| Gap loan for the exact gap (simulated, 2% fee) | $90 today, $91.80 back on Fri 13 Nov: closes at $100, tight | $21 today, $21.42 back on Fri 13 Nov | Always needs your OK |
+| Short-term loan for the exact gap (simulated, 2% fee) | $90 today, $91.80 back on Fri 13 Nov: closes at $100, tight | $21 today, $21.42 back on Fri 13 Nov | Always needs your OK |
 
 ## 9. Judge script
 
@@ -164,6 +164,6 @@ The judges' sandbox buyer login: _P2 adds it here and on `/demo` (task P2-1)._
 | 3 | Sent reminders | Open the payment link and pay as the test buyer. | The order is paid. $72.00 minus PayPal's $3.00 fee: $69.00 arrives. Today's sentence says Thu 12 Nov is $21 short. |
 | 4 | Sent reminders | Press **Send a follow-up** on Maya's reminder. | **Blocked**: "PayPal shows order #1258 already paid". Only rule 1 fails on its receipt. |
 | 5 | Fix the gap (`/fix`) | Pick **Set aside $11 a day**. | **Approved**. Thu 12 Nov closes at $156 and turns green; the sentence says clear for two weeks. |
-| 6 | Ask | Press "Can I afford a $200 order on Monday?" | Not yet: Mon 9 Nov ends at $808 (exactly $807.93), but Thu 12 Nov would be $144 short. The facts under it list both. |
+| 6 | Ask | Press "Can I afford a $200 order on Monday?" | No: Mon 9 Nov ends at $808 (exactly $807.93), but Thu 12 Nov would be $144 short. The facts under it list both. |
 
 Reset (on `/demo`) puts the copy back at step 1 with a new demo run id. Other visitors' copies are never touched.
