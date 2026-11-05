@@ -1,10 +1,9 @@
 # components/charts/
 
-**Owner:** Person 2. Task P2-5.
+**Owner:** Person 2. Task P2-5 (built Thu 5 Nov).
 
-**What goes here:** the forecast chart: AG Charts Community only (never `ag-charts-enterprise`), loaded with dynamic
-import on `/dashboard`. Must keep: labelled axes, the minimum-balance line, the shortfall marker. No unlabelled charts.
-
-**Must export:** `ForecastChart({ forecast })`.
-
-**Now:** a labelled SVG placeholder, marked `TODO(Person 4)`.
+`ForecastChart({ forecast })`: the 14-day forecast in **AG Charts Community** only (never `ag-charts-enterprise`;
+animation, for one, is Enterprise, so it's off). One column per day coloured like the day tickets, labelled axes, the
+owner's minimum as a dashed line, the short day banded and labelled, and a tooltip with each day's money in and out
+(`AgForecastChart`). Downloaded only on a wide screen; phones, the loading moment and any failure get the light SVG
+version of the same numbers (`ForecastChartSvg`).

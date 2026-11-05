@@ -423,7 +423,10 @@ one real sandbox payment end to end.
 - Render shows a paid plan;
 - a daily check through the end of judging confirms the hosted link loads and a reset works.
 
-### [ ] P2-5 AG Grid dashboard and AG Charts forecast chart (was P4-5; Mon 9 Nov)
+### [x] P2-5 AG Grid dashboard and AG Charts forecast chart (was P4-5; Mon 9 Nov)
+_Done Thu 5 Nov by P1, with the owner's OK (P2's folders): orders grid and money-out grid in AG Grid, the forecast in
+AG Charts, both laptop-only, with loading, empty and error states. Also fixed in `lib/demo`: on a visitor's very first
+request a page could read their copy before it existed; `getVisitorStoreId()` now waits for it._
 AG Grid has the biggest sponsor prize, so use it meaningfully:
 - **Dashboard:** a laptop dashboard with an orders and payments grid. It has sorting and filtering, plus custom
   cell renderers for money, state words and referee cards. It is styled in our design, not a stock-looking grid.

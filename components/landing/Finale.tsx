@@ -35,7 +35,7 @@ export function Finale() {
             <Link href="/today" className="btn-chunky btn-ghost">
               See the app
             </Link>
-            <a href="https://github.com/kritsii/paypal" className="btn-chunky btn-ghost">
+            <a href="https://github.com/Rahulkumar0407/paypal" className="btn-chunky btn-ghost">
               Read the code
             </a>
           </div>
