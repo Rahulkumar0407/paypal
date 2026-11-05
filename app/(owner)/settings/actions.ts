@@ -1,9 +1,15 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { DEMO_STORE_SETTINGS, getVisitorStoreId } from "@/lib/demo";
+import { getForecast } from "@/lib/forecast";
+import { saveStoreSettings } from "@/lib/store";
+import { formatDay } from "@/lib/shared/dates";
+import { formatDollars, formatShortfall } from "@/lib/shared/money";
 
 export interface SettingsResult {
-  status: "idle" | "checked" | "invalid";
+  status: "idle" | "saved" | "invalid";
   message: string;
   errors: Partial<Record<"minimum" | "margin" | "whatYouSell" | "supplierPaymentMethod" | "busySeasons", string>>;
   /** What was typed, so the form shows it again after React resets it. Counts submissions to re-mount the form. */
@@ -31,9 +37,12 @@ const schema = z.object({
     .pipe(z.array(z.string().max(60, "Keep each season under 60 characters.")).max(6, "Up to six busy seasons.")),
 });
 
+/** Every screen that colours days or judges money against the minimum. */
+const AFFECTED = ["/today", "/dues", "/fix", "/approvals", "/ask", "/dashboard", "/settings"];
+
 /**
- * Checks the setup answers. TODO(Person 2 / Person 4, P4-4): lib/store has no save function yet, so the answers are
- * checked but not kept. Once `saveStoreSettings` exists, call it here with the parsed values (minimum and margin in cents).
+ * Checks the setup answers and keeps them on this visitor's copy of the store. The reply says what the new safety line
+ * does to the next 14 days, worked out by the forecast (never by AI).
  */
 export async function checkSettings(previous: SettingsResult, form: FormData): Promise<SettingsResult> {
   const text = (key: string) => {
@@ -57,11 +66,36 @@ export async function checkSettings(previous: SettingsResult, form: FormData): P
     }
     return { status: "invalid", message: "A couple of answers need another look.", errors, values, attempt };
   }
-  return {
-    status: "checked",
-    message: "These look right. The demo doesn't keep changes yet, so the forecast still uses the store's own answers.",
-    errors: {},
-    values,
-    attempt,
-  };
+  const answers = parsed.data;
+  const storeId = await getVisitorStoreId();
+  try {
+    const kept = await saveStoreSettings(storeId, {
+      minimumBalanceCents: answers.minimum * 100,
+      tightMarginCents: answers.margin * 100,
+      whatYouSell: answers.whatYouSell,
+      supplierPaymentMethod: answers.supplierPaymentMethod,
+      busySeasons: answers.busySeasons,
+    });
+    if (!kept) {
+      return { status: "invalid", message: "These look right, but this copy has no database to keep them in.", errors: {}, values, attempt };
+    }
+  } catch (error) {
+    console.error("[settings] could not save:", error instanceof Error ? error.message : error);
+    return { status: "invalid", message: "Couldn't save just now. Nothing has changed. Try again in a minute.", errors: {}, values, attempt };
+  }
+  for (const path of AFFECTED) revalidatePath(path);
+
+  // What the new line means for the next two weeks.
+  const forecast = await getForecast(storeId).catch(() => null);
+  const gap = forecast?.firstShortfall ?? null;
+  const effect = !forecast
+    ? ""
+    : gap
+      ? ` With a ${formatDollars(answers.minimum * 100)} minimum, the first short day is ${formatDay(gap.date)}, ${formatShortfall(gap.amountCents)} short.`
+      : ` With a ${formatDollars(answers.minimum * 100)} minimum, no day in the next 14 is short.`;
+  const story =
+    answers.minimum * 100 !== DEMO_STORE_SETTINGS.minimumBalanceCents || answers.margin * 100 !== DEMO_STORE_SETTINGS.tightMarginCents
+      ? " The demo story's numbers assume $100 and $50; Reset on the demo guide puts them back."
+      : "";
+  return { status: "saved", message: `Saved.${effect}${story}`, errors: {}, values, attempt };
 }

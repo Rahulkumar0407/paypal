@@ -52,6 +52,29 @@ export async function listRecentOrders(storeId: StoreId, limit = 50): Promise<Or
   }));
 }
 
+/** The answers the owner can change on Settings. */
+export type EditableSettings = Pick<StoreSettings, "minimumBalanceCents" | "tightMarginCents" | "whatYouSell" | "supplierPaymentMethod" | "busySeasons">;
+
+/**
+ * Keeps the owner's Settings answers on their copy of the store. The forecast, the fixes and the Guard's minimum-balance
+ * rule all read the minimum and the warning zone from here, so they follow at once. Reset on /demo restores the seed.
+ * Without a database there is nothing to keep: returns false.
+ */
+export async function saveStoreSettings(storeId: StoreId, settings: EditableSettings): Promise<boolean> {
+  if (!isDatabaseConfigured()) return false;
+  await getDb().store.update({
+    where: { id: storeId },
+    data: {
+      minimumBalanceCents: settings.minimumBalanceCents,
+      tightMarginCents: settings.tightMarginCents,
+      whatYouSell: settings.whatYouSell,
+      supplierPaymentMethod: settings.supplierPaymentMethod,
+      busySeasons: settings.busySeasons,
+    },
+  });
+  return true;
+}
+
 export async function getStoreSettings(storeId: StoreId): Promise<StoreSettings> {
   const fallback: StoreSettings = {
     storeId,

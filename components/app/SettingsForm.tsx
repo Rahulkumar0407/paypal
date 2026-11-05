@@ -5,7 +5,7 @@ import type { StoreSettings } from "@/types";
 import { Button } from "@/components/ui/Button";
 
 interface Result {
-  status: "idle" | "checked" | "invalid";
+  status: "idle" | "saved" | "invalid";
   message: string;
   errors: Partial<Record<"minimum" | "margin" | "whatYouSell" | "supplierPaymentMethod" | "busySeasons", string>>;
   values: Record<string, string> | null;
@@ -127,11 +127,11 @@ export function SettingsForm({ settings, action }: { settings: StoreSettings; ac
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
         <Button type="submit" disabled={pending} className="min-h-12 px-6 text-[16px]">
-          {pending ? "Checking" : "Save answers"}
+          {pending ? "Saving" : "Save answers"}
         </Button>
         <p role="status" aria-live="polite" className="flex items-start gap-2 text-[15px] leading-6 text-ink">
           {result.status !== "idle" ? (
-            <span aria-hidden className={`mt-2 inline-block size-2 shrink-0 rounded-full ${result.status === "checked" ? "bg-green" : "bg-red"}`} />
+            <span aria-hidden className={`mt-2 inline-block size-2 shrink-0 rounded-full ${result.status === "saved" ? "bg-green" : "bg-red"}`} />
           ) : null}
           {result.message}
         </p>
