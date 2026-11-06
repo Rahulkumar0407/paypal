@@ -6,6 +6,20 @@ import { isStoreId, newStoreId, STORE_COOKIE, STORE_COOKIE_MAX_AGE } from "@/lib
  * No database work here: lib/demo creates the copy the first time a page needs it.
  */
 export function proxy(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  // Strict Server-Side Authentication Gate:
+  // Protected routes require an active session cookie. Unauthenticated visitors
+  // receive an immediate HTTP 307 redirect to /login before any page or component evaluates.
+  if (pathname.startsWith("/onboarding")) {
+    const sessionToken = request.cookies.get("ns_session")?.value;
+    if (!sessionToken) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("from", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
   if (isStoreId(request.cookies.get(STORE_COOKIE)?.value)) return NextResponse.next();
 
   const storeId = newStoreId();
