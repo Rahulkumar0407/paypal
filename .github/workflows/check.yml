@@ -1,4 +1,4 @@
-# Owner: Person 1. Runs `npm run check` (lint, typecheck, unit tests) on every push to main, and on pull requests.
+# Automated Release Gate: Runs dependency check, linting, typechecking, tests, and production build on every push and PR.
 name: check
 
 on:
@@ -22,5 +22,11 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci
-      - run: npm run check
+      - name: Install clean dependencies
+        run: npm ci
+      - name: Generate Prisma Client
+        run: npx prisma generate
+      - name: Code Quality & Test Suite
+        run: npm run check
+      - name: Production Next.js Build
+        run: npm run build
