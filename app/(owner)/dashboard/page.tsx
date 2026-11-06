@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ButtonLink } from "@/components/ui";
 import { UnifiedForecastChart } from "@/components/app/UnifiedForecastChart";
 import { CollapsibleSection } from "@/components/app/CollapsibleSection";
 import { DuesList, DuesTable } from "@/components/dashboard/DuesTable";
@@ -15,6 +16,23 @@ import { formatCents, formatDollars, formatShortfall } from "@/lib/shared/money"
 
 export const metadata: Metadata = { title: "Forecast • NeverShort" };
 
+async function load() {
+  const storeId = await getVisitorStoreId();
+  try {
+    const [forecast, orders, flags, receipts, dues] = await Promise.all([
+      getForecast(storeId),
+      listRecentOrders(storeId, 50),
+      listRiskFlags(storeId),
+      listReceipts(storeId),
+      getDues(storeId),
+    ]);
+    return { storeId, forecast, orders, flags, receipts, dues };
+  } catch (error) {
+    console.error("[dashboard] could not load forecast data:", error instanceof Error ? error.message : error);
+    return null;
+  }
+}
+
 /**
  * Clean, human-friendly Cash Flow Forecast.
  * Prioritizes:
@@ -24,15 +42,22 @@ export const metadata: Metadata = { title: "Forecast • NeverShort" };
  * - Progressive disclosure for detailed order ledgers and background tables.
  */
 export default async function DashboardPage() {
-  const storeId = await getVisitorStoreId();
-  const [forecast, orders, flags, receipts, dues] = await Promise.all([
-    getForecast(storeId),
-    listRecentOrders(storeId, 50),
-    listRiskFlags(storeId),
-    listReceipts(storeId),
-    getDues(storeId),
-  ]);
+  const data = await load();
+  if (!data) {
+    return (
+      <div className="max-w-xl mx-auto p-8 rounded-2xl bg-white border border-slate-200 text-center shadow-xs">
+        <h2 className="text-xl font-bold text-slate-900">Couldn&apos;t load forecast</h2>
+        <p className="mt-2 text-sm text-slate-500">Your funds are completely safe. Retry in a moment.</p>
+        <div className="mt-5">
+          <ButtonLink href="/dashboard" variant="secondary">
+            Retry
+          </ButtonLink>
+        </div>
+      </div>
+    );
+  }
 
+  const { forecast, orders, flags, receipts, dues } = data;
   const rows = orderRows(orders, flags, receipts);
   const lastDay = forecast.days[forecast.days.length - 1]!.date;
   const duesRows = dueRows(dues.filter((d) => d.dueOn <= lastDay));

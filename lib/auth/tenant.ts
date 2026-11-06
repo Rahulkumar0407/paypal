@@ -62,3 +62,4 @@ export async function getAuthorizedStoreId(): Promise<string> {
   }
   return primary;
 }
+

@@ -12,7 +12,7 @@ export default function HomeLoading() {
       role="status"
       aria-live="polite"
       aria-label="Loading financial overview"
-      className="space-y-6 max-w-[960px] mx-auto animate-pulse"
+      className="space-y-6 max-w-[960px] mx-auto motion-safe:animate-pulse"
     >
       {/* 1. Status Banner Skeleton */}
       <div className="rounded-2xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs space-y-3">

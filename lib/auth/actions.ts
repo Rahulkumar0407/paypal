@@ -180,3 +180,4 @@ export async function logoutAction(): Promise<void> {
   revalidatePath("/", "layout");
   redirect("/login");
 }
+

@@ -40,3 +40,4 @@ describe("lib/auth/crypto", () => {
     expect(hash1).toHaveLength(64);
   });
 });
+
