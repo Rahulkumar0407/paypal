@@ -16,6 +16,7 @@ export const PRIMARY_NAV: NavItem[] = [
 export const SECONDARY_NAV: NavItem[] = [
   { href: "/ask", label: "Ask Co-pilot", icon: "ask", description: "AI cash queries with tools" },
   { href: "/receipts", label: "Receipts", icon: "receipts", description: "Audit trail & guard logs" },
+  { href: "/onboarding", label: "Merchant Setup", icon: "setup", description: "Real store onboarding" },
   { href: "/settings", label: "Settings", icon: "settings", description: "Store rules & limits" },
 ];
 

@@ -10,10 +10,12 @@ import { BottomNav, SideNav } from "./NavLinks";
 export function AppShell({
   today,
   storeName,
+  isDemo = true,
   children,
 }: {
   today: string;
   storeName: string;
+  isDemo?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -63,18 +65,33 @@ export function AppShell({
 
         {/* Bottom System Status */}
         <div className="pt-4 border-t border-slate-200/80 flex flex-col gap-2">
-          <Link
-            href="/demo"
-            className="flex items-center justify-between p-2.5 rounded-xl bg-blue-50 border border-blue-200/60 text-blue-700 text-xs font-medium hover:bg-blue-100 transition-colors group"
-          >
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-blue-600" />
-              <span className="font-semibold">Demo Guide</span>
-            </div>
-            <span className="text-[10px] font-mono uppercase font-bold text-blue-600/80 group-hover:translate-x-0.5 transition-transform">
-              Walkthrough →
-            </span>
-          </Link>
+          {isDemo ? (
+            <Link
+              href="/demo"
+              className="flex items-center justify-between p-2.5 rounded-xl bg-blue-50 border border-blue-200/60 text-blue-700 text-xs font-medium hover:bg-blue-100 transition-colors group"
+            >
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-blue-600" />
+                <span className="font-semibold">Demo Guide</span>
+              </div>
+              <span className="text-[10px] font-mono uppercase font-bold text-blue-600/80 group-hover:translate-x-0.5 transition-transform">
+                Walkthrough →
+              </span>
+            </Link>
+          ) : (
+            <Link
+              href="/onboarding"
+              className="flex items-center justify-between p-2.5 rounded-xl bg-emerald-50 border border-emerald-200/60 text-emerald-800 text-xs font-medium hover:bg-emerald-100 transition-colors group"
+            >
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-600" />
+                <span className="font-semibold">Merchant Setup</span>
+              </div>
+              <span className="text-[10px] font-mono uppercase font-bold text-emerald-700 group-hover:translate-x-0.5 transition-transform">
+                Edit →
+              </span>
+            </Link>
+          )}
 
           <div className="px-2 py-1 text-[11px] font-mono text-slate-500 flex items-center justify-between">
             <span>PayPal Sandbox</span>
@@ -85,7 +102,7 @@ export function AppShell({
 
       {/* ── Main Content Area ── */}
       <div className="min-w-0 flex flex-col min-h-dvh">
-        <DemoBanner today={today} />
+        {isDemo && <DemoBanner today={today} />}
 
         {/* Mobile Header */}
         <header className="sticky top-0 z-30 flex items-center justify-between px-5 py-3.5 bg-white/95 backdrop-blur border-b border-slate-200/80 lg:hidden">

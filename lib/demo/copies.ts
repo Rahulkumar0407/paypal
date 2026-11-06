@@ -36,6 +36,42 @@ export async function resetStoreWith(db: PrismaClient, storeId: StoreId): Promis
   return runId;
 }
 
+/** Initialize a clean real merchant store with real parameters and 0 sample data */
+export async function createRealMerchantStoreWith(
+  db: PrismaClient,
+  storeId: StoreId,
+  config: {
+    name: string;
+    whatYouSell: string;
+    openingBalanceCents: number;
+    minimumBalanceCents: number;
+    tightMarginCents?: number;
+    timezone?: string;
+  }
+): Promise<string> {
+  const runId = newDemoRunId();
+  await db.$transaction(async (tx) => {
+    await tx.store.deleteMany({ where: { id: storeId } });
+    await tx.store.create({
+      data: {
+        id: storeId,
+        name: config.name,
+        currency: "USD",
+        timezone: config.timezone ?? "America/New_York",
+        minimumBalanceCents: config.minimumBalanceCents,
+        tightMarginCents: config.tightMarginCents ?? Math.round(config.minimumBalanceCents * 0.5),
+        openingBalanceCents: config.openingBalanceCents,
+        openingBalanceOn: today(),
+        whatYouSell: config.whatYouSell,
+        supplierPaymentMethod: "PAYPAL_PAYOUTS",
+        busySeasons: [],
+        demoRunId: runId,
+      },
+    });
+  }, TX_OPTIONS);
+  return runId;
+}
+
 /** Create the visitor's copy if it does not exist yet; otherwise just note the visit. */
 export async function ensureStoreWith(db: PrismaClient, storeId: StoreId): Promise<"created" | "existing"> {
   const touched = await db.store.updateMany({ where: { id: storeId }, data: { lastSeenAt: new Date() } });

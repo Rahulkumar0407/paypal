@@ -8,6 +8,7 @@ import { getDb, isDatabaseConfigured } from "@/lib/shared/db";
 import { isStoreId, LOCAL_STORE_ID, STORE_COOKIE } from "@/lib/shared/visitor";
 import {
   cleanupIdleStoresWith,
+  createRealMerchantStoreWith,
   ensureStoreWith,
   getStoreStatusWith,
   resetAllStoresWith,
@@ -16,7 +17,22 @@ import {
 
 export { buildDemoSeed, paypalFeeCents, DEMO_STORE_SETTINGS, DEMO_SEED_VERSION, type DemoSeed } from "./seed";
 export { DEMO_CATALOG, DEMO_CUSTOMER_NAMES, type CatalogItem } from "./catalog";
-export { newDemoRunId, resetStoreWith, ensureStoreWith, resetAllStoresWith, cleanupIdleStoresWith, getStoreStatusWith } from "./copies";
+export { newDemoRunId, resetStoreWith, createRealMerchantStoreWith, ensureStoreWith, resetAllStoresWith, cleanupIdleStoresWith, getStoreStatusWith } from "./copies";
+
+export async function createRealMerchantStore(
+  storeId: StoreId,
+  config: {
+    name: string;
+    whatYouSell: string;
+    openingBalanceCents: number;
+    minimumBalanceCents: number;
+    tightMarginCents?: number;
+    timezone?: string;
+  }
+): Promise<string> {
+  if (!isDatabaseConfigured()) return "";
+  return createRealMerchantStoreWith(getDb(), storeId, config);
+}
 
 /**
  * The storeId of the visitor making this request (set by proxy.ts), once their copy of Loop Audio exists. Server

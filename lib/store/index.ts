@@ -53,7 +53,9 @@ export async function listRecentOrders(storeId: StoreId, limit = 50): Promise<Or
 }
 
 /** The answers the owner can change on Settings. */
-export type EditableSettings = Pick<StoreSettings, "minimumBalanceCents" | "tightMarginCents" | "whatYouSell" | "supplierPaymentMethod" | "busySeasons">;
+export type EditableSettings = Pick<StoreSettings, "minimumBalanceCents" | "tightMarginCents" | "whatYouSell" | "supplierPaymentMethod" | "busySeasons"> & {
+  name?: string;
+};
 
 /**
  * Keeps the owner's Settings answers on their copy of the store. The forecast, the fixes and the Guard's minimum-balance
@@ -65,6 +67,7 @@ export async function saveStoreSettings(storeId: StoreId, settings: EditableSett
   await getDb().store.update({
     where: { id: storeId },
     data: {
+      ...(settings.name ? { name: settings.name } : {}),
       minimumBalanceCents: settings.minimumBalanceCents,
       tightMarginCents: settings.tightMarginCents,
       whatYouSell: settings.whatYouSell,
