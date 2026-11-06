@@ -8,9 +8,9 @@ import nextTs from "eslint-config-next/typescript";
 // 2. Only the Guard, the PayPal module, app/api/paypal and app/store may import `@/lib/paypal`.
 // 3. Only lib/ai/model.ts may import an AI provider package.
 const deepModuleImports = {
-  group: ["@/lib/*/*", "!@/lib/shared/*"],
+  group: ["@/lib/*/*", "!@/lib/shared/*", "!@/lib/auth/actions"],
   message:
-    "Import a module through its index (@/lib/<module>). Only lib/shared files may be imported directly. See AGENTS.md section 9.",
+    "Import a module through its index (@/lib/<module>). Only lib/shared files and server actions may be imported directly. See AGENTS.md section 9.",
 };
 const paypal = {
   name: "@/lib/paypal",

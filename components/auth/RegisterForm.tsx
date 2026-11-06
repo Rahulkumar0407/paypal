@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
-import { registerAction, type AuthActionResult } from "@/lib/auth";
+import { registerAction, type AuthActionResult } from "@/lib/auth/actions";
 
 const initialState: AuthActionResult = {
   status: "idle",

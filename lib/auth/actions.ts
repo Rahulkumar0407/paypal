@@ -2,10 +2,12 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { z } from "zod";
 import { getDb, isDatabaseConfigured } from "@/lib/shared/db";
 import { hashPassword, verifyPassword } from "./crypto";
 import { createSession, revokeCurrentSession } from "./session";
+import { checkRateLimit, resetRateLimit } from "./rate-limit";
 
 export interface AuthActionResult {
   status: "idle" | "error";
@@ -40,6 +42,17 @@ export async function registerAction(
 ): Promise<AuthActionResult> {
   if (!isDatabaseConfigured()) {
     return { status: "error", message: "Database is not configured." };
+  }
+
+  // Rate limit: max 5 registrations per 15 minutes per IP
+  const reqHeaders = await headers().catch(() => null);
+  const clientIp = reqHeaders?.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
+  const rateLimit = checkRateLimit(`register:${clientIp}`, 5, 15 * 60 * 1000);
+  if (!rateLimit.allowed) {
+    return {
+      status: "error",
+      message: `Too many registration attempts. Please try again in ${Math.ceil(rateLimit.retryAfterSeconds / 60)} minutes.`,
+    };
   }
 
   const raw = {
@@ -150,6 +163,21 @@ export async function loginAction(
   }
 
   const { email, password } = parsed.data;
+
+  // Rate limit: max 5 login attempts per 15 minutes per email and IP
+  const reqHeaders = await headers().catch(() => null);
+  const clientIp = reqHeaders?.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
+  const rateLimitEmail = checkRateLimit(`login:email:${email}`, 5, 15 * 60 * 1000);
+  const rateLimitIp = checkRateLimit(`login:ip:${clientIp}`, 10, 15 * 60 * 1000);
+
+  if (!rateLimitEmail.allowed || !rateLimitIp.allowed) {
+    const retrySec = Math.max(rateLimitEmail.retryAfterSeconds, rateLimitIp.retryAfterSeconds);
+    return {
+      status: "error",
+      message: `Too many login attempts. Please try again in ${Math.ceil(retrySec / 60)} minutes.`,
+    };
+  }
+
   const db = getDb();
 
   const user = await db.user.findUnique({
@@ -163,6 +191,9 @@ export async function loginAction(
       message: "Invalid email or password. Please try again.",
     };
   }
+
+  // Reset rate limits upon successful credential verification
+  resetRateLimit(`login:email:${email}`);
 
   try {
     await createSession(user.id);
