@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { formatDayWithYear, weekdayShort } from "@/lib/shared/dates";
-import { logoutAction } from "@/lib/auth";
+import { logoutAction } from "@/lib/auth/actions";
 import { BottomNav, SideNav } from "./NavLinks";
 
 /**

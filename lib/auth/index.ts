@@ -29,3 +29,9 @@ export {
   type AuthActionResult,
 } from "./actions";
 
+export {
+  checkRateLimit,
+  clearRateLimits,
+  resetRateLimit,
+} from "./rate-limit";
+

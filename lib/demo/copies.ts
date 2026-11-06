@@ -27,6 +27,14 @@ const TX_OPTIONS = { timeout: 30_000, maxWait: 10_000 } as const;
 
 /** Delete this store's copy (everything cascades) and write a fresh one with a new demo run id. */
 export async function resetStoreWith(db: PrismaClient, storeId: StoreId): Promise<string> {
+  const existing = await db.store.findUnique({
+    where: { id: storeId },
+    select: { isDemo: true },
+  });
+  if (existing && !existing.isDemo) {
+    throw new Error(`Store ${storeId} is a real merchant store and cannot be reset as a demo.`);
+  }
+
   const runId = newDemoRunId();
   const seed = buildDemoSeed(storeId, today(), runId);
   await db.$transaction(async (tx) => {
