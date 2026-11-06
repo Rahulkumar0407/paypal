@@ -1,38 +1,72 @@
 import { formatDay } from "@/lib/shared/dates";
 import { formatDollars } from "@/lib/shared/money";
 import { ReadyMeter, SimulatedTag } from "@/components/ui/Card";
-import { DAY_FILL, DAY_WORD } from "@/components/ui/meaning";
+import { DAY_WORD } from "@/components/ui/meaning";
 import type { DueWithState } from "./due-state";
 
-const KIND_WORD = { SUPPLIER: "Supplier order", BILL: "Bill", OWNER_TRANSFER: "To your bank", LOAN: "Loan repayment" } as const;
+const KIND_WORD = {
+  SUPPLIER: "Supplier order",
+  BILL: "Recurring bill",
+  OWNER_TRANSFER: "Bank transfer",
+  LOAN: "Loan repayment",
+} as const;
 
 /** Upcoming dues in date order: name, date, how much is ready, and a clear state word. */
 export function UpcomingDues({ items }: { items: DueWithState[] }) {
   return (
-    <ul className="divide-y divide-line">
+    <ul className="divide-y divide-slate-100">
       {items.map(({ due, state }) => {
         const fully = due.readyCents >= due.amountCents;
+        const isShort = state === "short";
+        const isTight = state === "tight";
+
         return (
-          <li key={due.id} className="py-4">
+          <li key={due.id} className="py-4 first:pt-0 last:pb-0">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
-                <p className="text-[16px] leading-6 font-semibold text-ink">
-                  {due.payeeName} {due.simulated ? <SimulatedTag className="ml-1 align-middle" /> : null}
-                </p>
-                <p className="text-[14px] leading-5 text-ink-muted">
-                  {formatDay(due.dueOn)}, {KIND_WORD[due.kind].toLowerCase()}
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-semibold text-slate-900 truncate">
+                    {due.payeeName}
+                  </p>
+                  {due.simulated && <SimulatedTag />}
+                </div>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Due {formatDay(due.dueOn)} • {KIND_WORD[due.kind]}
                 </p>
               </div>
-              <p className="flex shrink-0 items-center gap-2 text-[14px] font-semibold text-ink">
-                <span aria-hidden className={`inline-block size-2.5 rounded-[3px] ${DAY_FILL[state]}`} />
-                {DAY_WORD[state]}
-              </p>
+
+              <div className="text-right">
+                <p className="text-sm font-mono font-bold text-slate-900">
+                  {formatDollars(due.amountCents)}
+                </p>
+                <span
+                  className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold mt-0.5 ${
+                    isShort
+                      ? "bg-rose-100 text-rose-700"
+                      : isTight
+                        ? "bg-amber-100 text-amber-800"
+                        : "bg-emerald-100 text-emerald-800"
+                  }`}
+                >
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full mr-1 ${
+                      isShort ? "bg-rose-600" : isTight ? "bg-amber-500" : "bg-emerald-600"
+                    }`}
+                  />
+                  {DAY_WORD[state]}
+                </span>
+              </div>
             </div>
-            <div className="mt-2.5 flex items-center gap-3">
-              <div className="w-full max-w-[220px]">
+
+            <div className="mt-3 flex items-center justify-between gap-3 text-xs">
+              <div className="w-full max-w-[200px]">
                 <ReadyMeter readyCents={due.readyCents} amountCents={due.amountCents} />
               </div>
-              <p className={`text-[14px] whitespace-nowrap tabular ${fully ? "text-ink-muted" : "font-semibold text-ink"}`}>
+              <p
+                className={`text-xs tabular-nums font-mono ${
+                  fully ? "text-slate-500" : "font-semibold text-rose-600"
+                }`}
+              >
                 {formatDollars(due.readyCents)} of {formatDollars(due.amountCents)} ready
               </p>
             </div>

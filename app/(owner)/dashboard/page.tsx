@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Card, PageSentence, RefereeCard } from "@/components/ui";
-import { ForecastChart } from "@/components/charts/ForecastChart";
+import Link from "next/link";
+import { UnifiedForecastChart } from "@/components/app/UnifiedForecastChart";
+import { CollapsibleSection } from "@/components/app/CollapsibleSection";
 import { DuesList, DuesTable } from "@/components/dashboard/DuesTable";
 import { OrdersList, OrdersTable } from "@/components/dashboard/OrdersTable";
 import { dueRows, orderRows } from "@/components/dashboard/rows";
@@ -10,14 +11,17 @@ import { listReceipts } from "@/lib/guard";
 import { listRiskFlags } from "@/lib/risk";
 import { listRecentOrders } from "@/lib/store";
 import { formatDay } from "@/lib/shared/dates";
-import { formatCents, formatDollars } from "@/lib/shared/money";
+import { formatCents, formatDollars, formatShortfall } from "@/lib/shared/money";
 
-export const metadata: Metadata = { title: "Dashboard" };
+export const metadata: Metadata = { title: "Forecast • NeverShort" };
 
 /**
- * The laptop dashboard (P2-5): the forecast as an AG Chart, every recent order and every payment due in AG Grid
- * tables, and the orders worth a second look. Phones get plain lists of the same data: AG Grid and AG Charts are
- * downloaded only on a wide screen.
+ * Clean, human-friendly Cash Flow Forecast.
+ * Prioritizes:
+ * - One readable chart with interactive day inspection.
+ * - Clear dates and plain English.
+ * - One highlighted risk with an explanation of why it exists.
+ * - Progressive disclosure for detailed order ledgers and background tables.
  */
 export default async function DashboardPage() {
   const storeId = await getVisitorStoreId();
@@ -28,105 +32,107 @@ export default async function DashboardPage() {
     listReceipts(storeId),
     getDues(storeId),
   ]);
+
   const rows = orderRows(orders, flags, receipts);
-  // The same 14 days as the forecast: "ready on the day" is only worked out inside it.
   const lastDay = forecast.days[forecast.days.length - 1]!.date;
   const duesRows = dueRows(dues.filter((d) => d.dueOn <= lastDay));
+  const gap = forecast.firstShortfall;
   const lowest = forecast.days.reduce((a, d) => (d.closingCents < a.closingCents ? d : a), forecast.days[0]!);
-  // One card per order, with every reason it was flagged.
-  const flagged = [...Map.groupBy(flags, (f) => f.orderId).values()].map((fs) => ({
-    orderId: fs[0]!.orderId,
-    orderNumber: fs[0]!.orderNumber,
-    amountCents: fs[0]!.amountCents,
-    held: fs.some((f) => f.held),
-    details: [...new Set(fs.map((f) => f.detail))],
-  }));
+  const startOn = gap?.date ?? forecast.days[0]?.date ?? forecast.asOf;
+
   const arrived = orders.reduce((s, o) => s + (o.netCents ?? 0), 0);
   const fees = orders.reduce((s, o) => s + (o.feeCents ?? 0), 0);
 
   return (
-    <div className="space-y-10">
-      <PageSentence>Two weeks ahead, every recent order, and every payment due.</PageSentence>
+    <div className="space-y-6 max-w-[960px] mx-auto">
+      {/* ── Page Header ── */}
+      <div className="space-y-1.5">
+        <h1 className="text-2xl sm:text-3xl font-serif font-black text-slate-900 tracking-tight">
+          14-Day Cash Forecast
+        </h1>
+        <p className="text-sm text-slate-500">
+          A forward-looking estimate of your bank balance based on average sales and scheduled bills.
+        </p>
+      </div>
 
-      <Card>
-        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-          <h2 className="text-[20px] leading-7 font-semibold text-ink">Balance forecast</h2>
-          <p className="text-[15px] text-ink-muted">
-            Lowest: {formatDay(lowest.date)}, {formatDollars(lowest.closingCents)}. Your minimum is{" "}
-            {formatDollars(forecast.minimumBalanceCents)}.
-          </p>
-        </div>
-        <div className="mt-4">
-          <ForecastChart forecast={forecast} />
-        </div>
-      </Card>
+      {/* ── Highlighted Risk & Plain Explanation ── */}
+      {gap ? (
+        <div className="rounded-2xl border border-rose-200 bg-rose-50/70 p-5 sm:p-6 shadow-xs space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-rose-800 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-rose-600" />
+              Primary Cash Flow Risk
+            </span>
+            <span className="text-xs font-mono font-bold text-rose-800 bg-white/90 px-2.5 py-0.5 rounded-full border border-rose-200">
+              {formatDay(gap.date)}
+            </span>
+          </div>
 
-      <Card>
-        <div className="mb-4 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-          <h2 id="orders-title" className="text-[20px] leading-7 font-semibold text-ink">
-            Orders and payments
+          <div>
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900">
+              Projected shortfall of {formatShortfall(gap.amountCents)} on {formatDay(gap.date)}
+            </h2>
+            <p className="text-sm text-slate-700 mt-1 leading-relaxed">
+              Why this happens: {gap.reason}. Your balance is estimated to end at {formatDollars(lowest.closingCents)}, dipping below your {formatDollars(forecast.minimumBalanceCents)} cash reserve.
+            </p>
+          </div>
+
+          <div className="pt-1">
+            <Link
+              href="/fix"
+              className="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-rose-600 text-white text-xs font-semibold hover:bg-rose-700 transition-colors shadow-xs"
+            >
+              Explore solutions to fix this gap →
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-5 sm:p-6 shadow-xs space-y-1">
+          <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            Forecast Clear
+          </span>
+          <h2 className="text-lg font-bold text-slate-900">
+            No projected shortfalls over the next two weeks.
           </h2>
-          <p className="text-[15px] text-ink-muted tabular">
-            {formatCents(arrived)} arrived after {formatCents(fees)} in PayPal fees
+          <p className="text-sm text-slate-600">
+            Lowest estimated balance is {formatDollars(lowest.closingCents)} on {formatDay(lowest.date)}, safely above your {formatDollars(forecast.minimumBalanceCents)} cash reserve.
           </p>
         </div>
+      )}
+
+      {/* ── ONE Readable Chart + Day Inspection ── */}
+      <UnifiedForecastChart
+        days={forecast.days}
+        minimumBalanceCents={forecast.minimumBalanceCents}
+        initialDate={startOn}
+      />
+
+      {/* ── Progressive Disclosure: Scheduled Payments Table ── */}
+      <CollapsibleSection
+        title="Upcoming Bills & Payments in this Forecast"
+        subtitle={`${duesRows.length} obligations due over the next 14 days`}
+      >
+        <div className="hidden md:block">
+          <DuesTable rows={duesRows} />
+        </div>
+        <div className="md:hidden">
+          <DuesList rows={duesRows} />
+        </div>
+      </CollapsibleSection>
+
+      {/* ── Progressive Disclosure: Complete Transaction Ledger ── */}
+      <CollapsibleSection
+        title="Recent Customer Orders & PayPal Net Receipts"
+        subtitle={`Total settled: ${formatCents(arrived)} net after ${formatCents(fees)} in PayPal processing fees`}
+      >
         <div className="hidden md:block">
           <OrdersTable rows={rows} orders={orders} />
         </div>
         <div className="md:hidden">
           <OrdersList orders={orders} />
         </div>
-      </Card>
-
-      <div className="grid gap-10 2xl:grid-cols-[minmax(0,8fr)_minmax(0,4fr)]">
-        <Card>
-          <h2 className="mb-4 text-[20px] leading-7 font-semibold text-ink">Money out, next 14 days</h2>
-          <div className="hidden md:block">
-            <DuesTable rows={duesRows} />
-          </div>
-          <div className="md:hidden">
-            <DuesList rows={duesRows} />
-          </div>
-        </Card>
-
-        <section aria-labelledby="risk-title">
-          <h2 id="risk-title" className="mb-3 text-[20px] leading-7 font-semibold text-ink">
-            Worth a second look
-          </h2>
-          {flagged.length === 0 ? (
-            <Card tone="outline">
-              <p className="text-[15px] leading-6 text-ink-muted">No risky orders right now.</p>
-            </Card>
-          ) : (
-            <ul className="space-y-3">
-              {flagged.map((f) => (
-                <li key={f.orderId}>
-                  <Card tone="outline">
-                    <div className="flex items-baseline justify-between gap-3">
-                      <p className="text-[16px] font-semibold text-ink">Order #{f.orderNumber}</p>
-                      <p className="tabular text-[15px] text-ink">{formatCents(f.amountCents)}</p>
-                    </div>
-                    <ul className="mt-1 space-y-0.5">
-                      {f.details.map((d) => (
-                        <li key={d} className="text-[15px] leading-6 text-ink-muted">
-                          {d}
-                        </li>
-                      ))}
-                    </ul>
-                    <p className="mt-3 text-[14px] text-ink">
-                      {f.held ? (
-                        <span className="inline-flex items-center gap-2 align-middle text-[13px] font-medium text-ink"><span aria-hidden className="inline-block size-2.5 rounded-[3px] border border-ink/60" />Held: not counted in your forecast</span>
-                      ) : (
-                        <RefereeCard decision="ESCALATE" size="sm" label="Hold waiting for your OK" />
-                      )}
-                    </p>
-                  </Card>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-      </div>
+      </CollapsibleSection>
     </div>
   );
 }

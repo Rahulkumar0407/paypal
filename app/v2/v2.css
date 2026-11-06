@@ -1,0 +1,281 @@
+/* ══════════════════════════════════════════════════════════════
+   NEVERSHORT SIGNATURE MOTION DESIGN SYSTEM
+   "The Future Is Already in the Picture"
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── 1. Character Natural Ambient Dynamics ── */
+@keyframes merchantBreathe {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-3px) scale(1.002);
+  }
+}
+
+@keyframes characterEyeBlink {
+  0%, 94%, 98%, 100% {
+    transform: scaleY(1);
+  }
+  96% {
+    transform: scaleY(0.1);
+  }
+}
+
+@keyframes floatGuardian {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+/* ── 2. Hero & Counter Timeline ── */
+@keyframes bagHandoverCurve {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  35% {
+    transform: translate(-16px, -12px) rotate(-6deg);
+  }
+  70% {
+    transform: translate(-32px, 4px) rotate(2deg);
+  }
+  100% {
+    transform: translate(-38px, 0px) rotate(0deg);
+  }
+}
+
+@keyframes wordAlertPulse {
+  0%, 100% {
+    color: #DC2626;
+    text-shadow: 0 0 0 rgba(220, 38, 38, 0);
+  }
+  50% {
+    color: #B91C1C;
+    text-shadow: 0 0 12px rgba(220, 38, 38, 0.35);
+  }
+}
+
+/* ── 3. Dropping Bills with Realistic Paper Physics (Counter Surface Landing) ── */
+@keyframes billDropVoltaCounter {
+  0% {
+    transform: translateY(-80px) rotate(-14deg) scale(0.9);
+    opacity: 0;
+  }
+  50% {
+    transform: translateY(8px) rotate(3deg) scale(1.02);
+    opacity: 1;
+  }
+  75% {
+    transform: translateY(-2px) rotate(-5deg) scale(0.99);
+  }
+  100% {
+    transform: translateY(0) rotate(-4deg) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes billDropRentCounter {
+  0% {
+    transform: translateY(-90px) rotate(18deg) scale(0.9);
+    opacity: 0;
+  }
+  50% {
+    transform: translateY(10px) rotate(-3deg) scale(1.02);
+    opacity: 1;
+  }
+  75% {
+    transform: translateY(-3px) rotate(5deg) scale(0.99);
+  }
+  100% {
+    transform: translateY(0) rotate(4deg) scale(1);
+    opacity: 1;
+  }
+}
+
+/* ── 4. Signature Optical Future-Reveal Lens (Financial X-Ray) ── */
+@keyframes lensScanMovement {
+  0% {
+    transform: translate(30px, -15px) rotate(6deg);
+  }
+  50% {
+    transform: translate(-8px, -10px) rotate(-2deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+
+@keyframes xrayGlowPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.45), 0 20px 45px rgba(0, 112, 224, 0.25);
+    background-color: rgba(254, 242, 242, 0.88);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(220, 38, 38, 0), 0 25px 60px rgba(0, 112, 224, 0.4);
+    background-color: rgba(254, 226, 226, 0.95);
+  }
+}
+
+/* ── 5. Parabolic Gold Coin Flight (Customer Phone to Merchant) ── */
+@keyframes coinArc1 {
+  0% {
+    transform: translate(0, 0) scale(0.5) rotate(0deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+    transform: translate(40px, -65px) scale(1.15) rotate(60deg);
+  }
+  50% {
+    transform: translate(150px, -90px) scale(1.05) rotate(180deg);
+  }
+  80% {
+    transform: translate(250px, -35px) scale(0.95) rotate(300deg);
+  }
+  100% {
+    transform: translate(320px, 15px) scale(0.85) rotate(420deg);
+    opacity: 0;
+  }
+}
+
+@keyframes coinArc2 {
+  0% {
+    transform: translate(0, 0) scale(0.45) rotate(0deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+    transform: translate(35px, -55px) scale(1.1) rotate(45deg);
+  }
+  55% {
+    transform: translate(140px, -78px) scale(1) rotate(150deg);
+  }
+  85% {
+    transform: translate(240px, -25px) scale(0.9) rotate(270deg);
+  }
+  100% {
+    transform: translate(310px, 20px) scale(0.8) rotate(390deg);
+    opacity: 0;
+  }
+}
+
+@keyframes coinArc3 {
+  0% {
+    transform: translate(0, 0) scale(0.55) rotate(0deg);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+    transform: translate(50px, -75px) scale(1.2) rotate(80deg);
+  }
+  60% {
+    transform: translate(165px, -100px) scale(1.08) rotate(210deg);
+  }
+  88% {
+    transform: translate(265px, -40px) scale(0.95) rotate(330deg);
+  }
+  100% {
+    transform: translate(335px, 10px) scale(0.85) rotate(460deg);
+    opacity: 0;
+  }
+}
+
+/* ── 6. Margin Guard Distinctive Posture Dynamics ── */
+@keyframes guardianHaltPose {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.02) rotate(-1.5deg);
+  }
+}
+
+/* ── 7. Tactile Physical Stamp Slam ── */
+@keyframes stampSlamPhysical {
+  0% {
+    transform: scale(2.6) rotate(-26deg);
+    opacity: 0;
+  }
+  45% {
+    transform: scale(0.94) rotate(-6deg);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(1.05) rotate(-9deg);
+  }
+  100% {
+    transform: scale(1) rotate(-8deg);
+    opacity: 1;
+  }
+}
+
+/* ── Class Hooks ── */
+.animate-breathe {
+  animation: merchantBreathe 6s ease-in-out infinite;
+}
+
+.animate-float-gentle {
+  animation: floatGuardian 5s ease-in-out infinite;
+}
+
+.animate-bag-handover {
+  animation: bagHandoverCurve 3.2s ease-in-out infinite alternate;
+}
+
+.animate-word-alert {
+  animation: wordAlertPulse 2.5s ease-in-out infinite;
+}
+
+.animate-bill-1 {
+  animation: billDropVoltaCounter 0.75s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.animate-bill-2 {
+  animation: billDropRentCounter 0.85s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.12s forwards;
+}
+
+.animate-lens-glide {
+  animation: lensScanMovement 6s ease-in-out infinite alternate;
+}
+
+.animate-lens-xray {
+  animation: xrayGlowPulse 2.8s ease-in-out infinite;
+}
+
+.animate-coin-1 {
+  animation: coinArc1 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.animate-coin-2 {
+  animation: coinArc2 1.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.08s forwards;
+}
+
+.animate-coin-3 {
+  animation: coinArc3 1.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.16s forwards;
+}
+
+.animate-stamp-slam {
+  animation: stampSlamPhysical 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* ── Reduced Motion Accessibility ── */
+@media (prefers-reduced-motion: reduce) {
+  .animate-breathe,
+  .animate-float-gentle,
+  .animate-bag-handover,
+  .animate-word-alert,
+  .animate-bill-1,
+  .animate-bill-2,
+  .animate-lens-glide,
+  .animate-lens-xray,
+  .animate-coin-1,
+  .animate-coin-2,
+  .animate-coin-3,
+  .animate-stamp-slam {
+    animation: none !important;
+    transform: none !important;
+  }
+}

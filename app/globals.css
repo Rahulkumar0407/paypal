@@ -12,22 +12,67 @@
   --color-current: currentColor;
 
   --color-paper: #ffffff;
-  --color-ink: #14201b;
+  --color-ink: #0f172a;
   /* Ink tint for secondary text: 6.5:1 on white, 5.9:1 on surface. */
-  --color-ink-muted: #56605b;
+  --color-ink-muted: #64748b;
   /* Ink tint for hairlines and dividers only. */
-  --color-line: #dce1dd;
-  --color-brand: #0e3b2c;
-  --color-surface: #f3f5f2;
+  --color-line: #e2e8f0;
+  --color-brand: #0070e0;
+  --color-surface: #f8fafc;
 
-  --color-green: #1e9e5e;
-  --color-amber: #f2a93b;
-  --color-red: #e5484d;
+  --color-green: #10b981;
+  --color-amber: #f59e0b;
+  --color-red: #ef4444;
 
-  --radius-chip: 3px;
-  --radius-control: 10px;
+  /* Fintech Slate Palette */
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+  --color-slate-950: #020617;
+
+  /* Fintech Primary Blue Palette */
+  --color-blue-50: #eff6ff;
+  --color-blue-100: #dbeafe;
+  --color-blue-200: #bfdbfe;
+  --color-blue-500: #3b82f6;
+  --color-blue-600: #0070e0;
+  --color-blue-700: #1d4ed8;
+
+  /* Fintech Semantic Success */
+  --color-emerald-50: #ecfdf5;
+  --color-emerald-100: #d1fae5;
+  --color-emerald-200: #a7f3d0;
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857;
+
+  /* Fintech Semantic Warning */
+  --color-amber-50: #fffbeb;
+  --color-amber-100: #fef3c7;
+  --color-amber-200: #fde68a;
+  --color-amber-500: #f59e0b;
+  --color-amber-600: #d97706;
+  --color-amber-700: #b45309;
+
+  /* Fintech Semantic Danger */
+  --color-rose-50: #fff1f2;
+  --color-rose-100: #ffe4e6;
+  --color-rose-200: #fecdd3;
+  --color-rose-500: #f43f5e;
+  --color-rose-600: #e11d48;
+  --color-rose-700: #be123c;
+
+  --radius-chip: 4px;
+  --radius-control: 8px;
   --radius-tile: 12px;
-  --radius-card: 20px;
+  --radius-card: 16px;
 
   --ease-land: cubic-bezier(0.2, 0.9, 0.25, 1);
 

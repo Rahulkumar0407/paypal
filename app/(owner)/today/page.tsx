@@ -1,204 +1,255 @@
 import { Suspense } from "react";
-import type { Forecast, FixOption, RecoveryCandidate, Alert, RecurringPayee, Due } from "@/types";
-import { BanknotePanel, ButtonLink, Card, CardTitle, EmptyState, HeadlineSentence, NOTE_ROOM, StatusChip } from "@/components/ui";
-import { ChartSlot } from "@/components/app/ChartSlot";
-import { DetectedPayees } from "@/components/app/DetectedPayees";
-import { ExplainedPayees } from "@/components/app/ExplainedPayees";
+import Link from "next/link";
+import type { Forecast, Due, FixOption } from "@/types";
+import { ButtonLink } from "@/components/ui";
+import { UnifiedForecastChart } from "@/components/app/UnifiedForecastChart";
 import { ShortfallNote } from "@/components/app/ShortfallNote";
-import { FixOptions } from "@/components/app/FixOptions";
-import { ForecastStrip } from "@/components/app/ForecastStrip";
-import { UpcomingDues } from "@/components/app/UpcomingDues";
 import { duesInForecast } from "@/components/app/due-state";
 import { getVisitorStoreId } from "@/lib/demo";
-import { buildHeadline, getDues, getFixOptions, getForecast, getRecurringPayees } from "@/lib/forecast";
-import { findRecoveryCandidates } from "@/lib/recovery";
-import { getAlerts } from "@/lib/risk";
+import { getDues, getFixOptions, getForecast } from "@/lib/forecast";
 import { formatDay } from "@/lib/shared/dates";
-import { formatDollars } from "@/lib/shared/money";
-
-const CONFIDENCE_WORD = { high: "High confidence", medium: "Medium confidence", low: "Low confidence" } as const;
-const NOTE = "-mx-5 -mt-6 px-14 pt-24 pb-28 lg:-mx-12 lg:-mt-12 lg:px-24 lg:pt-[140px] lg:pb-[200px]";
+import { formatDollars, formatShortfall } from "@/lib/shared/money";
 
 interface HomeData {
-  storeId: string;
   forecast: Forecast;
   dues: Due[];
   fixes: FixOption[];
-  payees: RecurringPayee[];
-  candidates: RecoveryCandidate[];
-  alerts: Alert[];
 }
 
 async function load(): Promise<HomeData | null> {
   const storeId = await getVisitorStoreId();
   try {
-    const [forecast, dues, fixes, payees, candidates, alerts] = await Promise.all([
+    const [forecast, dues, fixes] = await Promise.all([
       getForecast(storeId),
       getDues(storeId),
       getFixOptions(storeId),
-      getRecurringPayees(storeId),
-      findRecoveryCandidates(storeId),
-      // Alerts are extras: if they fail, Today still shows the forecast.
-      getAlerts(storeId).catch(() => []),
     ]);
-    return { storeId, forecast, dues, fixes, payees, candidates, alerts };
+    return { forecast, dues, fixes };
   } catch (error) {
-    console.error("[home] could not load the forecast:", error instanceof Error ? error.message : error);
+    console.error("[home] could not load forecast:", error instanceof Error ? error.message : error);
     return null;
   }
 }
 
-/** Home: the money forecast on the banknote, the days you can tap, what's due, and what to do about it. */
+/**
+ * Minimal, world-class Overview for small business owners.
+ * Strict adherence to the 10-Second Rule:
+ * 1. How much cash is available?
+ * 2. Is there a future financial problem?
+ * 3. What should I do about it?
+ */
 export default async function HomePage() {
   const data = await load();
 
   if (!data) {
     return (
-      <BanknotePanel className={NOTE}>
-        <div role="alert" className="max-w-[560px] rounded-[14px] bg-brand p-6 ring-1 ring-white/25">
-          <p className="font-serif text-[1.9rem] leading-tight text-white">Couldn&apos;t work out your forecast.</p>
-          <p className="mt-3 text-[16px] leading-7 text-white/85">
-            Your money hasn&apos;t moved: nothing is paid or sent without passing NeverShort&apos;s safety check. Try again in a minute.
-          </p>
-          <div className="mt-5">
-            <ButtonLink href="/today" variant="secondary">
-              Try again
-            </ButtonLink>
-          </div>
+      <div className="max-w-xl mx-auto p-8 rounded-2xl bg-white border border-slate-200 text-center shadow-xs">
+        <h2 className="text-xl font-bold text-slate-900">Couldn&apos;t load financial status</h2>
+        <p className="mt-2 text-sm text-slate-500">
+          Your funds are completely safe. Retry in a moment.
+        </p>
+        <div className="mt-5">
+          <ButtonLink href="/today" variant="secondary">
+            Retry
+          </ButtonLink>
         </div>
-      </BanknotePanel>
+      </div>
     );
   }
 
-  const { storeId, forecast, dues, fixes, payees, candidates, alerts } = data;
-  const headline = buildHeadline(forecast);
+  const { forecast, dues, fixes } = data;
   const gap = forecast.firstShortfall;
-  const tight = forecast.days.find((d) => d.state === "tight");
   const upcoming = duesInForecast(dues, forecast);
-  const suggestion = payees.find((p) => p.status === "DETECTED" && p.kind === "SUPPLIER") ?? payees.find((p) => p.status === "DETECTED");
-  const recoverable = candidates.find((c) => c.contactConsent && c.remindersSentLast48h === 0);
   const startOn = gap?.date ?? forecast.days[0]?.date ?? forecast.asOf;
 
+  // Key Financial Figures
+  const availableCashCents = forecast.days[0]?.openingCents ?? 0;
+  const totalMoneyOutCents = forecast.days.reduce((sum, d) => sum + d.knownOutCents, 0);
+  const lowestDay = forecast.days.reduce(
+    (min, d) => (d.closingCents < min.closingCents ? d : min),
+    forecast.days[0] ?? { closingCents: 0, date: forecast.asOf, state: "covered" }
+  );
+
+  // Top Prioritized Fix
+  const topFix = fixes[0];
+
   return (
-    <div className="space-y-12 lg:space-y-16">
-      <BanknotePanel className={NOTE}>
-        <div className="space-y-6 lg:space-y-8">
-          <div className={`space-y-5 ${NOTE_ROOM}`}>
-            {gap ? (
-              <StatusChip state="short" inverse>
-                Short on {formatDay(gap.date)}
-              </StatusChip>
-            ) : tight ? (
-              <StatusChip state="tight" inverse>
-                Tight on {formatDay(tight.date)}
-              </StatusChip>
-            ) : (
-              <StatusChip state="covered" inverse>
-                Covered for the next two weeks
-              </StatusChip>
-            )}
-            <HeadlineSentence headline={headline} inverse />
-            {gap ? (
-              <Suspense fallback={null}>
-                <ShortfallNote forecast={forecast} />
-              </Suspense>
-            ) : null}
-            {gap ? (
-              <ButtonLink href="/fix" variant="secondary" className="min-h-12 px-5 text-[16px] font-semibold">
-                Fix the gap on {formatDay(gap.date)}
-              </ButtonLink>
-            ) : null}
+    <div className="space-y-6 max-w-[960px] mx-auto">
+      {/* ── 1. Top: One Concise Financial Status ── */}
+      {gap ? (
+        <section
+          aria-label="Cash status alert"
+          className="rounded-2xl border border-rose-200/90 bg-rose-50/60 p-5 sm:p-6 shadow-xs space-y-3"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-rose-800">
+              <span className="w-2 h-2 rounded-full bg-rose-600 animate-pulse" />
+              Cash Warning
+            </span>
+            <span className="text-xs font-mono font-bold text-rose-700 bg-white/80 px-2.5 py-0.5 rounded-full border border-rose-200">
+              Short by {formatShortfall(gap.amountCents)} on {formatDay(gap.date)}
+            </span>
           </div>
 
-          {/* The clear window: a calm surface over the engraving, so every number reads easily in daylight. */}
-          <div className="-mx-9 rounded-[14px] bg-brand p-3 ring-1 ring-white/20 sm:mx-0 sm:p-4 lg:p-6">
-            {forecast.days.length > 0 ? (
-              <ForecastStrip days={forecast.days} initialDate={startOn} minimumBalanceCents={forecast.minimumBalanceCents} />
-            ) : (
-              <p className="text-[16px] leading-7 text-white">
-                No forecast yet. It starts as soon as a week of sales is in, and fills in day by day.
-              </p>
-            )}
-            <p className="mt-5 max-w-[70ch] text-[13px] leading-5 text-white/80">
-              Balance at the end of each day, after expected sales and known payments. {CONFIDENCE_WORD[forecast.confidence]}:{" "}
-              {forecast.confidenceReason.charAt(0).toLowerCase() + forecast.confidenceReason.slice(1)}
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-serif font-black text-slate-900 tracking-tight">
+              You may fall {formatShortfall(gap.amountCents)} below your cash reserve next {formatDay(gap.date)}.
+            </h1>
+            <Suspense fallback={null}>
+              <ShortfallNote forecast={forecast} className="text-sm text-slate-600 mt-1 leading-relaxed" />
+            </Suspense>
+          </div>
+        </section>
+      ) : (
+        <section
+          aria-label="Cash status safe"
+          className="rounded-2xl border border-emerald-200/90 bg-emerald-50/50 p-5 sm:p-6 shadow-xs space-y-1.5"
+        >
+          <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-emerald-800">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            Cash Position Healthy
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-serif font-black text-slate-900 tracking-tight">
+            Your cash is covered for the next two weeks.
+          </h1>
+          <p className="text-sm text-slate-600">
+            All scheduled obligations are fully covered by incoming PayPal revenues.
+          </p>
+        </section>
+      )}
+
+      {/* ── 2. Below: Three Essential Financial Metrics ── */}
+      <section aria-label="Essential metrics" className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+        <div className="bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-xs">
+          <span className="text-xs font-medium text-slate-500 block">
+            Available Cash Today
+          </span>
+          <div className="text-2xl sm:text-3xl font-serif font-black text-slate-900 mt-1">
+            {formatDollars(availableCashCents)}
+          </div>
+          <p className="text-xs text-slate-400 mt-0.5">
+            Settled in PayPal account
+          </p>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-xs">
+          <span className="text-xs font-medium text-slate-500 block">
+            Lowest Projected Balance
+          </span>
+          <div
+            className={`text-2xl sm:text-3xl font-serif font-black mt-1 ${
+              lowestDay.state === "short" ? "text-rose-600" : "text-slate-900"
+            }`}
+          >
+            {formatDollars(lowestDay.closingCents)}
+          </div>
+          <p className="text-xs text-slate-400 mt-0.5">
+            On {formatDay(lowestDay.date)} • Reserve {formatDollars(forecast.minimumBalanceCents)}
+          </p>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-xs">
+          <span className="text-xs font-medium text-slate-500 block">
+            Upcoming Obligations (14d)
+          </span>
+          <div className="text-2xl sm:text-3xl font-serif font-black text-slate-900 mt-1">
+            {formatDollars(totalMoneyOutCents)}
+          </div>
+          <p className="text-xs text-slate-400 mt-0.5">
+            Across {dues.length} scheduled payments
+          </p>
+        </div>
+      </section>
+
+      {/* ── 3. Middle: ONE Clean, Interactive 14-Day Cash-Flow Chart ── */}
+      <UnifiedForecastChart
+        days={forecast.days}
+        minimumBalanceCents={forecast.minimumBalanceCents}
+        initialDate={startOn}
+      />
+
+      {/* ── 4. Below Chart: ONE Important Recommendation with a Clear Action ── */}
+      {gap && topFix && (
+        <section
+          aria-label="Recommended action"
+          className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+        >
+          <div className="space-y-1">
+            <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider block">
+              Recommended Fix
+            </span>
+            <h2 className="text-base sm:text-lg font-semibold text-slate-900">
+              {topFix.title}
+            </h2>
+            <p className="text-xs text-slate-500 max-w-xl leading-relaxed">
+              Covering the {formatShortfall(gap.amountCents)} shortfall on {formatDay(gap.date)} brings your projected closing balance to{" "}
+              <strong className="text-slate-900 font-semibold">{formatDollars(topFix.resultingClosingCents)}</strong> without borrowing.
             </p>
           </div>
-        </div>
-      </BanknotePanel>
+          <Link
+            href="/fix"
+            className="shrink-0 inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-colors shadow-xs"
+          >
+            Fix the Gap →
+          </Link>
+        </section>
+      )}
 
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-14">
-        <div className="space-y-10">
-          <section aria-labelledby="dues-title" className="rounded-card bg-paper p-5 ring-1 ring-ink/[0.06] lg:p-6">
-            <div className="flex items-baseline justify-between gap-4">
-              <h2 id="dues-title" className="text-[20px] leading-7 font-semibold text-ink">
-                Coming up
-              </h2>
-              <ButtonLink href="/dues" variant="quiet">
-                See everything to pay
-              </ButtonLink>
-            </div>
-            <p className="text-[15px] text-ink-muted">Payments in the next two weeks, and how much of each is ready.</p>
-            {upcoming.length > 0 ? (
-              <UpcomingDues items={upcoming} />
-            ) : (
-              <div className="mt-4">
-                <EmptyState title="Nothing due in the next two weeks." body="Bills and supplier orders show up here as soon as they're found in your payments." />
-              </div>
-            )}
-          </section>
-          <ChartSlot forecast={forecast} />
+      {/* ── 5. Bottom: A Compact List of Upcoming Bills ── */}
+      <section
+        aria-labelledby="upcoming-bills-title"
+        className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-xs space-y-4"
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 id="upcoming-bills-title" className="text-base font-semibold text-slate-900">
+              Approaching Payments
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Bills and supplier orders due in the next 14 days.
+            </p>
+          </div>
+          <Link
+            href="/dues"
+            className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+          >
+            See all payments →
+          </Link>
         </div>
 
-        <aside className="space-y-5">
-          {gap && fixes.length > 0 ? (
-            <section id="fix-the-gap" className="scroll-mt-6">
-              <Card>
-                <CardTitle>
-                  {fixes.length === 3 ? "Three" : fixes.length === 2 ? "Two" : "One"} ways to cover {formatDay(gap.date)}
-                </CardTitle>
-                <p className="mt-1 mb-4 text-[15px] leading-6 text-ink-muted">Pick one. NeverShort&apos;s safety check looks at it before anything happens.</p>
-                <FixOptions fixes={fixes} />
-                <div className="mt-4">
-                  <ButtonLink href="/fix" variant="secondary">
-                    Compare the fixes
-                  </ButtonLink>
+        <ul className="divide-y divide-slate-100">
+          {upcoming.slice(0, 4).map(({ due, state }) => {
+            const isShort = state === "short";
+            return (
+              <li key={due.id} className="py-3 flex items-center justify-between gap-3 text-sm">
+                <div>
+                  <span className="font-medium text-slate-900 block truncate max-w-[240px] sm:max-w-md">
+                    {due.payeeName}
+                  </span>
+                  <span className="text-xs text-slate-400">
+                    Due {formatDay(due.dueOn)}
+                  </span>
                 </div>
-              </Card>
-            </section>
-          ) : null}
 
-          {suggestion ? (
-            <section aria-label="A regular payment we found">
-              <Suspense fallback={<DetectedPayees payees={[suggestion]} />}>
-                <ExplainedPayees storeId={storeId} payees={[suggestion]} />
-              </Suspense>
-            </section>
-          ) : null}
-
-          {recoverable ? (
-            <Card>
-              <p className="text-[13px] text-ink-muted">Found in unfinished checkouts</p>
-              <p className="mt-1 text-[17px] leading-6 text-ink">
-                {recoverable.customerName} left {formatDollars(recoverable.amountCents)} in the cart on {formatDay(recoverable.lastActivityOn)}. We
-                drafted a reminder with a new PayPal payment link; it gets a quick safety check before it&apos;s sent.
-              </p>
-              <div className="mt-4">
-                <ButtonLink href="/approvals" variant="secondary">
-                  See the reminder
-                </ButtonLink>
-              </div>
-            </Card>
-          ) : null}
-
-          {alerts.map((alert) => (
-            <Card key={alert.id} tone="outline">
-              <p className="text-[16px] leading-6 font-semibold text-ink">{alert.title}</p>
-              <p className="mt-1 text-[15px] leading-6 text-ink-muted">{alert.detail}</p>
-            </Card>
-          ))}
-        </aside>
-      </div>
+                <div className="text-right">
+                  <span className="font-mono font-bold text-slate-900 block">
+                    {formatDollars(due.amountCents)}
+                  </span>
+                  <span
+                    className={`inline-block text-[10px] font-semibold px-2 py-0.2 rounded-full ${
+                      isShort
+                        ? "bg-rose-100 text-rose-700"
+                        : "bg-emerald-100 text-emerald-800"
+                    }`}
+                  >
+                    {isShort ? "Needs Attention" : "Covered"}
+                  </span>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
     </div>
   );
 }

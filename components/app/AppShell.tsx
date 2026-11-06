@@ -1,53 +1,125 @@
 import Link from "next/link";
 import { formatDayWithYear, weekdayShort } from "@/lib/shared/dates";
-import { MatBackdrop } from "@/components/ui/Paper";
 import { BottomNav, SideNav } from "./NavLinks";
 
-/** Each screw on the till sits at its own angle. */
-const turn = (deg: number) => ({ "--turn": `${deg}deg` }) as React.CSSProperties;
-
 /**
- * The owner's app frame, a shopkeeper's money desk. On a laptop: the till on the left (a screwed-down panel with the
- * name, a display window showing the shop and today's date, and the register keys) and a green counting mat on the
- * right that every page lies on. On a phone the mat fills the screen and the keys run along the bottom.
+ * Modern, world-class fintech AppShell for NeverShort.
+ * Clean, light neutral background (#F8FAFC), crisp white surfaces,
+ * sophisticated typography, clear hierarchical navigation, and an intuitive mobile PWA model.
  */
-export function AppShell({ today, storeName, children }: { today: string; storeName: string; children: React.ReactNode }) {
+export function AppShell({
+  today,
+  storeName,
+  children,
+}: {
+  today: string;
+  storeName: string;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="mat relative isolate min-h-dvh lg:grid lg:grid-cols-[264px_minmax(0,1fr)]">
-      <MatBackdrop />
-      <aside className="sticky top-0 hidden h-dvh p-2.5 pr-0 lg:block">
-        <div className="till-body relative flex h-full flex-col rounded-[20px] px-5 pt-7 pb-5">
-          <span aria-hidden className="screw top-2.5 left-2.5" style={turn(35)} />
-          <span aria-hidden className="screw top-2.5 right-2.5" style={turn(-20)} />
-          <span aria-hidden className="screw bottom-2.5 left-2.5" style={turn(80)} />
-          <span aria-hidden className="screw right-2.5 bottom-2.5" style={turn(10)} />
-          <Link href="/today" className="block px-1">
-            <span className="block font-serif text-[30px] leading-none text-ink">NeverShort</span>
-          </Link>
-          <div className="till-display mt-5 px-4 py-3">
-            <p className="text-[11px] font-semibold tracking-[0.14em] text-ink-muted uppercase">{storeName}</p>
-            <p className="mt-1 font-serif text-[22px] leading-none text-ink tabular">
-              {weekdayShort(today)} {formatDayWithYear(today).split(" ").slice(1, 3).join(" ")}
-            </p>
+    <div className="min-h-dvh bg-slate-50 text-slate-900 font-sans selection:bg-blue-600 selection:text-white lg:grid lg:grid-cols-[260px_minmax(0,1fr)]">
+      {/* ── Modern Desktop Sidebar (Sticky, Left) ── */}
+      <aside className="sticky top-0 hidden h-dvh border-r border-slate-200/80 bg-white p-5 lg:flex lg:flex-col justify-between">
+        <div className="flex flex-col gap-6">
+          {/* Brand Header */}
+          <div className="flex items-center justify-between">
+            <Link href="/today" className="flex items-center gap-2.5 group">
+              <span className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-black text-base shadow-sm group-hover:bg-blue-700 transition-colors">
+                N
+              </span>
+              <div className="flex flex-col">
+                <span className="font-serif font-black text-xl leading-none text-slate-900 tracking-tight">
+                  NeverShort
+                </span>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold mt-0.5">
+                  Cash Co-pilot
+                </span>
+              </div>
+            </Link>
           </div>
-          <div className="mt-7 flex flex-1 flex-col">
-            <SideNav />
+
+          {/* Connected Store & Demo Clock Display */}
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70 flex flex-col gap-1">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-mono uppercase font-bold text-slate-500 tracking-wider">
+                Connected Store
+              </span>
+              <span className="flex items-center gap-1.5 text-[10px] font-mono text-emerald-600 font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Live
+              </span>
+            </div>
+            <div className="font-serif font-bold text-base text-slate-900 truncate">
+              {storeName}
+            </div>
+            <div className="text-xs font-mono text-slate-500">
+              {weekdayShort(today)} {formatDayWithYear(today).split(" ").slice(1, 3).join(" ")}
+            </div>
+          </div>
+
+          {/* Navigation Links */}
+          <SideNav />
+        </div>
+
+        {/* Bottom System Status */}
+        <div className="pt-4 border-t border-slate-200/80 flex flex-col gap-2">
+          <Link
+            href="/demo"
+            className="flex items-center justify-between p-2.5 rounded-xl bg-blue-50 border border-blue-200/60 text-blue-700 text-xs font-medium hover:bg-blue-100 transition-colors group"
+          >
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-blue-600" />
+              <span className="font-semibold">Demo Guide</span>
+            </div>
+            <span className="text-[10px] font-mono uppercase font-bold text-blue-600/80 group-hover:translate-x-0.5 transition-transform">
+              Walkthrough →
+            </span>
+          </Link>
+
+          <div className="px-2 py-1 text-[11px] font-mono text-slate-500 flex items-center justify-between">
+            <span>PayPal Sandbox</span>
+            <span className="text-emerald-700 font-semibold">Ready</span>
           </div>
         </div>
       </aside>
 
-      <div className="min-w-0 lg:p-2.5">
+      {/* ── Main Content Area ── */}
+      <div className="min-w-0 flex flex-col min-h-dvh">
         <DemoBanner today={today} />
-        <header className="flex items-baseline justify-between px-5 pt-5 lg:hidden">
-          <Link href="/today" className="font-serif text-[26px] leading-none text-ink">
-            NeverShort
+
+        {/* Mobile Header */}
+        <header className="sticky top-0 z-30 flex items-center justify-between px-5 py-3.5 bg-white/95 backdrop-blur border-b border-slate-200/80 lg:hidden">
+          <Link href="/today" className="flex items-center gap-2">
+            <span className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-black text-sm">
+              N
+            </span>
+            <span className="font-serif font-black text-xl leading-none text-slate-900">
+              NeverShort
+            </span>
           </Link>
-          <span className="text-[13px] font-semibold tracking-[0.12em] text-ink-muted uppercase">{storeName}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-bold border border-slate-200">
+              {storeName}
+            </span>
+            <Link
+              href="/demo"
+              className="text-xs font-mono px-2.5 py-1 rounded-lg bg-blue-600 text-white font-bold"
+            >
+              Demo
+            </Link>
+          </div>
         </header>
-        <main id="main" className="mx-auto w-full max-w-[1160px] px-5 pt-6 pb-32 lg:px-12 lg:pt-12 lg:pb-20">
+
+        {/* Main View Container */}
+        <main
+          id="main"
+          className="flex-1 w-full max-w-[1020px] mx-auto px-4 sm:px-8 py-6 sm:py-8 pb-28 lg:pb-12 space-y-6"
+        >
           {children}
         </main>
       </div>
+
+      {/* Mobile Bottom Navigation Bar */}
       <BottomNav />
     </div>
   );
@@ -55,22 +127,33 @@ export function AppShell({ today, storeName, children }: { today: string; storeN
 
 export function DemoBanner({ today }: { today: string }) {
   return (
-    <div className="bg-brand px-5 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-2 text-[13px] leading-5 text-white lg:rounded-t-[22px] lg:px-12">
-      <p className="mx-auto flex max-w-[1160px] flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
-        <span>
-          Sample shop. In this demo, today is {formatDayWithYear(today)}.
-          <span className="hidden sm:inline"> Past sales are made up; payments use PayPal&apos;s test mode.</span>
-        </span>
-        <span className="flex gap-x-4">
-          <Link href="/try" className="font-medium underline decoration-white/40 underline-offset-4 hover:decoration-white">
-            <span className="sm:hidden">Your numbers</span>
-            <span className="hidden sm:inline">Try your own numbers</span>
+    <div className="bg-slate-900 px-4 sm:px-8 py-2.5 text-xs text-white border-b border-slate-800">
+      <div className="max-w-[1200px] mx-auto flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+        <div className="flex items-center gap-2 text-slate-300">
+          <span className="inline-block w-2 h-2 rounded-full bg-blue-400" />
+          <span>
+            Demo Mode: Today is <strong className="text-white font-semibold">{formatDayWithYear(today)}</strong>.
+          </span>
+          <span className="hidden md:inline text-slate-400">
+            Simulated Loop Audio boutique. Payments operate in PayPal Sandbox.
+          </span>
+        </div>
+        <div className="flex items-center gap-3 font-mono">
+          <Link
+            href="/try"
+            className="text-slate-300 hover:text-white underline underline-offset-2 transition-colors"
+          >
+            Try Your Numbers
           </Link>
-          <Link href="/demo" className="font-medium underline decoration-white/40 underline-offset-4 hover:decoration-white">
-            Demo guide
+          <span className="text-slate-600">•</span>
+          <Link
+            href="/demo"
+            className="text-blue-400 hover:text-blue-300 font-bold transition-colors"
+          >
+            Demo Guide →
           </Link>
-        </span>
-      </p>
+        </div>
+      </div>
     </div>
   );
 }
