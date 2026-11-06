@@ -4,6 +4,7 @@
  */
 import { cookies } from "next/headers";
 import type { DemoStoreStatus, StoreId } from "@/types";
+import { getCurrentUser } from "@/lib/auth";
 import { getDb, isDatabaseConfigured } from "@/lib/shared/db";
 import { isStoreId, LOCAL_STORE_ID, STORE_COOKIE } from "@/lib/shared/visitor";
 import {
@@ -43,6 +44,13 @@ export async function createRealMerchantStore(
  * A failure is left to the layout to report; the page then renders from what's there.
  */
 export async function getVisitorStoreId(): Promise<StoreId> {
+  // 1. Authenticated merchant check: if user is signed in, return their authorized store
+  const user = await getCurrentUser();
+  if (user && user.stores.length > 0 && user.stores[0]) {
+    return user.stores[0].storeId;
+  }
+
+  // 2. Demo simulation fallback: visitor cookie for unauthenticated sandbox walkthrough
   const jar = await cookies();
   const value = jar.get(STORE_COOKIE)?.value;
   const storeId = isStoreId(value) ? value : LOCAL_STORE_ID;

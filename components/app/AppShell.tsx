@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { formatDayWithYear, weekdayShort } from "@/lib/shared/dates";
+import { logoutAction } from "@/lib/auth";
 import { BottomNav, SideNav } from "./NavLinks";
 
 /**
@@ -11,11 +12,13 @@ export function AppShell({
   today,
   storeName,
   isDemo = true,
+  user = null,
   children,
 }: {
   today: string;
   storeName: string;
   isDemo?: boolean;
+  user?: { email: string; name: string } | null;
   children: React.ReactNode;
 }) {
   return (
@@ -97,6 +100,30 @@ export function AppShell({
             <span>PayPal Sandbox</span>
             <span className="text-emerald-700 font-semibold">Ready</span>
           </div>
+
+          {user ? (
+            <div className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200/70 text-xs">
+              <div className="truncate min-w-0 pr-2">
+                <div className="font-semibold text-slate-900 truncate">{user.name}</div>
+                <div className="text-[10px] text-slate-500 truncate">{user.email}</div>
+              </div>
+              <form action={logoutAction}>
+                <button
+                  type="submit"
+                  className="text-[11px] font-semibold text-rose-600 hover:text-rose-700 underline"
+                >
+                  Sign out
+                </button>
+              </form>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between px-2 py-1 text-xs text-slate-500 border-t border-slate-100 pt-2">
+              <span>Merchant Account</span>
+              <Link href="/login" className="font-semibold text-blue-600 hover:text-blue-700">
+                Sign in →
+              </Link>
+            </div>
+          )}
         </div>
       </aside>
 

@@ -1,6 +1,7 @@
 import { after } from "next/server";
 import { AppShell } from "@/components/app/AppShell";
 import { agentsHaveRun, runAgents } from "./agents";
+import { getCurrentUser } from "@/lib/auth";
 import { ensureStore, getVisitorStoreId } from "@/lib/demo";
 import { getStoreSettings } from "@/lib/store";
 import { today } from "@/lib/shared/clock";
@@ -8,6 +9,7 @@ import { today } from "@/lib/shared/clock";
 /** Every owner page: makes sure this visitor's store exists, reads real settings, then draws the shell. */
 export default async function OwnerLayout({ children }: { children: React.ReactNode }) {
   const storeId = await getVisitorStoreId();
+  const user = await getCurrentUser();
   let storeName = "Loop Audio";
   let isDemo = true;
 
@@ -25,7 +27,12 @@ export default async function OwnerLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <AppShell today={today()} storeName={storeName} isDemo={isDemo}>
+    <AppShell
+      today={today()}
+      storeName={storeName}
+      isDemo={isDemo}
+      user={user ? { email: user.email, name: user.name } : null}
+    >
       {children}
     </AppShell>
   );
