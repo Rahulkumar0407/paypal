@@ -38,6 +38,7 @@ export interface StoreSettings {
   whatYouSell: string;
   supplierPaymentMethod: "PAYPAL_PAYOUTS" | "BANK_TRANSFER" | "CARD";
   busySeasons: string[];
+  isDemo?: boolean;
 }
 
 export interface Product {

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { getCurrentUser, requireAuthenticatedUser } from "@/lib/auth";
 import { createRealMerchantStore, getVisitorStoreId, resetStoreWith } from "@/lib/demo";
 import { getDb } from "@/lib/shared/db";
 
@@ -32,7 +33,8 @@ export async function submitMerchantOnboarding(
   _prev: OnboardingState,
   formData: FormData
 ): Promise<OnboardingState> {
-  const storeId = await getVisitorStoreId();
+  const user = await requireAuthenticatedUser();
+  const storeId = user.stores[0]?.storeId ?? (await getVisitorStoreId());
   const raw = {
     name: formData.get("name")?.toString() ?? "",
     whatYouSell: formData.get("whatYouSell")?.toString() ?? "",
@@ -80,6 +82,13 @@ export async function submitMerchantOnboarding(
 }
 
 export async function resetToDemoSimulation(): Promise<{ ok: boolean; message: string }> {
+  const user = await getCurrentUser();
+  if (user) {
+    return {
+      ok: false,
+      message: "Signed-in merchant accounts cannot be overwritten with demo simulation data.",
+    };
+  }
   const storeId = await getVisitorStoreId();
   try {
     await resetStoreWith(getDb(), storeId);

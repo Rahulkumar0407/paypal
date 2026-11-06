@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { requireAuthenticatedUser } from "@/lib/auth";
 import { getVisitorStoreId } from "@/lib/demo";
 import { getStoreSettings } from "@/lib/store";
 import { OnboardingForm } from "@/components/app/OnboardingForm";
@@ -8,9 +9,10 @@ export const metadata: Metadata = {
 };
 
 export default async function OnboardingPage() {
+  await requireAuthenticatedUser();
   const storeId = await getVisitorStoreId();
   const settings = await getStoreSettings(storeId);
-  const isDemo = settings.name === "Loop Audio";
+  const isDemo = settings.isDemo ?? false;
 
   return (
     <div className="space-y-6 max-w-[780px] mx-auto py-2">

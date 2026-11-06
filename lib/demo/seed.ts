@@ -318,6 +318,7 @@ export function buildDemoSeed(storeId: StoreId, today: IsoDate, demoRunId: strin
     supplierPaymentMethod: "PAYPAL_PAYOUTS",
     busySeasons: [...DEMO_STORE_SETTINGS.busySeasons],
     demoRunId,
+    isDemo: true,
   };
 
   return { store, products, customers, payees, orders, orderItems, ledgerEntries, dues };

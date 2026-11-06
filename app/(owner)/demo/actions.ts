@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { forgetAgents, runAgents } from "../agents";
 import { getVisitorStoreId, resetStore } from "@/lib/demo";
-import { isDatabaseConfigured } from "@/lib/shared/db";
+import { getDb, isDatabaseConfigured } from "@/lib/shared/db";
 
 export type ResetResult = { status: "idle" } | { status: "done"; runId: string } | { status: "failed"; message: string };
 
@@ -16,6 +16,17 @@ export async function resetMyCopy(previous: ResetResult): Promise<ResetResult> {
   }
   const storeId = await getVisitorStoreId();
   try {
+    const store = await getDb().store.findUnique({
+      where: { id: storeId },
+      select: { isDemo: true },
+    });
+    if (store && !store.isDemo) {
+      return {
+        status: "failed",
+        message: "Real merchant production accounts cannot be overwritten by demo resets.",
+      };
+    }
+
     const runId = await resetStore(storeId);
     forgetAgents(storeId);
     after(() => runAgents(storeId));

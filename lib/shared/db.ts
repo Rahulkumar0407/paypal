@@ -1,6 +1,7 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/prisma/client";
 import { getEnv } from "./env";
+import { SUPABASE_CA_PEM } from "./supabase-ca";
 
 /**
  * The single Prisma client for the app (server code only).
@@ -32,9 +33,14 @@ export function createPrismaClient(connectionString: string): PrismaClient {
   const sslInUrl = /[?&]sslmode=/.test(connectionString);
   const adapter = new PrismaPg({
     connectionString,
-    // Supabase requires TLS. Its pooler certificate is not in Node's default trust store,
-    // so verify encryption but not the chain, unless the URL sets sslmode itself.
-    ssl: sslInUrl || isLocalHost(connectionString) ? undefined : { rejectUnauthorized: false },
+    // Production Grade Strict TLS Verification:
+    // Uses trusted Supabase Root & Intermediate CA bundle with rejectUnauthorized: true.
+    ssl: sslInUrl || isLocalHost(connectionString)
+      ? undefined
+      : {
+          rejectUnauthorized: true,
+          ca: SUPABASE_CA_PEM,
+        },
     // Ten connections: a page's forecast reads ~10 small queries at once, so they go in one wave, not two.
     max: 10,
     connectionTimeoutMillis: 8_000,

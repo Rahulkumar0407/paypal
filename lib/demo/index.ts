@@ -4,7 +4,7 @@
  */
 import { cookies } from "next/headers";
 import type { DemoStoreStatus, StoreId } from "@/types";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, TenantAccessDeniedError } from "@/lib/auth";
 import { getDb, isDatabaseConfigured } from "@/lib/shared/db";
 import { isStoreId, LOCAL_STORE_ID, STORE_COOKIE } from "@/lib/shared/visitor";
 import {
@@ -54,6 +54,27 @@ export async function getVisitorStoreId(): Promise<StoreId> {
   const jar = await cookies();
   const value = jar.get(STORE_COOKIE)?.value;
   const storeId = isStoreId(value) ? value : LOCAL_STORE_ID;
+
+  // 3. Mandatory Tenant Protection Gate:
+  // If this storeId already exists in database, verify that it is NOT a real merchant store.
+  // Unauthenticated visitors holding a real merchant's storeId are denied immediately.
+  if (isDatabaseConfigured()) {
+    try {
+      const store = await getDb().store.findUnique({
+        where: { id: storeId },
+        select: { isDemo: true },
+      });
+      if (store && !store.isDemo) {
+        throw new TenantAccessDeniedError(
+          "Unauthenticated access to real merchant data is strictly prohibited."
+        );
+      }
+    } catch (err) {
+      if (err instanceof TenantAccessDeniedError) throw err;
+      // Allow database connectivity retries to proceed to ensureStore
+    }
+  }
+
   await ensureStore(storeId).catch(() => null);
   return storeId;
 }

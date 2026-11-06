@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb, isDatabaseConfigured } from "@/lib/shared/db";
 import { today } from "@/lib/shared/clock";
+import { getBuildCommitSha } from "@/lib/shared/version";
 
 /**
  * Health check. Owner: Person 1.
@@ -13,7 +14,7 @@ export const dynamic = "force-dynamic";
 const NO_STORE = { "Cache-Control": "no-store" };
 
 async function check() {
-  const base = { demoToday: today() };
+  const base = { demoToday: today(), buildCommit: getBuildCommitSha() };
   if (!isDatabaseConfigured()) {
     return NextResponse.json({ ok: false, ...base, database: "not configured" }, { status: 503, headers: NO_STORE });
   }

@@ -103,5 +103,6 @@ export async function getStoreSettings(storeId: StoreId): Promise<StoreSettings>
     whatYouSell: s.whatYouSell,
     supplierPaymentMethod: s.supplierPaymentMethod,
     busySeasons: s.busySeasons,
+    isDemo: s.isDemo,
   };
 }

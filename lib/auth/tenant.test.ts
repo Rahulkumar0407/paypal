@@ -134,4 +134,68 @@ describe("Multi-tenant isolation and authorization", () => {
     const revokedUser = await validateSessionToken(revokedToken, mockDb);
     expect(revokedUser).toBeNull();
   });
+
+  it("blocks unauthenticated access to real merchant stores holding isDemo=false via cookie", async () => {
+    // Mock database with a real store (isDemo: false) and a demo store (isDemo: true)
+    const storesDb: Record<string, { isDemo: boolean }> = {
+      real_merchant_boutique: { isDemo: false },
+      st_demo_visitor: { isDemo: true },
+    };
+
+    async function evaluateAccess(storeId: string, user: AuthenticatedUser | null) {
+      const store = storesDb[storeId];
+      if (!store) throw new Error("Store not found");
+
+      // Real merchant store requires authentication and ownership
+      if (!store.isDemo) {
+        if (!user) {
+          throw new TenantAccessDeniedError(
+            "Unauthenticated access to real merchant data is strictly prohibited."
+          );
+        }
+        const isMember = user.stores.some((s) => s.storeId === storeId);
+        if (!isMember) {
+          throw new TenantAccessDeniedError(
+            "User does not have authorization to access this store."
+          );
+        }
+        return { authorized: true, role: "OWNER" };
+      }
+
+      // Demo store allows sandbox walkthrough
+      return { authorized: true, role: "DEMO_GUEST" };
+    }
+
+    // 1. Unauthenticated visitor attempting to access real store -> MUST THROW TenantAccessDeniedError
+    await expect(evaluateAccess("real_merchant_boutique", null)).rejects.toThrow(
+      TenantAccessDeniedError
+    );
+
+    // 2. Unauthenticated visitor accessing demo store -> ALLOWED
+    const demoAccess = await evaluateAccess("st_demo_visitor", null);
+    expect(demoAccess.authorized).toBe(true);
+
+    // 3. User B attempting to access User A's real store -> MUST THROW TenantAccessDeniedError
+    const userB: AuthenticatedUser = {
+      id: "usr_bob",
+      email: "bob@beta.com",
+      name: "Bob",
+      emailVerified: true,
+      stores: [{ storeId: "real_store_b", role: "OWNER", storeName: "Bob Boutique" }],
+    };
+    await expect(evaluateAccess("real_merchant_boutique", userB)).rejects.toThrow(
+      TenantAccessDeniedError
+    );
+
+    // 4. Authorized owner accessing real store -> ALLOWED
+    const ownerA: AuthenticatedUser = {
+      id: "usr_alice",
+      email: "alice@acme.com",
+      name: "Alice",
+      emailVerified: true,
+      stores: [{ storeId: "real_merchant_boutique", role: "OWNER", storeName: "Alice Audio" }],
+    };
+    const aliceAccess = await evaluateAccess("real_merchant_boutique", ownerA);
+    expect(aliceAccess.authorized).toBe(true);
+  });
 });

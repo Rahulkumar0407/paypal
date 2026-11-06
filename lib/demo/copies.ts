@@ -66,6 +66,7 @@ export async function createRealMerchantStoreWith(
         supplierPaymentMethod: "PAYPAL_PAYOUTS",
         busySeasons: [],
         demoRunId: runId,
+        isDemo: false,
       },
     });
   }, TX_OPTIONS);

@@ -17,7 +17,7 @@ export default async function OwnerLayout({ children }: { children: React.ReactN
     const copy = await ensureStore(storeId);
     const settings = await getStoreSettings(storeId);
     storeName = settings.name;
-    isDemo = settings.name === "Loop Audio";
+    isDemo = settings.isDemo ?? (settings.name === "Loop Audio");
 
     // Once the page is sent, let the reminder helper and the risk check do their round, so Approvals is ready.
     if (copy !== null && !agentsHaveRun(storeId)) after(() => runAgents(storeId));
