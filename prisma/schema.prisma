@@ -29,6 +29,8 @@ model Store {
   tightMarginCents      Int
   openingBalanceCents   Int // balance at the start of openingBalanceOn
   openingBalanceOn      String // 'YYYY-MM-DD', first day of the simulated history
+  openingBalanceSource  String    @default("USER")
+  openingBalanceUpdatedAt DateTime?
   whatYouSell           String
   supplierPaymentMethod SupplierPaymentMethod @default(PAYPAL_PAYOUTS)
   busySeasons           String[]
@@ -55,6 +57,7 @@ model Store {
   webhookEvents WebhookEvent[]
   payments      PaymentAttempt[]
   memberships   UserStore[]
+  auditEvents   FinancialAuditEvent[]
 
   @@index([lastSeenAt])
 }
@@ -72,8 +75,10 @@ model User {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
-  sessions    Session[]
-  memberships UserStore[]
+  sessions           Session[]
+  memberships        UserStore[]
+  verificationTokens EmailVerificationToken[]
+  resetTokens        PasswordResetToken[]
 
   @@index([email])
 }
@@ -230,23 +235,29 @@ enum LedgerCategory {
 }
 
 model LedgerEntry {
-  id          String         @id
-  storeId     String
-  occurredOn  String // 'YYYY-MM-DD'
-  direction   Direction
-  amountCents Int // always positive; direction gives the sign
-  category    LedgerCategory
-  description String
-  payeeId     String?
-  orderId     String?
-  paypalRef   String?
-  simulated   Boolean        @default(false)
+  id            String         @id
+  storeId       String
+  occurredOn    String // 'YYYY-MM-DD'
+  direction     Direction
+  amountCents   Int // always positive; direction gives the sign
+  category      LedgerCategory
+  description   String
+  payeeId       String?
+  orderId       String?
+  paypalRef     String?
+  simulated     Boolean        @default(false)
+  // Provenance: USER (typed by owner), IMPORT (CSV/file), PROVIDER (PayPal etc.), FORECAST (estimated), SIMULATED
+  source        String         @default("USER")
+  sourceDetail  String? // file name, provider ref, or human note
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 
   store Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
   payee Payee? @relation(fields: [payeeId], references: [id], onDelete: Cascade)
   order Order? @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@index([storeId, occurredOn])
+  @@index([storeId, source])
 }
 
 enum PayeeKind {
@@ -282,12 +293,17 @@ model Payee {
   weekday            Int? // EVERY_N_WEEKS: 0 = Sunday
   dayOfMonth         Int? // MONTHLY
   paypalEmail        String? // for Payouts (PAY_SUPPLIER)
+  source             String      @default("USER")
+  sourceDetail       String?
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
 
   store         Store         @relation(fields: [storeId], references: [id], onDelete: Cascade)
   dues          Due[]
   ledgerEntries LedgerEntry[]
 
   @@index([storeId])
+  @@index([storeId, source])
 }
 
 enum DueStatus {
@@ -298,19 +314,24 @@ enum DueStatus {
 }
 
 model Due {
-  id          String    @id
-  storeId     String
-  payeeId     String
-  dueOn       String // 'YYYY-MM-DD'
-  amountCents Int
-  status      DueStatus @default(SCHEDULED)
-  movedFromOn String? // set when a MOVE_PAYMENT ran (simulated)
-  simulated   Boolean   @default(false)
+  id           String    @id
+  storeId      String
+  payeeId      String
+  dueOn        String // 'YYYY-MM-DD'
+  amountCents  Int
+  status       DueStatus @default(SCHEDULED)
+  movedFromOn  String? // set when a MOVE_PAYMENT ran (simulated)
+  simulated    Boolean   @default(false)
+  source       String    @default("USER")
+  sourceDetail String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
   payee Payee @relation(fields: [payeeId], references: [id], onDelete: Cascade)
 
   @@index([storeId, dueOn])
+  @@index([storeId, source])
 }
 
 // ---------------------------------------------------------------------------
@@ -528,4 +549,54 @@ model WebhookEvent {
   store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
   @@index([storeId])
+}
+
+// ---------------------------------------------------------------------------
+// Email verification and password reset tokens
+// ---------------------------------------------------------------------------
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// Audit trail for critical financial changes
+// ---------------------------------------------------------------------------
+
+model FinancialAuditEvent {
+  id         String   @id @default(cuid())
+  storeId    String
+  entityType String
+  entityId   String
+  action     String
+  actor      String
+  before     Json?
+  after      Json?
+  createdAt  DateTime @default(now())
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId, createdAt])
 }

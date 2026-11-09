@@ -56,14 +56,32 @@ export async function submitMerchantOnboarding(
   const { name, whatYouSell, openingBalanceDollars, minimumReserveDollars, timezone } = parsed.data;
 
   try {
-    await createRealMerchantStore(storeId, {
-      name,
-      whatYouSell,
-      openingBalanceCents: openingBalanceDollars * 100,
-      minimumBalanceCents: minimumReserveDollars * 100,
-      tightMarginCents: Math.round(minimumReserveDollars * 50),
-      timezone,
-    });
+    const db = getDb();
+    const existing = await db.store.findUnique({ where: { id: storeId }, select: { id: true } });
+    if (existing) {
+      await db.store.update({
+        where: { id: storeId },
+        data: {
+          name,
+          whatYouSell,
+          openingBalanceCents: openingBalanceDollars * 100,
+          minimumBalanceCents: minimumReserveDollars * 100,
+          tightMarginCents: Math.round(minimumReserveDollars * 50),
+          timezone,
+          openingBalanceSource: "USER",
+          openingBalanceUpdatedAt: new Date(),
+        },
+      });
+    } else {
+      await createRealMerchantStore(storeId, {
+        name,
+        whatYouSell,
+        openingBalanceCents: openingBalanceDollars * 100,
+        minimumBalanceCents: minimumReserveDollars * 100,
+        tightMarginCents: Math.round(minimumReserveDollars * 50),
+        timezone,
+      });
+    }
 
     const paths = ["/today", "/dashboard", "/dues", "/approvals", "/settings", "/onboarding"];
     for (const p of paths) revalidatePath(p);

@@ -34,6 +34,10 @@ export interface StoreSettings {
   minimumBalanceCents: Cents;
   /** A day at or above the minimum but within this margin of it is "tight". */
   tightMarginCents: Cents;
+  /** Starting cash balance at the start of openingBalanceOn. */
+  openingBalanceCents: Cents;
+  openingBalanceOn: IsoDate;
+  openingBalanceSource: string;
   /** Setup form answers. */
   whatYouSell: string;
   supplierPaymentMethod: "PAYPAL_PAYOUTS" | "BANK_TRANSFER" | "CARD";

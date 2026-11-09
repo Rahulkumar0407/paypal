@@ -134,7 +134,7 @@ async function createReceipt(tx: Tx, storeId: StoreId, proposalId: string, decis
   return receipt.id;
 }
 
-const TX = { timeout: 15_000, maxWait: 8_000 } as const;
+const TX = { timeout: 30_000, maxWait: 15_000 } as const;
 
 export function prismaGuardRepo(db: PrismaClient): GuardRepo {
   const read = async (storeId: StoreId, receiptId: string) => {

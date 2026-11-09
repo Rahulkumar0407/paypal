@@ -26,8 +26,18 @@ export {
   loginAction,
   logoutAction,
   registerAction,
+  demoLoginAction,
   type AuthActionResult,
 } from "./actions";
+
+export {
+  createEmailVerificationToken,
+  verifyEmailToken,
+  createPasswordResetToken,
+  resetPasswordWithToken,
+  isEmailDeliveryConfigured,
+  sendVerificationEmail,
+} from "./verification";
 
 export {
   checkRateLimit,

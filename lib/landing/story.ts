@@ -59,6 +59,8 @@ export interface LandingStory {
   shortIndex: number | null;
   /** Steps of $1 a day, from $0 to MAX_DAILY_DOLLARS. */
   steps: FixStep[];
+  /** The same set-aside choices after Maya's recovered checkout is counted by the forecast. */
+  recoveredSteps: FixStep[];
   /** The smallest step the Guard approves that leaves no short day. */
   bestStep: number | null;
   recovery: {
@@ -149,12 +151,12 @@ const NO_ORDER: Pick<GuardContext, "order" | "orderMissing" | "paypal" | "remind
   spentLast7DaysCents: null,
 };
 
-function fixSteps(base: Forecast): FixStep[] {
+function fixSteps(base: Forecast, recovered = false): FixStep[] {
   const today = base.asOf;
   const forDate = base.firstShortfall?.date ?? null;
   return Array.from({ length: MAX_DAILY_DOLLARS + 1 }, (_, dollars) => {
     const dailyCents = dollars * 100;
-    const after = forDate ? previewDemoForecast({ setAsideDailyCents: dailyCents }) : base;
+    const after = forDate ? previewDemoForecast({ recovered, setAsideDailyCents: dailyCents }) : base;
     const transfer = after.days.flatMap((d) => d.dues).find((d) => d.kind === "OWNER_TRANSFER" && (!forDate || d.dueOn < forDate));
     const step: FixStep = {
       dailyCents,
@@ -250,6 +252,7 @@ export function buildLandingStory(): LandingStory {
   const days = base.days.map((d, i) => storyDay(d, i, base));
   const shortIndex = base.days.findIndex((d) => d.state === "short");
   const steps = fixSteps(base);
+  const recoveredSteps = fixSteps(recovered, true);
   const best = steps.findIndex((s) => s.decision === "APPROVE" && !s.states.includes("short"));
   const netCents = recovered.days[0]!.closingCents - base.days[0]!.closingCents;
   const grossCents = 7_200;
@@ -265,6 +268,7 @@ export function buildLandingStory(): LandingStory {
     days,
     shortIndex: shortIndex === -1 ? null : shortIndex,
     steps,
+    recoveredSteps,
     bestStep: best === -1 ? null : best,
     recovery: {
       label: "Order #1258, Maya Okafor",

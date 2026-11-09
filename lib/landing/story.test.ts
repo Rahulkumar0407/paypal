@@ -12,8 +12,10 @@ describe("the landing page story", () => {
     const short = story.days[story.shortIndex!]!;
     expect(short.label).toBe("Thu 12 Nov");
     expect(short.closingCents).toBe(1_000);
+    expect(short.shortByCents).toBe(9_000);
     expect(short.narrator).toBe("Thu 12 Nov: the supplier order and rent land the same day. $10 left, $90 less than the shop needs.");
     expect(short.moves.filter((m) => m.kind === "out").map((m) => m.label).sort()).toEqual(["Rent", "Volta Audio Parts"]);
+    expect(short.moves.filter((m) => m.kind === "out").map((m) => m.amountCents).sort((a, b) => a - b)).toEqual([30_000, 120_000]);
   });
 
   it("writes every narrator line in the house voice", () => {
@@ -34,6 +36,16 @@ describe("the landing page story", () => {
     expect(story.steps[20]!.transferCents).toBe(250_000 - 20 * 100 * 7);
   });
 
+  it("works out set-aside steps after Maya's recovered checkout with the real forecast", () => {
+    for (const dollars of [0, 7, 14, 21]) {
+      const after = previewDemoForecast({ recovered: true, setAsideDailyCents: dollars * 100 });
+      expect(story.recoveredSteps[dollars]!.closings).toEqual(after.days.map((d) => d.closingCents));
+      expect(story.recoveredSteps[dollars]!.shortBy).toEqual(after.days.map((d) => d.shortByCents));
+    }
+    expect(story.recoveredSteps[0]!.shortBy[story.shortIndex!]!).toBe(2_100);
+    expect(story.recoveredSteps[7]!.states[story.shortIndex!]!).not.toBe("short");
+  });
+
   it("lets the real Guard decide each step: approve, then ask the owner, then block at the 30% cap", () => {
     expect(story.steps[13]!.decision).toBe("APPROVE");
     expect(story.steps[20]!.decision).toBe("ESCALATE");
@@ -47,9 +59,9 @@ describe("the landing page story", () => {
 
   it("counts a recovered payment after PayPal's fee", () => {
     expect(story.recovery.grossCents).toBe(7_200);
-    expect(story.recovery.netCents).toBeGreaterThan(6_500);
-    expect(story.recovery.netCents).toBeLessThan(7_200);
-    expect(story.recovery.feeCents).toBe(story.recovery.grossCents - story.recovery.netCents);
+    expect(story.recovery.netCents).toBe(6_900);
+    expect(story.recovery.feeCents).toBe(300);
+    expect(story.recovery.shortByAfterCents).toBe(2_100);
     // The short payment fills up by exactly what arrived.
     const due = story.recovery.due!;
     expect(due.name).toBe("Volta Audio Parts");

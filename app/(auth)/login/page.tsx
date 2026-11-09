@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LoginForm } from "@/components/auth/LoginForm";
+import { demoLoginAction } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "Sign In • NeverShort",
@@ -17,6 +18,14 @@ export default function LoginPage() {
         </p>
       </div>
       <LoginForm />
+      <form action={demoLoginAction}>
+        <button
+          type="submit"
+          className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 text-sm font-semibold text-white hover:bg-emerald-700 transition-colors shadow-xs"
+        >
+          Try Live Demo →
+        </button>
+      </form>
     </div>
   );
 }
