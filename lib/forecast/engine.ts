@@ -102,6 +102,8 @@ export interface PayeeRow {
   intervalWeeks?: number | null;
   weekday?: number | null;
   dayOfMonth?: number | null;
+  autoDebit?: boolean;
+  optional?: boolean;
 }
 
 /** The id a projected payment gets, and keeps when the owner confirms the payee or the executor acts on it. */
@@ -239,6 +241,8 @@ export function inputFromRows(rows: StoreRows, storeId: StoreId, today: IsoDate)
           status: "PAID",
           movedFromOn: null,
           simulated: false,
+          autoDebit: payee?.autoDebit ?? false,
+          optional: payee?.optional ?? false,
         });
       }
     }
@@ -304,7 +308,22 @@ function dueFrom(
   movedFromOn: IsoDate | null,
   simulated: boolean,
 ): Due {
-  return { id, storeId, payeeId: payee.id, payeeName: payee.name, label: payee.label, kind: payee.kind, dueOn, amountCents, readyCents: 0, status, movedFromOn, simulated };
+  return {
+    id,
+    storeId,
+    payeeId: payee.id,
+    payeeName: payee.name,
+    label: payee.label,
+    kind: payee.kind,
+    dueOn,
+    amountCents,
+    readyCents: 0,
+    status,
+    movedFromOn,
+    simulated,
+    autoDebit: payee.autoDebit ?? false,
+    optional: payee.optional ?? false,
+  };
 }
 
 function loanRepayment(storeId: StoreId, loanId: string, repayOn: IsoDate, amountCents: Cents): Due {

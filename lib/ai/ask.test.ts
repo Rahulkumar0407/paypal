@@ -46,7 +46,7 @@ describe("five sample questions, answered from the forecast's numbers (no AI)", 
 
   it("'How much do I usually pay Bean There?' its last three payments and the next", async () => {
     const a = await answerWith("How much do I usually pay Bean There?", data(START), null);
-    expect(a.answer).toBe("Your last 3 payments to Bean There: $404 on Mon 2 Nov, $396 on Fri 23 Oct, $400 on Tue 13 Oct. The next one is $400 on Thu 12 Nov.");
+    expect(a.answer).toBe("Your last 3 payments to Bean There: $400 on Mon 2 Nov, $396 on Fri 23 Oct, $400 on Tue 13 Oct. The next one is $400 on Thu 12 Nov.");
   });
 
   it("'How much did I sell in the last 7 days?' the week's sales after PayPal's fees", async () => {

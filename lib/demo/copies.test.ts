@@ -11,7 +11,7 @@ type Row = Record<string, unknown>;
 type Where = Record<string, unknown>;
 /** Fields a reset is meant to change: the run id and the copy's own timestamps. */
 const VOLATILE = new Set(["demoRunId", "createdAt", "lastResetAt", "lastSeenAt"]);
-const TABLES = ["store", "product", "customer", "payee", "order", "orderItem", "ledgerEntry", "due"] as const;
+const TABLES = ["store", "product", "customer", "payee", "order", "orderItem", "ledgerEntry", "due", "goal", "teamRequest"] as const;
 
 function memoryDb() {
   const tables: Record<string, Row[]> = Object.fromEntries(TABLES.map((t) => [t, []]));

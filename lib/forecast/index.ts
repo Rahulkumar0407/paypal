@@ -25,10 +25,14 @@ import {
   withAdjustments,
 } from "./engine";
 import { demoScenarioRows, loadStoreRows, readStoreRows, type DemoScenario } from "./load";
+import { monthPlanFrom, type MonthGoal, type MonthOwed, type MonthPlan } from "./month";
+import { buildDemoSeed } from "@/lib/demo";
+import { isDatabaseConfigured } from "@/lib/shared/db";
 
 export { buildHeadline } from "./headline";
 export { yourFix, yourForecast, warningZoneFor, type YourFix, type YourNumbers, type YourPayment, type YourForecast } from "./yours";
 export type { DemoScenario } from "./load";
+export { ordinal, type MonthChip, type MonthDay, type MonthGoal, type MonthOwed, type MonthPlan, type MustPayItem, type TodayPanel, type WantToDoItem } from "./month";
 export type { PatternEvidence, RecentPayment } from "./history";
 
 async function inputFor(storeId: StoreId) {
@@ -200,5 +204,54 @@ export function previewDemoStore(scenario: DemoScenario = {}) {
     evidence: patternEvidenceFromRows(rows, day),
     recentPayments: recentPaymentsFromRows(rows, day),
     canAfford: (amountCents: Cents, date: IsoDate) => affordability(input, amountCents, date),
+  };
+}
+
+/**
+ * The month page and the Today panel for this store: Must pay, Coming in, Want to do and the focus line, all from the
+ * forecast's own numbers. Goals and money owed come from the store's rows. Without a database, the demo seed.
+ */
+export async function getMonthPlan(storeId: StoreId, month?: string): Promise<MonthPlan> {
+  const day = today();
+  const rows = await loadStoreRows(storeId, day);
+  const input = inputFromRows(rows, storeId, day);
+  if (!isDatabaseConfigured()) return monthPlanFrom({ rows, input, ...seedExtras(storeId, day, false), month });
+  const db = getDb();
+  const [store, goals, unpaid] = await Promise.all([
+    db.store.findUnique({ where: { id: storeId }, select: { focusLine: true } }),
+    db.goal.findMany({ where: { storeId, status: "PLANNED" }, orderBy: [{ wantedOn: "asc" }, { createdAt: "asc" }] }),
+    db.order.findMany({
+      where: { storeId, status: { in: ["ABANDONED", "FAILED"] }, dueOn: { not: null } },
+      select: { id: true, totalCents: true, dueOn: true, customer: { select: { name: true, contactConsent: true } } },
+      orderBy: { dueOn: "asc" },
+    }),
+  ]);
+  return monthPlanFrom({
+    rows,
+    input,
+    focusLine: store?.focusLine ?? null,
+    goals: goals.map((g) => ({ id: g.id, title: g.title, amountCents: g.amountCents, savedCents: g.savedCents, wantedOn: g.wantedOn })),
+    owed: unpaid.map((o) => ({ orderId: o.id, customerName: o.customer.name, amountCents: o.totalCents, dueOn: o.dueOn, canRemind: o.customer.contactConsent })),
+    month,
+  });
+}
+
+/** The demo store's month page at a point in the story, in memory from the seed (no database). The tests use it. */
+export function previewDemoMonth(scenario: DemoScenario = {}): MonthPlan {
+  const day = today();
+  const rows = demoScenarioRows("st_preview", day, scenario);
+  const input = inputFromRows(rows, "st_preview", day);
+  return monthPlanFrom({ rows, input, ...seedExtras("st_preview", day, scenario.recovered ?? false) });
+}
+
+function seedExtras(storeId: StoreId, day: IsoDate, recovered: boolean): { goals: MonthGoal[]; owed: MonthOwed[]; focusLine: string | null } {
+  const seed = buildDemoSeed(storeId, day, "run_preview");
+  const customers = new Map(seed.customers.map((c) => [c.id, c]));
+  return {
+    focusLine: seed.store.focusLine ?? null,
+    goals: seed.goals.map((g) => ({ id: g.id, title: g.title, amountCents: g.amountCents, savedCents: g.savedCents ?? 0, wantedOn: g.wantedOn ?? null })),
+    owed: seed.orders
+      .filter((o) => (o.status === "ABANDONED" || o.status === "FAILED") && o.dueOn && !recovered)
+      .map((o) => ({ orderId: o.id, customerName: customers.get(o.customerId)?.name ?? "A customer", amountCents: o.totalCents, dueOn: o.dueOn ?? null, canRemind: customers.get(o.customerId)?.contactConsent ?? false })),
   };
 }

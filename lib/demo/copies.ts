@@ -21,6 +21,8 @@ async function writeSeed(tx: Tx, seed: DemoSeed): Promise<void> {
   await tx.orderItem.createMany({ data: seed.orderItems });
   await tx.ledgerEntry.createMany({ data: seed.ledgerEntries });
   await tx.due.createMany({ data: seed.dues });
+  await tx.goal.createMany({ data: seed.goals });
+  await tx.teamRequest.createMany({ data: seed.requests });
 }
 
 const TX_OPTIONS = { timeout: 30_000, maxWait: 10_000 } as const;

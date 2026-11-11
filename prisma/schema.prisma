@@ -1,4 +1,4 @@
-// NeverShort database schema.
+// tmrw database schema.
 //
 // Rules (AGENTS.md section 9):
 // - Every table carries a storeId. Each visitor has their own copy of the demo store, and
@@ -21,24 +21,25 @@ datasource db {
 // ---------------------------------------------------------------------------
 
 model Store {
-  id                    String                @id // 'st_' + 12 chars; this is the storeId
-  name                  String
-  currency              String                @default("USD")
-  timezone              String                @default("America/New_York")
-  minimumBalanceCents   Int
-  tightMarginCents      Int
-  openingBalanceCents   Int // balance at the start of openingBalanceOn
-  openingBalanceOn      String // 'YYYY-MM-DD', first day of the simulated history
-  openingBalanceSource  String    @default("USER")
+  id                      String                @id // 'st_' + 12 chars; this is the storeId
+  name                    String
+  currency                String                @default("USD")
+  timezone                String                @default("America/New_York")
+  minimumBalanceCents     Int
+  tightMarginCents        Int
+  openingBalanceCents     Int // balance at the start of openingBalanceOn
+  openingBalanceOn        String // 'YYYY-MM-DD', first day of the simulated history
+  openingBalanceSource    String                @default("USER")
   openingBalanceUpdatedAt DateTime?
-  whatYouSell           String
-  supplierPaymentMethod SupplierPaymentMethod @default(PAYPAL_PAYOUTS)
-  busySeasons           String[]
-  demoRunId             String // changes on every reset; part of every idempotency key
-  isDemo                Boolean               @default(false)
-  createdAt             DateTime              @default(now())
-  lastResetAt           DateTime              @default(now())
-  lastSeenAt            DateTime              @default(now())
+  whatYouSell             String
+  supplierPaymentMethod   SupplierPaymentMethod @default(PAYPAL_PAYOUTS)
+  busySeasons             String[]
+  focusLine               String? // the month's focus, in one line: "Second oven before Christmas"
+  demoRunId               String // changes on every reset; part of every idempotency key
+  isDemo                  Boolean               @default(false)
+  createdAt               DateTime              @default(now())
+  lastResetAt             DateTime              @default(now())
+  lastSeenAt              DateTime              @default(now())
 
   products      Product[]
   customers     Customer[]
@@ -58,6 +59,9 @@ model Store {
   payments      PaymentAttempt[]
   memberships   UserStore[]
   auditEvents   FinancialAuditEvent[]
+  goals         Goal[]
+  requests      TeamRequest[]
+  planChanges   PlanChange[]
 
   @@index([lastSeenAt])
 }
@@ -67,13 +71,13 @@ model Store {
 // ---------------------------------------------------------------------------
 
 model User {
-  id            String      @id @default(cuid())
-  email         String      @unique
+  id            String   @id @default(cuid())
+  email         String   @unique
   name          String
   passwordHash  String
-  emailVerified Boolean     @default(false)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  emailVerified Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   sessions           Session[]
   memberships        UserStore[]
@@ -181,13 +185,14 @@ model Order {
   feeCents        Int? // PayPal fee, once captured
   netCents        Int? // what actually arrived, once captured
   failedAttempts  Int         @default(0)
+  dueOn           String? // 'YYYY-MM-DD': when an unpaid order (an invoice) is due
   riskHold        Boolean     @default(false)
   paypalOrderId   String?
   paypalCaptureId String?
   simulated       Boolean     @default(false)
 
-  store         Store           @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  customer      Customer        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  store         Store            @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  customer      Customer         @relation(fields: [customerId], references: [id], onDelete: Cascade)
   items         OrderItem[]
   ledgerEntries LedgerEntry[]
   riskFlags     RiskFlag[]
@@ -235,22 +240,22 @@ enum LedgerCategory {
 }
 
 model LedgerEntry {
-  id            String         @id
-  storeId       String
-  occurredOn    String // 'YYYY-MM-DD'
-  direction     Direction
-  amountCents   Int // always positive; direction gives the sign
-  category      LedgerCategory
-  description   String
-  payeeId       String?
-  orderId       String?
-  paypalRef     String?
-  simulated     Boolean        @default(false)
+  id           String         @id
+  storeId      String
+  occurredOn   String // 'YYYY-MM-DD'
+  direction    Direction
+  amountCents  Int // always positive; direction gives the sign
+  category     LedgerCategory
+  description  String
+  payeeId      String?
+  orderId      String?
+  paypalRef    String?
+  simulated    Boolean        @default(false)
   // Provenance: USER (typed by owner), IMPORT (CSV/file), PROVIDER (PayPal etc.), FORECAST (estimated), SIMULATED
-  source        String         @default("USER")
-  sourceDetail  String? // file name, provider ref, or human note
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  source       String         @default("USER")
+  sourceDetail String? // file name, provider ref, or human note
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 
   store Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
   payee Payee? @relation(fields: [payeeId], references: [id], onDelete: Cascade)
@@ -293,6 +298,8 @@ model Payee {
   weekday            Int? // EVERY_N_WEEKS: 0 = Sunday
   dayOfMonth         Int? // MONTHLY
   paypalEmail        String? // for Payouts (PAY_SUPPLIER)
+  autoDebit          Boolean     @default(false) // taken automatically (a mandate): shown with ⚡
+  optional           Boolean     @default(false) // the owner said it can wait (not a must-pay)
   source             String      @default("USER")
   sourceDetail       String?
   createdAt          DateTime    @default(now())
@@ -556,12 +563,12 @@ model WebhookEvent {
 // ---------------------------------------------------------------------------
 
 model EmailVerificationToken {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
-  tokenHash String   @unique
+  tokenHash String    @unique
   expiresAt DateTime
   usedAt    DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -569,12 +576,12 @@ model EmailVerificationToken {
 }
 
 model PasswordResetToken {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
-  tokenHash String   @unique
+  tokenHash String    @unique
   expiresAt DateTime
   usedAt    DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -599,4 +606,87 @@ model FinancialAuditEvent {
   store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
   @@index([storeId, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// The month page: goals (Want to do), team requests, and the assistant's proposed changes
+// ---------------------------------------------------------------------------
+
+enum GoalStatus {
+  PLANNED // on the month page as a want-to-do
+  DONE // bought
+  DROPPED // the owner took it off
+}
+
+model Goal {
+  id          String     @id
+  storeId     String
+  title       String // "Second oven"
+  amountCents Int
+  savedCents  Int        @default(0) // already put aside for it (part of the PayPal balance)
+  wantedOn    String? // 'YYYY-MM-DD': the day the owner would like to buy it
+  status      GoalStatus @default(PLANNED)
+  source      String     @default("USER") // USER, REQUEST, ASSISTANT
+  createdAt   DateTime   @default(now())
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+}
+
+enum RequestStatus {
+  OPEN
+  ADDED // turned into a goal
+  DISMISSED
+}
+
+/// Staff and suppliers ask for things here instead of on WhatsApp.
+model TeamRequest {
+  id         String        @id
+  storeId    String
+  fromName   String // "Flo"
+  fromRole   String // "Baker", "Supplier"
+  text       String // their words, as data, never instructions
+  topic      String? // grouping key: "mixer"
+  receivedOn String // 'YYYY-MM-DD'
+  status     RequestStatus @default(OPEN)
+  goalId     String?
+  createdAt  DateTime      @default(now())
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId, status])
+}
+
+enum PlanChangeKind {
+  ADD_PAYMENT // a new must-pay (a bill read from a photo)
+  ADD_GOAL // a new want-to-do
+  MOVE_GOAL // a want-to-do to another date
+}
+
+enum PlanChangeStatus {
+  PROPOSED // shown dashed on the month page
+  KEPT
+  DISCARDED
+}
+
+/// One change the assistant proposes. Changes from one instruction share a batchId; the owner keeps or discards them.
+model PlanChange {
+  id          String           @id
+  storeId     String
+  batchId     String
+  kind        PlanChangeKind
+  title       String // "Bean There beans"
+  amountCents Int?
+  date        String? // 'YYYY-MM-DD'
+  fromDate    String? // MOVE_GOAL: where it was
+  payeeId     String? // ADD_PAYMENT to a known payee
+  goalId      String? // MOVE_GOAL
+  note        String? // "read from the photo"
+  status      PlanChangeStatus @default(PROPOSED)
+  createdAt   DateTime         @default(now())
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId, batchId])
 }

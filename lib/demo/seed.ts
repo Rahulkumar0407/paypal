@@ -12,7 +12,7 @@ import { createRandom } from "./prng";
  * DEMO.md has the hand calculation and lib/forecast/demo-story.test.ts checks it.
  */
 
-export const DEMO_SEED_VERSION = 3;
+export const DEMO_SEED_VERSION = 4;
 const RANDOM_SEED = 20261105;
 
 export const DEMO_STORE_SETTINGS = {
@@ -29,6 +29,7 @@ export const DEMO_STORE_SETTINGS = {
   futureDays: 35,
   whatYouSell: "Bread, pastries, cakes and coffee from a small café-bakery, ordered through PayPal.",
   busySeasons: ["Late November (Black Friday)", "December holidays", "Wedding season (May to September)"],
+  focusLine: "Second oven before Christmas",
 } as const;
 
 /** Orders per weekday (0 = Sunday). About one day in three has one more or one fewer. */
@@ -49,6 +50,8 @@ export interface DemoSeed {
   orderItems: Prisma.OrderItemCreateManyInput[];
   ledgerEntries: Prisma.LedgerEntryCreateManyInput[];
   dues: Prisma.DueCreateManyInput[];
+  goals: Prisma.GoalCreateManyInput[];
+  requests: Prisma.TeamRequestCreateManyInput[];
 }
 
 interface PayeePlan {
@@ -64,6 +67,8 @@ interface PayeePlan {
   weekday?: number;
   dayOfMonth?: number;
   paypalEmail?: string;
+  /** Taken automatically (a mandate): shown with ⚡. */
+  autoDebit?: boolean;
   /** Past payments differ from the typical amount by these whole dollars, in turn. Their median is 0, so the
    *  typical amount detection finds is exactly the plan's. */
   pastJitterDollars: readonly number[];
@@ -78,14 +83,14 @@ const FIXED = [0] as const;
  * and writes their dues when the owner confirms them.
  */
 const PAYEES: readonly PayeePlan[] = [
-  { key: "beans", name: "Bean There", label: "the bean order", kind: "SUPPLIER", status: "DETECTED", typicalAmountCents: 40_000, cadence: "EVERY_N_DAYS", intervalDays: 10, paypalEmail: "orders@bean-there.example", pastJitterDollars: [5, -8, 12, 0, -10, 6, 0, -4, 4], category: "SUPPLIER" },
+  { key: "beans", name: "Bean There", label: "the bean order", kind: "SUPPLIER", status: "DETECTED", typicalAmountCents: 40_000, cadence: "EVERY_N_DAYS", intervalDays: 10, paypalEmail: "orders@bean-there.example", pastJitterDollars: [5, -8, 12, 0, -10, 6, 0, -4, 0], category: "SUPPLIER" },
   { key: "rent", name: "Rent", label: "rent", kind: "BILL", status: "CONFIRMED", typicalAmountCents: 150_000, cadence: "MONTHLY", dayOfMonth: 12, pastJitterDollars: FIXED, category: "BILL" },
   // The card machine's auto-debit nobody wrote down: only in history, so Spot finds it.
-  { key: "card", name: "Card machine", label: "the card machine fee", kind: "BILL", status: "DETECTED", typicalAmountCents: 4_900, cadence: "MONTHLY", dayOfMonth: 13, pastJitterDollars: FIXED, category: "BILL" },
+  { key: "card", name: "Card machine", label: "the card machine fee", kind: "BILL", status: "DETECTED", typicalAmountCents: 4_900, cadence: "MONTHLY", dayOfMonth: 13, autoDebit: true, pastJitterDollars: FIXED, category: "BILL" },
   // Oat milk went up: $165 for the last three months, $180 from Sun 15 Nov (the price-rise alert finds it).
-  { key: "oat", name: "Oat of Office", label: "the oat milk order", kind: "SUPPLIER", status: "CONFIRMED", typicalAmountCents: 18_000, cadence: "MONTHLY", dayOfMonth: 15, paypalEmail: "billing@oat-of-office.example", pastJitterDollars: [-15], category: "SUPPLIER" },
-  { key: "internet", name: "Internet", label: "the internet bill", kind: "BILL", status: "CONFIRMED", typicalAmountCents: 6_000, cadence: "MONTHLY", dayOfMonth: 3, pastJitterDollars: FIXED, category: "BILL" },
-  { key: "loan", name: "Oven loan", label: "the oven loan repayment", kind: "LOAN", status: "CONFIRMED", typicalAmountCents: 25_000, cadence: "MONTHLY", dayOfMonth: 25, pastJitterDollars: FIXED, category: "LOAN_REPAYMENT" },
+  { key: "oat", name: "Oat of Office", label: "the oat milk order", kind: "SUPPLIER", status: "CONFIRMED", typicalAmountCents: 18_000, cadence: "MONTHLY", dayOfMonth: 15, paypalEmail: "billing@oat-of-office.example", autoDebit: true, pastJitterDollars: [-15], category: "SUPPLIER" },
+  { key: "internet", name: "Internet", label: "the internet bill", kind: "BILL", status: "CONFIRMED", typicalAmountCents: 6_000, cadence: "MONTHLY", dayOfMonth: 3, autoDebit: true, pastJitterDollars: FIXED, category: "BILL" },
+  { key: "loan", name: "Oven loan", label: "the oven loan repayment", kind: "LOAN", status: "CONFIRMED", typicalAmountCents: 25_000, cadence: "MONTHLY", dayOfMonth: 25, autoDebit: true, pastJitterDollars: FIXED, category: "LOAN_REPAYMENT" },
   { key: "staff", name: "Staff pay", label: "staff pay", kind: "BILL", status: "CONFIRMED", typicalAmountCents: 160_000, cadence: "MONTHLY", dayOfMonth: 28, pastJitterDollars: FIXED, category: "BILL" },
 ];
 
@@ -160,6 +165,7 @@ export function buildDemoSeed(storeId: StoreId, today: IsoDate, demoRunId: strin
     lines: { key: string; quantity: number }[];
     status: "ABANDONED" | "FAILED" | "PENDING" | "CAPTURED";
     failedAttempts?: number;
+    dueOn?: IsoDate;
   }) => {
     const number = orderNumber++;
     const orderId = id("ord", number);
@@ -179,6 +185,7 @@ export function buildDemoSeed(storeId: StoreId, today: IsoDate, demoRunId: strin
       feeCents: fee,
       netCents: net,
       failedAttempts: input.failedAttempts ?? 0,
+      dueOn: input.dueOn ?? null,
       paypalOrderId: captured ? `SIM-${number}-ORDER` : null,
       paypalCaptureId: captured ? `SIM-${number}-CAPTURE` : null,
       simulated: true,
@@ -237,7 +244,7 @@ export function buildDemoSeed(storeId: StoreId, today: IsoDate, demoRunId: strin
   const tiers = DEMO_CUSTOMER_NAMES.indexOf("Tiers of Joy");
   const hana = DEMO_CUSTOMER_NAMES.indexOf("Hana Sato");
   // Tiers of Joy's $240 tiered cake: delivered, not paid yet (due 18 Nov). Consent given, so tmrw may remind them.
-  addOrder({ customerIndex: tiers, date: addDays(today, -2), time: "16:20", lines: [{ key: "tiered", quantity: 1 }], status: "ABANDONED" });
+  addOrder({ customerIndex: tiers, date: addDays(today, -2), time: "16:20", lines: [{ key: "tiered", quantity: 1 }], status: "ABANDONED", dueOn: addDays(today, 13) });
   // An unpaid order from a customer who did not allow contact (Guard rule 2 blocks a reminder).
   customers[hana]!.contactConsent = false;
   addOrder({ customerIndex: hana, date: yesterday, time: "08:15", lines: [{ key: "croissants", quantity: 1 }], status: "ABANDONED" });
@@ -267,6 +274,7 @@ export function buildDemoSeed(storeId: StoreId, today: IsoDate, demoRunId: strin
     weekday: p.weekday ?? null,
     dayOfMonth: p.dayOfMonth ?? null,
     paypalEmail: p.paypalEmail ?? null,
+    autoDebit: p.autoDebit ?? false,
   }));
 
   const dues: Prisma.DueCreateManyInput[] = [];
@@ -336,9 +344,25 @@ export function buildDemoSeed(storeId: StoreId, today: IsoDate, demoRunId: strin
     whatYouSell: DEMO_STORE_SETTINGS.whatYouSell,
     supplierPaymentMethod: "PAYPAL_PAYOUTS",
     busySeasons: [...DEMO_STORE_SETTINGS.busySeasons],
+    focusLine: DEMO_STORE_SETTINGS.focusLine,
     demoRunId,
     isDemo: true,
   };
 
-  return { store, products, customers, payees, orders, orderItems, ledgerEntries, dues };
+  // --- Want to do, and the team's requests -----------------------------------------------
+  // The oven fund already has $320 put aside (inside the PayPal balance). Penny would like it on Sat 21 Nov.
+  const goals: Prisma.GoalCreateManyInput[] = [
+    { id: id("goal", "oven"), storeId, title: "Second oven", amountCents: 120_000, savedCents: 32_000, wantedOn: addDays(today, 16) },
+    { id: id("goal", "ads"), storeId, title: "Instagram ads", amountCents: 15_000, savedCents: 0, wantedOn: addDays(today, 15) },
+  ];
+  // Requests that would otherwise be WhatsApp messages. Three are about the mixer.
+  const requests: Prisma.TeamRequestCreateManyInput[] = [
+    { id: id("req", 1), storeId, fromName: "Flo", fromRole: "Baker", text: "The mixer keeps breaking, we need a new one.", topic: "mixer", receivedOn: addDays(today, -6) },
+    { id: id("req", 2), storeId, fromName: "Bean There", fromRole: "Coffee supplier", text: "Beans roasted, send $400 by Thursday.", topic: null, receivedOn: addDays(today, -2) },
+    { id: id("req", 3), storeId, fromName: "Flo", fromRole: "Baker", text: "Mixer stopped halfway through the dough again this morning.", topic: "mixer", receivedOn: addDays(today, -3) },
+    { id: id("req", 4), storeId, fromName: "Flo", fromRole: "Baker", text: "Can I get my pay on the 28th?", topic: null, receivedOn: addDays(today, -1) },
+    { id: id("req", 5), storeId, fromName: "Rafi", fromRole: "Weekend barista", text: "Can we get a stand mixer before the holiday orders? The old one is too slow.", topic: "mixer", receivedOn: addDays(today, -1) },
+  ];
+
+  return { store, products, customers, payees, orders, orderItems, ledgerEntries, dues, goals, requests };
 }

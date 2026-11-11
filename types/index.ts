@@ -102,6 +102,10 @@ export interface Due {
   /** Set when the payment was moved; the move itself is simulated. */
   movedFromOn: IsoDate | null;
   simulated: boolean;
+  /** Taken automatically (a mandate), shown with ⚡. */
+  autoDebit?: boolean;
+  /** The owner said it can wait: not a must-pay. */
+  optional?: boolean;
 }
 
 /** A payee found from payment history ("We think Volta is paid ~$300 every 10 days"). */
