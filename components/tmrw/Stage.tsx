@@ -2,7 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import { AppWindow, Dock } from "./Chrome";
-import { Login, Setup } from "./Onboarding";
+import { Login } from "./Onboarding";
+import { Setup } from "./Setup";
 import { ASSET, Seat, Station, Train } from "./Scenes";
 import { POSITIONS, useStage } from "./useStage";
 import { FRAME_H, useFrame } from "./useFrameScale";

@@ -1,0 +1,41 @@
+# Render Blueprint for tmrw: one web service. In Render: New > Blueprint > pick this repo.
+# Secrets are marked `sync: false`: Render asks for them once, in its dashboard. Never put real values in this file.
+services:
+  - type: web
+    name: tmrw
+    runtime: node
+    region: frankfurt
+    plan: starter
+    branch: main
+    buildCommand: npm ci && npm run build
+    # Applies new database migrations (additive) before each release goes live.
+    preDeployCommand: npm run db:migrate
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: DEMO_TODAY
+        value: "2026-11-05"
+      - key: PAYPAL_API_BASE
+        value: https://api-m.sandbox.paypal.com
+      # Copy these from your local .env. Leave PAYPAL_FAKE out entirely: it is refused in production.
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: APP_URL
+        sync: false
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: PAYPAL_WEBHOOK_ID
+        sync: false
+      - key: NEXT_PUBLIC_PAYPAL_CLIENT_ID
+        sync: false
+      - key: AI_MODEL
+        sync: false
+      - key: GOOGLE_GENERATIVE_AI_API_KEY
+        sync: false

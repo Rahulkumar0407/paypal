@@ -115,3 +115,70 @@ export async function getStoreSettings(storeId: StoreId): Promise<StoreSettings>
     isDemo: s.isDemo,
   };
 }
+
+/** What the tmrw setup flow saves on the shop: the name, the safety cushion, busy seasons and the plans to grow. */
+export interface SetupAnswers {
+  name: string;
+  businessType: string;
+  whatYouSell: string;
+  minimumBalanceCents: number;
+  busySeasons: string[];
+  busyDays: string[];
+  /** Payee name → whether its date can move. */
+  movable: Record<string, boolean>;
+  outside: { name: string; detail: string; kind: "EXPENSE" | "REVENUE"; amountCents: number | null }[];
+  clients: { name: string; note: string; reminders: boolean; tone: string }[];
+  team: { name: string; role: string; phone: string }[];
+  briefTime: string;
+  briefChannels: string[];
+  /** Plans become the month page's want-to-dos. Amounts in cents; dates 'YYYY-MM-DD' or null. */
+  plans: { title: string; amountCents: number; wantedOn: string | null }[];
+}
+
+/**
+ * Keeps the setup answers on this store. Plans replace the store's planned goals; a plan with the same title as an
+ * existing goal keeps what was already saved for it. Without a database there is nothing to keep: returns false.
+ */
+export async function saveSetupAnswers(storeId: StoreId, answers: SetupAnswers): Promise<boolean> {
+  if (!isDatabaseConfigured()) return false;
+  const db = getDb();
+  const existing = await db.goal.findMany({ where: { storeId, status: "PLANNED" }, select: { title: true, savedCents: true } });
+  const saved = new Map(existing.map((g) => [g.title.toLowerCase(), g.savedCents]));
+  const stamp = Date.now().toString(36);
+  const id = (kind: string, i: number) => `${storeId}_${kind}_${stamp}_${i}`;
+  await db.$transaction([
+    db.store.update({
+      where: { id: storeId },
+      data: {
+        name: answers.name,
+        businessType: answers.businessType,
+        whatYouSell: answers.whatYouSell,
+        minimumBalanceCents: answers.minimumBalanceCents,
+        busySeasons: answers.busySeasons,
+        busyDays: answers.busyDays,
+        briefTime: answers.briefTime,
+        briefChannels: answers.briefChannels,
+      },
+    }),
+    ...Object.entries(answers.movable).map(([name, canMove]) => db.payee.updateMany({ where: { storeId, name }, data: { canMove } })),
+    db.teamMember.deleteMany({ where: { storeId } }),
+    db.teamMember.createMany({ data: answers.team.map((t, i) => ({ id: id("team", i), storeId, name: t.name, role: t.role, phone: t.phone || null })) }),
+    db.client.deleteMany({ where: { storeId } }),
+    db.client.createMany({ data: answers.clients.map((c, i) => ({ id: id("client", i), storeId, ...c })) }),
+    db.manualEntry.deleteMany({ where: { storeId } }),
+    db.manualEntry.createMany({ data: answers.outside.map((o, i) => ({ id: id("manual", i), storeId, ...o })) }),
+    db.goal.deleteMany({ where: { storeId, status: "PLANNED" } }),
+    db.goal.createMany({
+      data: answers.plans.map((p, i) => ({
+        id: `${storeId}_goal_setup_${stamp}_${i}`,
+        storeId,
+        title: p.title,
+        amountCents: p.amountCents,
+        savedCents: Math.min(saved.get(p.title.toLowerCase()) ?? 0, p.amountCents),
+        wantedOn: p.wantedOn,
+        source: "SETUP",
+      })),
+    }),
+  ]);
+  return true;
+}

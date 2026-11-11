@@ -35,6 +35,10 @@ model Store {
   supplierPaymentMethod   SupplierPaymentMethod @default(PAYPAL_PAYOUTS)
   busySeasons             String[]
   focusLine               String? // the month's focus, in one line: "Second oven before Christmas"
+  busyDays                String[]              @default([]) // "Sat", "Sun": the owner's busiest days (setup)
+  businessType            String? // "Bakery and café" (setup)
+  briefTime               String? // 'HH:MM', 24-hour: when the daily brief arrives
+  briefChannels           String[]              @default([]) // "In the app", "Notification", "WhatsApp", "Email"
   demoRunId               String // changes on every reset; part of every idempotency key
   isDemo                  Boolean               @default(false)
   createdAt               DateTime              @default(now())
@@ -62,6 +66,9 @@ model Store {
   goals         Goal[]
   requests      TeamRequest[]
   planChanges   PlanChange[]
+  team          TeamMember[]
+  clients       Client[]
+  manualEntries ManualEntry[]
 
   @@index([lastSeenAt])
 }
@@ -298,7 +305,8 @@ model Payee {
   weekday            Int? // EVERY_N_WEEKS: 0 = Sunday
   dayOfMonth         Int? // MONTHLY
   paypalEmail        String? // for Payouts (PAY_SUPPLIER)
-  autoDebit          Boolean     @default(false) // taken automatically (a mandate): shown with ⚡
+  autoDebit          Boolean     @default(false) // taken automatically (a mandate), labelled "Auto-debit"
+  canMove            Boolean     @default(false) // the owner said its date can move (setup)
   optional           Boolean     @default(false) // the owner said it can wait (not a must-pay)
   source             String      @default("USER")
   sourceDetail       String?
@@ -689,4 +697,57 @@ model PlanChange {
   store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
 
   @@index([storeId, batchId])
+}
+
+// ---------------------------------------------------------------------------
+// Setup answers: the team, clients who pay later, and money outside PayPal
+// ---------------------------------------------------------------------------
+
+/// Someone who works in the shop. Invited on WhatsApp; only the owner approves money.
+model TeamMember {
+  id        String   @id
+  storeId   String
+  name      String
+  role      String
+  phone     String? // WhatsApp number, as typed
+  createdAt DateTime @default(now())
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+}
+
+/// A client who buys on credit or invoice, and how tmrw may remind them.
+model Client {
+  id        String   @id
+  storeId   String
+  name      String // "Ivory & Vow - wedding planner"
+  note      String // "usually pays 5 days late"
+  reminders Boolean  @default(true) // the client agreed to reminders
+  tone      String   @default("Gentle") // Gentle or Firm
+  createdAt DateTime @default(now())
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+}
+
+enum EntryKind {
+  EXPENSE
+  REVENUE
+}
+
+/// Money the shop pays or receives outside PayPal (cash, bank auto-debits), added by hand in setup.
+model ManualEntry {
+  id          String    @id
+  storeId     String
+  name        String // "Oat of Office - oat milk"
+  detail      String // "$180 - bank auto-debit on the 15th"
+  kind        EntryKind
+  amountCents Int? // read from the detail when it has an amount
+  createdAt   DateTime  @default(now())
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
 }
