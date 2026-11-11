@@ -108,7 +108,19 @@ const UNFOCUS_ICON = "M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 
  * Section 6: a window over the dimmed seat. Seat windows are large (1300 × 820), dock windows smaller (820 × 560);
  * Focus fills the frame. Content is a "Coming soon" placeholder until the windows are designed.
  */
-export function AppWindow({ which, focus, onToggleFocus, onClose }: { which: WindowKey | null; focus: boolean; onToggleFocus: () => void; onClose: () => void }) {
+export function AppWindow({
+  which,
+  focus,
+  frameWidth,
+  onToggleFocus,
+  onClose,
+}: {
+  which: WindowKey | null;
+  focus: boolean;
+  frameWidth: number;
+  onToggleFocus: () => void;
+  onClose: () => void;
+}) {
   useEffect(() => {
     if (!which) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -117,7 +129,9 @@ export function AppWindow({ which, focus, onToggleFocus, onClose }: { which: Win
   }, [which, onClose]);
 
   const w = which ? WINDOWS[which] : null;
-  const box = !w ? null : focus ? { left: 0, top: 0, width: 1440, height: 900, borderRadius: 0 } : w.big ? { left: 70, top: 40, width: 1300, height: 820, borderRadius: 22 } : { left: 310, top: 170, width: 820, height: 560, borderRadius: 22 };
+  // Seat windows 1300 × 820, dock windows 820 × 560, centred in the frame; Focus fills it.
+  const size = w?.big ? { width: 1300, height: 820 } : { width: 820, height: 560 };
+  const box = !w ? null : focus ? { left: 0, top: 0, width: frameWidth, height: 900, borderRadius: 0 } : { left: (frameWidth - size.width) / 2, top: (900 - size.height) / 2, ...size, borderRadius: 22 };
 
   return (
     <>

@@ -29,10 +29,15 @@
   overflow: hidden;
 }
 
-/* Every painting is 1672 × 941, drawn in a 1600 × 900 box at left -80px (SPEC section 3). */
+/* Every painting is 1672 × 941, drawn in a 1600 × 900 box centred in the frame (SPEC section 3), then scaled up
+   just enough to cover a frame wider than 1600 (--cover on .tmrw-scene), so the scene always fills the screen. */
+.tmrw-scene {
+  transform: scale(var(--cover, 1));
+  transform-origin: 50% 50%;
+}
 .tmrw-paint {
   position: absolute;
-  left: -80px;
+  left: calc(50% - 800px);
   top: 0;
   width: 1600px;
   height: 900px;

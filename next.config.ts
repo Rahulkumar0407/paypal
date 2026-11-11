@@ -15,6 +15,8 @@ const nextConfig: NextConfig = {
   experimental: {
     turbopackFileSystemCacheForDev: false,
   },
+  // No "N" dev badge in the corner (it sat on top of the tmrw scenes).
+  devIndicators: false,
   // The Prisma client uses node-postgres; keep both out of the bundle.
   serverExternalPackages: ["pg", "@prisma/adapter-pg"],
 };

@@ -17,21 +17,24 @@ export type WindowKey = "cal" | "grow" | "ins" | "settings" | "morning" | "reque
 
 /** The five scroll positions: station, train, and the three seats. */
 export const POSITIONS = 5;
-export const SETUP_STEPS = 9;
+export const SETUP_STEPS = 10;
 /** One step per wheel notch at most this often (SPEC section 2). */
 export const STEP_DEBOUNCE_MS = 1100;
-/** The train's arrival, from the moment you scroll down from the station (SPEC section 4.2). */
+/**
+ * The train's arrival, from the moment you scroll down from the station. Slower than SPEC 4.2 (5.2 s to the doors):
+ * the train glides in over 8 s, so it reads as a train pulling into a station, not a blur.
+ */
 export const ARRIVAL_TIMELINE: readonly (readonly [number, Arrival])[] = [
   [60, "moving"],
-  [2100, "slowing"],
-  [3300, "settle"],
-  [4700, "stopped"],
-  [5200, "open"],
+  [3800, "slowing"],
+  [6200, "settle"],
+  [8000, "stopped"],
+  [8500, "open"],
 ];
 
 export interface StageState {
   stage: StageName;
-  /** Setup step, 1 to 9. */
+  /** Setup step, 1 to SETUP_STEPS. */
   step: number;
   /** Seat 0 Calendar, 1 Ventures, 2 Insights. */
   seat: number;

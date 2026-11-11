@@ -18,10 +18,10 @@ describe("the tmrw stage machine", () => {
     expect(STEP_DEBOUNCE_MS).toBe(1100);
     expect(ARRIVAL_TIMELINE).toEqual([
       [60, "moving"],
-      [2100, "slowing"],
-      [3300, "settle"],
-      [4700, "stopped"],
-      [5200, "open"],
+      [3800, "slowing"],
+      [6200, "settle"],
+      [8000, "stopped"],
+      [8500, "open"],
     ]);
   });
 });

@@ -5,7 +5,7 @@ import { AppWindow, Dock } from "./Chrome";
 import { Login, Setup } from "./Onboarding";
 import { ASSET, Seat, Station, Train } from "./Scenes";
 import { POSITIONS, useStage } from "./useStage";
-import { FRAME_H, FRAME_W, useFrameScale } from "./useFrameScale";
+import { FRAME_H, useFrame } from "./useFrameScale";
 import { useScrollSteps } from "./useScrollSteps";
 
 /** The next scene's painting, fetched while the current one plays (SPEC section 9). */
@@ -21,7 +21,7 @@ const PRELOAD: Record<string, string[]> = {
 export function Stage({ requests = 3 }: { requests?: number }) {
   const s = useStage();
   const { state, position } = s;
-  const scale = useFrameScale();
+  const frame = useFrame();
   const viewport = useRef<HTMLDivElement>(null);
   const pre = state.stage === "login" || state.stage === "setup";
   const inCar = state.stage === "car";
@@ -38,7 +38,7 @@ export function Stage({ requests = 3 }: { requests?: number }) {
     <div ref={viewport} className="tmrw-viewport">
       <div
         className="tmrw-frame"
-        style={{ width: FRAME_W, height: FRAME_H, transform: `translate(-50%, -50%) scale(${scale})` }}
+        style={{ width: frame.width, height: FRAME_H, transform: `translate(-50%, -50%) scale(${frame.scale})`, ["--cover" as string]: frame.cover }}
         data-stage={state.stage}
         data-position={position}
         data-arrival={state.arrival}
@@ -65,12 +65,7 @@ export function Stage({ requests = 3 }: { requests?: number }) {
         {inCar && <Dock onOpen={s.openWindow} requests={requests} />}
 
         {!pre && (
-          <nav aria-label="Move through tmrw" style={{ position: "absolute", zIndex: 18, right: 22, bottom: 100, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-            <button className="tmrw-btn tmrw-glass" onClick={s.up} aria-label="Scroll up" disabled={position === 0} style={navButton}>
-              <svg className="tmrw-icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M18 15l-6-6-6 6" />
-              </svg>
-            </button>
+          <div aria-hidden="true" style={{ position: "absolute", zIndex: 18, right: 26, top: "50%", transform: "translateY(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
             {Array.from({ length: POSITIONS }, (_, i) => (
               <span
                 key={i}
@@ -78,18 +73,11 @@ export function Stage({ requests = 3 }: { requests?: number }) {
                 style={{ width: 6, height: i === position ? 18 : 6, borderRadius: 3, background: i === position ? "#ffffff" : "rgba(255,255,255,.5)", transition: "height .3s" }}
               />
             ))}
-            <button className="tmrw-btn tmrw-glass" onClick={s.down} aria-label="Scroll down" disabled={position === POSITIONS - 1} style={navButton}>
-              <svg className="tmrw-icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M6 9l6 6 6-6" />
-              </svg>
-            </button>
-          </nav>
+          </div>
         )}
 
-        <AppWindow which={state.window} focus={state.focus} onToggleFocus={s.toggleFocus} onClose={s.closeWindow} />
+        <AppWindow frameWidth={frame.width} which={state.window} focus={state.focus} onToggleFocus={s.toggleFocus} onClose={s.closeWindow} />
       </div>
     </div>
   );
 }
-
-const navButton = { width: 40, height: 40, borderRadius: "50%", display: "grid", placeItems: "center", color: "#1D1D1F" } as const;
