@@ -5,7 +5,7 @@
  */
 const CACHE = "nevershort-offline-v1";
 const OFFLINE = "/offline.html";
-const PRECACHE = [OFFLINE, "/icons/icon-192.png"];
+const PRECACHE = [OFFLINE, "/tmrw/brand/icon-192.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(PRECACHE)).then(() => self.skipWaiting()));

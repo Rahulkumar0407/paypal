@@ -11,8 +11,8 @@ import { useScrollSteps } from "./useScrollSteps";
 
 /** The next scene's painting, fetched while the current one plays (SPEC section 9). */
 const PRELOAD: Record<string, string[]> = {
-  login: [`${ASSET}/scenes/train-doors-open.webp`, `${ASSET}/layers/train-band-doors-closed.webp`, `${ASSET}/layers/door-left.webp`, `${ASSET}/layers/door-right.webp`],
-  station: [`${ASSET}/layers/seat-window-glass-cut.webp`, `${ASSET}/layers/scenery-sky-tile.webp`, `${ASSET}/layers/scenery-ground-tile.webp`],
+  login: [`${ASSET}/layers/train-strip.webp`, `${ASSET}/scenes/train-open.webp`, `${ASSET}/layers/door2-left.webp`, `${ASSET}/layers/door2-right.webp`],
+  station: [`${ASSET}/layers/seat-window-glass-cut.webp`, `${ASSET}/layers/panorama-tile.webp`],
 };
 
 /**

@@ -187,6 +187,15 @@
 .tmrw-groundrun {
   animation: tmrw-run 9s linear infinite;
 }
+/* The window view: one mirrored panorama, 3222px wide at this height, so it loops with no seam. */
+.tmrw-panorun {
+  animation: tmrw-pano 70s linear infinite;
+}
+@keyframes tmrw-pano {
+  to {
+    background-position: -3222px 0;
+  }
+}
 @keyframes tmrw-run {
   to {
     background-position: -1356px 0;
