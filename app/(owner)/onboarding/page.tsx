@@ -5,7 +5,7 @@ import { getStoreSettings } from "@/lib/store";
 import { OnboardingForm } from "@/components/app/OnboardingForm";
 
 export const metadata: Metadata = {
-  title: "Merchant Onboarding • NeverShort",
+  title: "Merchant Onboarding • tmrw",
 };
 
 export default async function OnboardingPage() {
@@ -21,7 +21,7 @@ export default async function OnboardingPage() {
           Merchant Onboarding & Settings
         </h1>
         <p className="text-sm text-slate-500">
-          Transform NeverShort into your business&apos;s real cash co-pilot. Connect real store parameters, define safety thresholds, and verify live integrations.
+          Transform tmrw into your business&apos;s real cash co-pilot. Connect real store parameters, define safety thresholds, and verify live integrations.
         </p>
       </div>
 

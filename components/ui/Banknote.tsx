@@ -1,5 +1,5 @@
 /**
- * The banknote panel: the home screen's top band (chosen design A2, see /design/backgrounds). Owner: Person 1.
+ * The banknote panel: the home screen's top band (chosen design A2).
  * Precise, symmetric engraving like a real note: a fine lathe tint, a rope border with a 14 in each corner,
  * a rosette medallion, the Margin Guard seal, serials, plaques and signatures. All decorative (aria-hidden);
  * the meaning lives in the headline and strip placed inside it. Medallion, seal and signatures appear from
@@ -223,8 +223,8 @@ export function BanknoteArt({ sealOnly = false }: { sealOnly?: boolean }) {
       <CornerCounter className="bottom-[-2px] left-[-2px] lg:bottom-[-3px] lg:left-[-3px]" />
       <CornerCounter className="right-[-2px] bottom-[-2px] lg:right-[-3px] lg:bottom-[-3px]" />
 
-      <Plaque text="NEVERSHORT" className="top-[16px] lg:top-[29px]" />
-      <Plaque text="THIS FORECAST IS GOOD FOR FOURTEEN DAYS" short="GOOD FOR FOURTEEN DAYS" className="bottom-[16px] lg:bottom-[29px]" />
+      <Plaque text="TMRW" className="top-[16px] lg:top-[29px]" />
+      <Plaque text="THIS FORECAST IS GOOD FOR THIRTY DAYS" short="GOOD FOR THIRTY DAYS" className="bottom-[16px] lg:bottom-[29px]" />
 
       <p aria-hidden className="pointer-events-none absolute top-[78px] left-[96px] hidden font-mono text-[15px] tracking-[0.2em] text-red lg:block">
         NS 05112026 A
@@ -249,7 +249,7 @@ export function BanknoteArt({ sealOnly = false }: { sealOnly?: boolean }) {
       )}
 
       <Signature name="Margin Guard" role="KEEPER OF THE GUARD" className="bottom-[96px] left-[112px]" />
-      <Signature name="Loop Audio" role="OWNER" className="right-[24%] bottom-[96px]" />
+      <Signature name="Dunder Mifflin & Co." role="OWNER" className="right-[24%] bottom-[96px]" />
     </>
   );
 }

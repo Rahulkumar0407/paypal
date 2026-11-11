@@ -25,7 +25,7 @@ export function alertsFrom({ forecast, dues, evidence, salesLast7Cents }: AlertI
   const window = new Set(forecast.days.map((d) => d.date));
   const seen = new Set<string>();
   for (const due of dues) {
-    if (due.kind !== "BILL" || !window.has(due.dueOn) || seen.has(due.payeeId)) continue;
+    if ((due.kind !== "BILL" && due.kind !== "SUPPLIER") || !window.has(due.dueOn) || seen.has(due.payeeId)) continue;
     seen.add(due.payeeId);
     const past = evidence.find((e) => e.payeeId === due.payeeId);
     if (!past || due.amountCents <= past.highestCents) continue;

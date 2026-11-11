@@ -9,7 +9,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             N
           </span>
           <span className="font-serif font-black text-2xl text-slate-900 tracking-tight">
-            NeverShort
+            tmrw
           </span>
         </Link>
         <p className="text-xs font-mono uppercase tracking-wider text-slate-500 font-bold">

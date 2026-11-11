@@ -110,7 +110,7 @@ export default async function HomePage() {
             Cash Position Healthy
           </div>
           <h1 className="text-2xl sm:text-3xl font-serif font-black text-slate-900 tracking-tight">
-            Your cash is covered for the next two weeks.
+            Your cash is covered for the next 30 days.
           </h1>
           <p className="text-sm text-slate-600">
             All scheduled obligations are fully covered by incoming PayPal revenues.
@@ -161,7 +161,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── 3. Middle: ONE Clean, Interactive 14-Day Cash-Flow Chart ── */}
+      {/* ── 3. Middle: ONE Clean, Interactive 30-Day Cash-Flow Chart ── */}
       <UnifiedForecastChart
         days={forecast.days}
         minimumBalanceCents={forecast.minimumBalanceCents}
@@ -206,7 +206,7 @@ export default async function HomePage() {
               Approaching Payments
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              Bills and supplier orders due in the next 14 days.
+              Bills and supplier orders due in the next 30 days.
             </p>
           </div>
           <Link

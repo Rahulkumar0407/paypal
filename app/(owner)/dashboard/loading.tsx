@@ -2,7 +2,7 @@
  * Clean, minimal loading skeleton for the Forecast (Dashboard) page.
  * Matches 1:1 with app/(owner)/dashboard/page.tsx:
  * 1. Page Header (Title + Subtitle)
- * 2. 14-Day Trajectory Chart with Day Scrubber
+ * 2. 30-Day Trajectory Chart with Day Scrubber
  * 3. Collapsible data tables skeleton (Dues & Orders)
  */
 export default function DashboardLoading() {
@@ -19,7 +19,7 @@ export default function DashboardLoading() {
         <div className="h-4 w-96 max-w-full rounded bg-slate-100" />
       </div>
 
-      {/* 2. Unified 14-Day Forecast Chart Skeleton */}
+      {/* 2. Unified 30-Day Forecast Chart Skeleton */}
       <div className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-xs space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="space-y-1">

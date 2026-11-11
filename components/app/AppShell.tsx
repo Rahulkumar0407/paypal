@@ -4,7 +4,7 @@ import { logoutAction } from "@/lib/auth/actions";
 import { BottomNav, SideNav } from "./NavLinks";
 
 /**
- * Modern, world-class fintech AppShell for NeverShort.
+ * Modern, world-class fintech AppShell for tmrw.
  * Clean, light neutral background (#F8FAFC), crisp white surfaces,
  * sophisticated typography, clear hierarchical navigation, and an intuitive mobile PWA model.
  */
@@ -34,7 +34,7 @@ export function AppShell({
               </span>
               <div className="flex flex-col">
                 <span className="font-serif font-black text-xl leading-none text-slate-900 tracking-tight">
-                  NeverShort
+                  tmrw
                 </span>
                 <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold mt-0.5">
                   Cash Co-pilot
@@ -138,7 +138,7 @@ export function AppShell({
               N
             </span>
             <span className="font-serif font-black text-xl leading-none text-slate-900">
-              NeverShort
+              tmrw
             </span>
           </Link>
           <div className="flex items-center gap-2">
@@ -179,7 +179,7 @@ export function DemoBanner({ today }: { today: string }) {
             Demo Mode: Today is <strong className="text-white font-semibold">{formatDayWithYear(today)}</strong>.
           </span>
           <span className="hidden md:inline text-slate-400">
-            Simulated Loop Audio boutique. Payments operate in PayPal Sandbox.
+            Simulated Dunder Mifflin & Co. café-bakery. Payments operate in PayPal Sandbox.
           </span>
         </div>
         <div className="flex items-center gap-3 font-mono">

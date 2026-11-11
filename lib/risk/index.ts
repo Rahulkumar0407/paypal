@@ -1,5 +1,5 @@
 /**
- * lib/risk: the risk check and the alerts. Owner: Person 1.
+ * lib/risk: the risk check and the alerts.
  * Fixed rules score each pending or failed order (lib/shared/risk.ts); a flagged order gets a HOLD_ORDER proposal
  * through the Margin Guard, with one line on why (worded by lib/ai, with a template). The forecast already leaves a
  * flagged order out of money in until the owner clears it (declines the hold).

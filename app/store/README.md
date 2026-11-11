@@ -1,6 +1,5 @@
 # app/store/
 
-**Owner:** Person 1. Task P1-9. The buyer's side: Loop Audio's shop. Server code here may import `@/lib/paypal`.
 
 | Path | What it does |
 |------|--------------|

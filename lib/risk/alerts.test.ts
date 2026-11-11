@@ -12,16 +12,16 @@ describe("alerts", () => {
       {
         id: expect.stringContaining("price_rise_"),
         kind: "PRICE_RISE",
-        title: "Store software went up $10.",
-        detail: "It was $89 the last 3 times. The bill on Fri 13 Nov is $99.",
+        title: "Oat of Office went up $15.",
+        detail: "It was $165 the last 3 times. The bill on Sun 15 Nov is $180.",
         confidence: "high",
       },
     ]);
   });
 
   it("stays quiet about a bill that didn't go up", () => {
-    const software = store.evidence.find((e) => e.highestCents === 8_900)!;
-    const same = store.evidence.map((e) => (e === software ? { ...e, highestCents: 9_900 } : e));
+    const oat = store.evidence.find((e) => e.highestCents === 16_500)!;
+    const same = store.evidence.map((e) => (e === oat ? { ...e, highestCents: 18_000 } : e));
     expect(alertsFrom(input({ evidence: same }))).toEqual([]);
   });
 

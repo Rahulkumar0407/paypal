@@ -1,6 +1,5 @@
 # lib/risk/
 
-**Owner:** Person 1. Task P1-11.
 
 **What goes here:** the risk check and the alerts.
 

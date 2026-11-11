@@ -8,7 +8,7 @@ import { gridTheme } from "./gridTheme";
 import type { DueRow } from "./rows";
 
 /**
- * Money out over the next 14 days (AG Grid Community): each payment due with a ready meter, how much of it the
+ * Money out over the next 30 days (AG Grid Community): each payment due with a ready meter, how much of it the
  * forecast says will be there on the day, like the till drawer's note stack. Loaded only on a laptop (DuesTable).
  */
 
@@ -79,7 +79,7 @@ export function AgDuesGrid({ rows }: { rows: DueRow[] }) {
       defaultColDef={{ sortable: true, resizable: true, suppressHeaderMenuButton: true }}
       getRowId={(p) => p.data.id}
       domLayout="autoHeight"
-      overlayNoRowsTemplate='<span style="font-size:15px">Nothing to pay in the next 14 days.</span>'
+      overlayNoRowsTemplate='<span style="font-size:15px">Nothing to pay in the next 30 days.</span>'
       animateRows
     />
   );

@@ -1,4 +1,4 @@
-// NeverShort database schema. Shared file: created by Person 1, changes go through Person 2.
+// NeverShort database schema.
 //
 // Rules (AGENTS.md section 9):
 // - Every table carries a storeId. Each visitor has their own copy of the demo store, and

@@ -1,11 +1,10 @@
 /**
- * lib/store: the store's catalogue, orders, settings and payment records. Owner: Person 1.
+ * lib/store: the store's catalogue, orders, settings and payment records.
  * Payment records are written after a PayPal call made elsewhere (store routes, webhook, the Guard's executor):
  * lib/store itself never calls PayPal.
  */
 import type { Order, Product, StoreId, StoreSettings } from "@/types";
-import { MOCK_MINIMUM_BALANCE, MOCK_TIGHT_MARGIN } from "@/mocks/forecast";
-import { mockProducts, mockRecentOrders } from "@/mocks/store";
+import { DEMO_CATALOG, DEMO_STORE_SETTINGS } from "@/lib/demo";
 import { getDb, isDatabaseConfigured } from "@/lib/shared/db";
 
 export {
@@ -22,16 +21,20 @@ export {
   type PaymentEvent,
 } from "./payments";
 
-/** The catalogue, dearest first. Without a database, the sample catalogue (same products and prices as the seed). */
+/** The catalogue, dearest first. Without a database, the demo seed's catalogue. */
 export async function listProducts(storeId: StoreId): Promise<Product[]> {
-  if (!isDatabaseConfigured()) return mockProducts.map((p) => ({ ...p, storeId }));
+  if (!isDatabaseConfigured()) {
+    return [...DEMO_CATALOG]
+      .sort((a, b) => b.priceCents - a.priceCents || a.sku.localeCompare(b.sku))
+      .map((c) => ({ id: `${storeId}_prod_${c.key}`, storeId, sku: c.sku, name: c.name, description: c.description, priceCents: c.priceCents, costCents: c.costCents }));
+  }
   const rows = await getDb().product.findMany({ where: { storeId, active: true }, orderBy: [{ priceCents: "desc" }, { sku: "asc" }] });
   return rows.map((p) => ({ id: p.id, storeId: p.storeId, sku: p.sku, name: p.name, description: p.description, priceCents: p.priceCents, costCents: p.costCents }));
 }
 
 /** Newest orders first, with the customer's name. */
 export async function listRecentOrders(storeId: StoreId, limit = 50): Promise<Order[]> {
-  if (!isDatabaseConfigured()) return mockRecentOrders.slice(0, limit).map((o) => ({ ...o, storeId }));
+  if (!isDatabaseConfigured()) return [];
   const rows = await getDb().order.findMany({ where: { storeId }, include: { customer: { select: { name: true } } }, orderBy: [{ placedAt: "desc" }, { number: "desc" }], take: limit });
   return rows.map((o) => ({
     id: o.id,
@@ -81,14 +84,14 @@ export async function saveStoreSettings(storeId: StoreId, settings: EditableSett
 export async function getStoreSettings(storeId: StoreId): Promise<StoreSettings> {
   const fallback: StoreSettings = {
     storeId,
-    name: "Loop Audio",
+    name: DEMO_STORE_SETTINGS.name,
     currency: "USD",
     timezone: "America/New_York",
-    minimumBalanceCents: MOCK_MINIMUM_BALANCE,
-    tightMarginCents: MOCK_TIGHT_MARGIN,
-    whatYouSell: "Headphones, earbuds and spare parts, sold online across the US.",
+    minimumBalanceCents: DEMO_STORE_SETTINGS.minimumBalanceCents,
+    tightMarginCents: DEMO_STORE_SETTINGS.tightMarginCents,
+    whatYouSell: DEMO_STORE_SETTINGS.whatYouSell,
     supplierPaymentMethod: "PAYPAL_PAYOUTS",
-    busySeasons: ["Late November (Black Friday)", "December holidays", "Back to school (late August)"],
+    busySeasons: [...DEMO_STORE_SETTINGS.busySeasons],
   };
   if (!isDatabaseConfigured()) return fallback;
   const s = await getDb().store.findUnique({ where: { id: storeId } });

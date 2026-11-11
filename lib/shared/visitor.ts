@@ -1,7 +1,7 @@
 import type { StoreId } from "@/types";
 
 /**
- * Each visitor gets their own copy of Loop Audio. The proxy (proxy.ts) gives every new
+ * Each visitor gets their own copy of Dunder Mifflin & Co.. The proxy (proxy.ts) gives every new
  * browser this cookie; lib/demo creates the copy in the database on first use.
  * No database access here: this file is imported by the proxy.
  */

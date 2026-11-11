@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { AskPanel } from "@/components/ask/AskPanel";
 import { SUGGESTED_QUESTIONS } from "@/lib/ai";
 
-export const metadata: Metadata = { title: "Ask Co-pilot • NeverShort" };
+export const metadata: Metadata = { title: "Ask Co-pilot • tmrw" };
 
 /** Ask: plain questions about the shop's money, answered only from its own numbers. */
 export default function AskPage() {

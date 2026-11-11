@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SECONDARY_NAV, UTILITY_NAV } from "@/components/app/nav";
 
-export const metadata: Metadata = { title: "More • NeverShort" };
+export const metadata: Metadata = { title: "More • tmrw" };
 
 export default function MorePage() {
   return (

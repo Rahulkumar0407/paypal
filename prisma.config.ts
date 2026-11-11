@@ -1,4 +1,4 @@
-// Prisma CLI configuration (migrations, studio, seed). Shared file: changes go through Person 2.
+// Prisma CLI configuration (migrations, studio, seed).
 //
 // Supabase has two connection strings:
 //   DATABASE_URL  pooled (Transaction pooler, port 6543)  -> used by the app at runtime (lib/shared/db.ts)

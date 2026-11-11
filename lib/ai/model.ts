@@ -1,5 +1,5 @@
 /**
- * The ONE file with AI provider setup (AGENTS.md section 5). Owner: Person 1.
+ * The ONE file with AI provider setup (AGENTS.md section 5).
  * No other file imports a provider package (ESLint enforces it).
  *
  * Gemini through the AI SDK (`@ai-sdk/google`). From the environment:
@@ -35,7 +35,7 @@ export function isAiConfigured(): boolean {
 
 /**
  * Gemini 3 and later "think" before answering by default, which took 11-16 s per reply and ran past the app's time
- * limits. NeverShort's AI only words and explains numbers code already calculated, so it needs the least thinking.
+ * limits. tmrw's AI only words and explains numbers code already calculated, so it needs the least thinking.
  * Gemini 3+ takes a thinking level; 2.5 Flash models take a budget (0 = off). Other models are left as they are.
  */
 function thinkingFor(modelId: string): { thinkingLevel: "minimal" } | { thinkingBudget: 0 } | null {

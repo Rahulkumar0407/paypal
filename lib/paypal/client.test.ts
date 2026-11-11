@@ -21,7 +21,7 @@ interface Call {
   body: unknown;
 }
 
-const ORDER_INPUT = { storeId: "st_test", orderId: "st_test_ord_1258", amountCents: 7_200, description: "Loop Audio order #1258", idempotencyKey: "run_a:SEND_REMINDER:st_test_ord_1258:1", returnUrl: "http://localhost:3000/store/return", cancelUrl: "http://localhost:3000/store/cancel" };
+const ORDER_INPUT = { storeId: "st_test", orderId: "st_test_ord_1258", amountCents: 7_200, description: "Dunder Mifflin & Co. order #1258", idempotencyKey: "run_a:SEND_REMINDER:st_test_ord_1258:1", returnUrl: "http://localhost:3000/store/return", cancelUrl: "http://localhost:3000/store/cancel" };
 const CAPTURED = {
   id: "PP_ORDER",
   status: "COMPLETED",

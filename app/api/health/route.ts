@@ -4,7 +4,7 @@ import { today } from "@/lib/shared/clock";
 import { getBuildCommitSha } from "@/lib/shared/version";
 
 /**
- * Health check. Owner: Person 1.
+ * Health check.
  * A free uptime pinger opens this every 10 minutes: that keeps the Render service awake and stops Supabase
  * pausing the project. Keep it fast: exactly one light query (SELECT 1), no other work, never cached.
  * 200 = app and database fine. 503 = database missing or unreachable.

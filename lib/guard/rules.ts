@@ -181,7 +181,7 @@ export const RULES: readonly RuleDef[] = [
       const { dailyAmountCents: daily, startOn, endOn } = p.params;
       const window = forecast.before.days.filter((d) => d.date >= startOn && d.date <= endOn);
       if (window.length === 0 || window.at(-1)!.date !== endOn || window[0]!.date !== startOn) {
-        return ["FAIL", `Can't check days outside the 14-day forecast, ${SAFETY}`];
+        return ["FAIL", `Can't check days outside the 30-day forecast, ${SAFETY}`];
       }
       const over = window.find((d) => daily * 10 > d.expectedInCents * SET_ASIDE_CAP_TENTHS);
       if (over) {
@@ -201,9 +201,9 @@ export const RULES: readonly RuleDef[] = [
       const always = ALWAYS_ASK[p.type];
       if (always) return ["FAIL", always];
       if (p.amountCents > OWNER_APPROVAL_LIMIT_CENTS) {
-        return ["FAIL", `${formatCents(p.amountCents)} is more than ${formatCents(OWNER_APPROVAL_LIMIT_CENTS)}, the most NeverShort does without asking you.`];
+        return ["FAIL", `${formatCents(p.amountCents)} is more than ${formatCents(OWNER_APPROVAL_LIMIT_CENTS)}, the most tmrw does without asking you.`];
       }
-      return ["PASS", `${formatCents(p.amountCents)} is within the ${formatCents(OWNER_APPROVAL_LIMIT_CENTS)} NeverShort may do without asking you.`];
+      return ["PASS", `${formatCents(p.amountCents)} is within the ${formatCents(OWNER_APPROVAL_LIMIT_CENTS)} tmrw may do without asking you.`];
     },
   },
   {

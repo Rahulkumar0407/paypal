@@ -1,7 +1,7 @@
 import { getEnv } from "@/lib/shared/env";
 
 /**
- * Whether PayPal is set up. The app always runs without keys: until Person 2 creates the sandbox app,
+ * Whether PayPal is set up. The app always runs without keys: until the sandbox app exists,
  * checkout is switched off and the demo uses fake PayPal data (PAYPAL_FAKE=1 in tests).
  */
 export type PayPalSetup = "sandbox" | "fake" | "not-configured";

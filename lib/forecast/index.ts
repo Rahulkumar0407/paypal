@@ -1,5 +1,5 @@
 /**
- * lib/forecast: regular payment detection, the 14-day forecast, "can I afford", and what-ifs for the Guard.
+ * lib/forecast: regular payment detection, the 30-day forecast, "can I afford", and what-ifs for the Guard.
  * Deterministic code only: no AI. All money in integer cents; "today" only from lib/shared/clock.
  * The maths is pure (engine.ts, detect.ts); this file reads the store's rows and writes the owner's answers.
  */
@@ -36,7 +36,7 @@ async function inputFor(storeId: StoreId) {
   return inputFromRows(await loadStoreRows(storeId, day), storeId, day);
 }
 
-/** The 14-day forecast starting today, with the first shortfall and a confidence level. */
+/** The 30-day forecast starting today, with the first shortfall and a confidence level. */
 export async function getForecast(storeId: StoreId): Promise<Forecast> {
   return forecastFrom(await inputFor(storeId));
 }
@@ -165,7 +165,7 @@ export async function canAfford(storeId: StoreId, amountCents: Cents, date: IsoD
 
 /**
  * The demo store's real forecast at a point in the story, worked out in memory from the seed (no database).
- * /design shows it; the tests check the story's numbers with it.
+ * The tests check the story's numbers with it.
  */
 export function previewDemoForecast(scenario: DemoScenario = {}): Forecast {
   const day = today();
@@ -186,7 +186,7 @@ export async function getPatternEvidence(storeId: StoreId): Promise<PatternEvide
 
 /**
  * The demo store at a point in the story, everything worked out in memory from the seed (no database): the forecast,
- * dues, found payees, recent payments, and "can I afford". The tests and /design use it.
+ * dues, found payees, recent payments, and "can I afford". The tests use it.
  */
 export function previewDemoStore(scenario: DemoScenario = {}) {
   const day = today();

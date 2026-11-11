@@ -1,6 +1,5 @@
 # lib/demo/
 
-**Owner:** Person 1. Copies and reset work since the foundation; P1-6 tuned the numbers for the real forecast.
 
 **What goes here:** the SIMULATED Loop Audio demo store, one private copy per visitor, and reset.
 

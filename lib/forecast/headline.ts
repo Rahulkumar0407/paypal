@@ -6,7 +6,7 @@ import { formatDollars, formatShortfall } from "@/lib/shared/money";
  * The one sentence that opens the home screen, read like a weather forecast.
  * Built from code templates only (AGENTS.md section 5), so the demo replays word for word.
  *
- *   "Clear until Wednesday. On Thu 12 Nov you'll be $90 short: the supplier order and rent land the same day."
+ *   "Clear until Wednesday. On Thu 12 Nov you'll be $120 short: the bean order and rent land the same day."
  */
 export function buildHeadline(forecast: Forecast): Headline {
   const today = forecast.asOf;
@@ -24,7 +24,7 @@ export function buildHeadline(forecast: Forecast): Headline {
   if (tight) {
     const spare = formatDollars(tight.closingCents - forecast.minimumBalanceCents);
     return {
-      text: `Covered for the next two weeks. ${formatDay(tight.date)} is tight, with ${spare} above your minimum.`,
+      text: `Covered for the next ${forecast.days.length} days. ${formatDay(tight.date)} is tight, with ${spare} above your minimum.`,
       tone: "tight",
     };
   }
@@ -37,11 +37,11 @@ export function buildHeadline(forecast: Forecast): Headline {
     const labels = busiest.dues.filter((d) => d.kind !== "OWNER_TRANSFER").map((d) => d.label);
     const what = labels.length === 1 ? labels[0]! : `${labels.slice(0, -1).join(", ")} and ${labels.at(-1)}`;
     return {
-      text: `Clear for the next two weeks. ${formatDay(busiest.date)} is covered too, when ${what} ${labels.length === 1 ? "goes" : "go"} out.`,
+      text: `Clear for the next ${forecast.days.length} days. ${formatDay(busiest.date)} is covered too, when ${what} ${labels.length === 1 ? "goes" : "go"} out.`,
       tone: "covered",
     };
   }
-  return { text: "Clear for the next two weeks. Nothing is due that sales won't cover.", tone: "covered" };
+  return { text: `Clear for the next ${forecast.days.length} days. Nothing is due that sales won't cover.`, tone: "covered" };
 }
 
 function forecastDayBefore(forecast: Forecast, date: string): string {

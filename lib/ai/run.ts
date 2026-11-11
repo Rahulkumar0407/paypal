@@ -2,7 +2,7 @@ import { generateText, Output, type LanguageModel } from "ai";
 import type { z } from "zod";
 
 /**
- * The two ways NeverShort calls a model: a short text, or a zod-checked object. Both give up quietly (null) on any
+ * The two ways tmrw calls a model: a short text, or a zod-checked object. Both give up quietly (null) on any
  * failure or after a time limit, so the caller shows its template instead. AI failure is never app failure.
  */
 

@@ -35,7 +35,7 @@ export function OnboardingForm({
             }`}
           />
           <span className="text-sm font-semibold text-slate-900">
-            Current Status: {isDemo ? "Demo Simulation (Loop Audio)" : `Active Merchant (${currentName})`}
+            Current Status: {isDemo ? "Demo Simulation (Dunder Mifflin & Co.)" : `Active Merchant (${currentName})`}
           </span>
         </div>
         {isDemo ? (
@@ -46,7 +46,7 @@ export function OnboardingForm({
           <button
             type="button"
             onClick={async () => {
-              if (confirm("Restore the Loop Audio demo simulation?")) {
+              if (confirm("Restore the Dunder Mifflin & Co. demo simulation?")) {
                 await resetToDemoSimulation();
                 window.location.reload();
               }
@@ -184,7 +184,7 @@ export function OnboardingForm({
       <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs space-y-3">
         <h3 className="text-base font-bold text-slate-900">3. PayPal Integration Status</h3>
         <p className="text-xs text-slate-500">
-          NeverShort connects to PayPal Orders v2 and Webhooks. Payments are verified on the server side using official PayPal cryptographic signatures.
+          tmrw connects to PayPal Orders v2 and Webhooks. Payments are verified on the server side using official PayPal cryptographic signatures.
         </p>
         <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/60 font-mono text-xs space-y-1.5 text-slate-600">
           <div className="flex justify-between">

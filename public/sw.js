@@ -1,5 +1,5 @@
 /*
- * NeverShort service worker. Owner: Person 1.
+ * tmrw service worker.
  * It never caches pages, API calls or data, so a reset always shows fresh numbers. Its one job: when the
  * phone is offline, show a calm offline page instead of the browser's error.
  */

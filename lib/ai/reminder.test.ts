@@ -11,15 +11,15 @@ describe("the reminder template", () => {
   it("names the customer and what they left, with a place for the link", () => {
     const d = reminderTemplate({ firstName: "Maya", orderNumber: 1258, items: ["Loop Kids volume-safe headphones", "Replacement ear cushions"], sequence: 1 });
     expect(d).toEqual({
-      subject: "Your Loop Audio order #1258 is waiting",
-      body: "Hi Maya, your Loop Kids volume-safe headphones and replacement ear cushions are still waiting for you. Here's a fresh checkout link if you'd like to finish your order: {checkout_link}. Thanks, Loop Audio",
+      subject: "Your Dunder Mifflin & Co. order #1258 is waiting",
+      body: "Hi Maya, your Loop Kids volume-safe headphones and replacement ear cushions are still waiting for you. Here's a fresh checkout link if you'd like to finish your order: {checkout_link}. Thanks, Dunder Mifflin & Co.",
       source: "template",
     });
   });
 
   it("is gentler the second time, and says there's no need to reply", () => {
     const d = reminderTemplate({ firstName: "Maya", orderNumber: 1258, items: ["Loop Buds"], sequence: 2 });
-    expect(d.subject).toBe("A last reminder about Loop Audio order #1258");
+    expect(d.subject).toBe("A last reminder about Dunder Mifflin & Co. order #1258");
     expect(d.body).toContain("Loop Buds is still saved for you");
     expect(d.body).toContain("no need to reply");
   });
@@ -41,16 +41,16 @@ describe("the AI draft", () => {
     new MockLanguageModelV4({ doGenerate: async () => ({ content: [{ type: "text", text: JSON.stringify({ subject, body }) }], finishReason: { unified: "stop", raw: undefined }, usage, warnings: [] }) });
 
   it("is used when it passes every check", async () => {
-    const d = await draftReminder(input, writes("Your Loop Audio order is waiting", "Hi Maya, your headphones are saved for you. You can finish here: {checkout_link}. Thanks, Loop Audio"));
-    expect(d).toMatchObject({ source: "ai", body: "Hi Maya, your headphones are saved for you. You can finish here: {checkout_link}. Thanks, Loop Audio" });
+    const d = await draftReminder(input, writes("Your Dunder Mifflin & Co. order is waiting", "Hi Maya, your headphones are saved for you. You can finish here: {checkout_link}. Thanks, Dunder Mifflin & Co."));
+    expect(d).toMatchObject({ source: "ai", body: "Hi Maya, your headphones are saved for you. You can finish here: {checkout_link}. Thanks, Dunder Mifflin & Co." });
   });
 
   it("falls back to the template for an amount, an exclamation mark, a missing link, or no AI", async () => {
     const template = reminderTemplate(input);
     for (const body of [
-      "Hi Maya, your $45 headphones are waiting: {checkout_link}. Thanks, Loop Audio",
-      "Hi Maya, don't miss out! Finish here: {checkout_link}. Thanks, Loop Audio",
-      "Hi Maya, your headphones are waiting. Thanks, Loop Audio",
+      "Hi Maya, your $45 headphones are waiting: {checkout_link}. Thanks, Dunder Mifflin & Co.",
+      "Hi Maya, don't miss out! Finish here: {checkout_link}. Thanks, Dunder Mifflin & Co.",
+      "Hi Maya, your headphones are waiting. Thanks, Dunder Mifflin & Co.",
     ]) {
       expect(await draftReminder(input, writes("Your order", body))).toEqual(template);
     }

@@ -1,12 +1,12 @@
 import type { MetadataRoute } from "next";
 
-/** Installs NeverShort to a phone's home screen: opens on Today, full-screen, in the brand's deep green. */
+/** Installs tmrw to a phone's home screen: opens on Today, full-screen, in the brand's deep green. */
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "NeverShort",
-    short_name: "NeverShort",
-    description: "A calm money forecast for a small online store: get paid, stay safe, never come up short.",
+    name: "tmrw",
+    short_name: "tmrw",
+    description: "See the short day before it arrives. Your shop's month, on one page, inside PayPal.",
     start_url: "/today",
     scope: "/",
     display: "standalone",

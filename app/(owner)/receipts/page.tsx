@@ -9,7 +9,7 @@ import { listReceipts } from "@/lib/guard";
 import { formatDay } from "@/lib/shared/dates";
 import { formatCents } from "@/lib/shared/money";
 
-export const metadata: Metadata = { title: "Receipts & Audit Trail • NeverShort" };
+export const metadata: Metadata = { title: "Receipts & Audit Trail • tmrw" };
 
 /** Every Guard decision, newest first, filterable by Approved / Escalated / Blocked. */
 export default async function ReceiptsPage({

@@ -11,7 +11,7 @@ import { formatDay } from "@/lib/shared/dates";
 import { formatDollars, formatShortfall } from "@/lib/shared/money";
 import type { PayeeKind } from "@/types";
 
-export const metadata: Metadata = { title: "Payments • NeverShort" };
+export const metadata: Metadata = { title: "Payments • tmrw" };
 
 const KIND_LABEL: Record<PayeeKind, string> = {
   SUPPLIER: "Supplier Order",
@@ -62,7 +62,7 @@ export default async function DuesPage() {
           Payment Schedule
         </h1>
         <p className="text-sm text-slate-500">
-          All vendor payouts, recurring bills, and owner bank transfers scheduled for the next 14 days.
+          All vendor payouts, recurring bills, and owner bank transfers scheduled for the next 30 days.
         </p>
       </div>
 
@@ -122,7 +122,7 @@ export default async function DuesPage() {
             Upcoming Payments
           </h2>
           <span className="text-xs text-slate-500">
-            Next 14 Days
+            Next 30 Days
           </span>
         </div>
 
@@ -194,7 +194,7 @@ export default async function DuesPage() {
           <div className="p-8 text-center">
             <EmptyState
               title="No payments due."
-              body="No upcoming bills or supplier disbursements found for the next two weeks."
+              body="No upcoming bills or supplier disbursements found for the next 30 days."
             />
           </div>
         )}

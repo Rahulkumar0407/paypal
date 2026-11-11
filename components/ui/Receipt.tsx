@@ -50,7 +50,7 @@ function Divider() {
 
 export function Receipt({
   receipt,
-  storeName = "Loop Audio",
+  storeName = "Dunder Mifflin & Co.",
   animateStamp = true,
   compact = false,
 }: {

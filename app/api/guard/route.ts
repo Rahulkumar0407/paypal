@@ -8,7 +8,7 @@ export async function GET() {
   return NextResponse.json({ inbox: await listInbox(storeId) });
 }
 
-/** Proposals are made on the server by NeverShort's own screens and agents (never from a browser), so there is no POST. */
+/** Proposals are made on the server by tmrw's own screens and agents (never from a browser), so there is no POST. */
 export async function POST() {
-  return NextResponse.json({ error: "Proposals come from NeverShort's own screens, not this API." }, { status: 405 });
+  return NextResponse.json({ error: "Proposals come from tmrw's own screens, not this API." }, { status: 405 });
 }

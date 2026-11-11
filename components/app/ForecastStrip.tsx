@@ -6,7 +6,7 @@ import { StripTileFace } from "@/components/ui/MoneyStrip";
 import { DayDetail } from "./DayDetail";
 
 /**
- * The 14-day interactive strip. Tapping a day displays that day's financial breakdown.
+ * The 30-day interactive strip. Tapping a day displays that day's financial breakdown.
  */
 export function ForecastStrip({
   days,
@@ -26,7 +26,7 @@ export function ForecastStrip({
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
           <h3 className="text-base font-semibold text-slate-900">
-            14-Day Daily Balance Trajectory
+            30-Day Daily Balance Trajectory
           </h3>
           <p className="text-xs text-slate-500 mt-0.5">
             Select any day to inspect opening balance, expected sales, and scheduled payments.
@@ -49,7 +49,7 @@ export function ForecastStrip({
         Choose a day to see its money in and out.
       </p>
       <ol
-        aria-label="Your balance at the end of each of the next 14 days"
+        aria-label="Your balance at the end of each of the next 30 days"
         aria-describedby="strip-hint"
         className="grid grid-cols-4 gap-2 sm:grid-cols-7 lg:gap-3"
       >

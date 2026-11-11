@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { isStoreId, newStoreId, STORE_COOKIE, STORE_COOKIE_MAX_AGE } from "@/lib/shared/visitor";
 
 /**
- * Gives every new visitor their own demo store id (a cookie). Owner: Person 1.
+ * Gives every new visitor their own demo store id (a cookie).
  * No database work here: lib/demo creates the copy the first time a page needs it.
  */
 export function proxy(request: NextRequest) {

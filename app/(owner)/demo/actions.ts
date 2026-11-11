@@ -8,7 +8,7 @@ import { getDb, isDatabaseConfigured } from "@/lib/shared/db";
 
 export type ResetResult = { status: "idle" } | { status: "done"; runId: string } | { status: "failed"; message: string };
 
-/** Puts this visitor's copy of Loop Audio back at the start of the story (Person 3's resetStore). Other visitors are untouched. */
+/** Puts this visitor's copy of Dunder Mifflin & Co. back at the start of the story (Person 3's resetStore). Other visitors are untouched. */
 export async function resetMyCopy(previous: ResetResult): Promise<ResetResult> {
   void previous;
   if (!isDatabaseConfigured()) {

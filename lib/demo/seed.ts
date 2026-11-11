@@ -6,35 +6,36 @@ import { DEMO_CATALOG, DEMO_CUSTOMER_NAMES } from "./catalog";
 import { createRandom } from "./prng";
 
 /**
- * Builds one complete copy of the Loop Audio demo store as plain rows. Pure and deterministic:
+ * Builds one complete copy of the Dunder Mifflin & Co. demo café-bakery as plain rows. Pure and deterministic:
  * the same storeId and date always give exactly the same rows (only demoRunId differs).
  * Everything here is SIMULATED. The numbers are tuned so the real forecast (lib/forecast) tells the demo story;
  * DEMO.md has the hand calculation and lib/forecast/demo-story.test.ts checks it.
  */
 
-export const DEMO_SEED_VERSION = 2;
+export const DEMO_SEED_VERSION = 3;
 const RANDOM_SEED = 20261105;
 
 export const DEMO_STORE_SETTINGS = {
-  name: "Loop Audio",
-  minimumBalanceCents: 10_000, // $100
-  tightMarginCents: 5_000, // tight = within $50 above the minimum
+  name: "Dunder Mifflin & Co.",
+  minimumBalanceCents: 20_000, // $200
+  tightMarginCents: 10_000, // tight = within $100 above the minimum
   /**
    * Balance at the start of DEMO_TODAY. The opening balance 90 days ago is worked back from this.
-   * Tuned so Thu 12 Nov closes at exactly $10.00, which is $90 short of the $100 minimum (DEMO.md).
+   * Tuned so Thu 12 Nov closes at exactly $80.00, which is $120 short of the $200 minimum: rent and beans ($1,900)
+   * land the same day with $1,780 free above the minimum.
    */
-  balanceAtStartOfTodayCents: 198_756, // $1,987.56
+  balanceAtStartOfTodayCents: 26_608, // $266.08
   historyDays: 90,
   futureDays: 35,
-  whatYouSell: "Headphones, earbuds and spare parts, sold online across the US.",
-  busySeasons: ["Late November (Black Friday)", "December holidays", "Back to school (late August)"],
+  whatYouSell: "Bread, pastries, cakes and coffee from a small café-bakery, ordered through PayPal.",
+  busySeasons: ["Late November (Black Friday)", "December holidays", "Wedding season (May to September)"],
 } as const;
 
 /** Orders per weekday (0 = Sunday). About one day in three has one more or one fewer. */
-const ORDERS_PER_WEEKDAY = [3, 2, 2, 2, 3, 4, 4] as const;
+const ORDERS_PER_WEEKDAY = [12, 7, 7, 7, 7, 7, 12] as const;
 const ORDER_COUNT_WOBBLE = 0.3;
 
-/** PayPal standard checkout fee in the US: 3.49% + $0.49. Person 2 confirms against a real sandbox capture. */
+/** PayPal standard checkout fee in the US: 3.49% + $0.49. Confirm against a real sandbox capture. */
 export function paypalFeeCents(grossCents: Cents): Cents {
   return Math.round(grossCents * 0.0349) + 49;
 }
@@ -77,24 +78,25 @@ const FIXED = [0] as const;
  * and writes their dues when the owner confirms them.
  */
 const PAYEES: readonly PayeePlan[] = [
-  { key: "volta", name: "Volta Audio Parts", label: "the supplier order", kind: "SUPPLIER", status: "DETECTED", typicalAmountCents: 30_000, cadence: "EVERY_N_DAYS", intervalDays: 10, paypalEmail: "orders@volta-audio-parts.example", pastJitterDollars: [4, -6, 12, 0, -9, 7, 0, -3, 5], category: "SUPPLIER" },
-  { key: "rent", name: "Rent", label: "rent", kind: "BILL", status: "CONFIRMED", typicalAmountCents: 120_000, cadence: "MONTHLY", dayOfMonth: 12, pastJitterDollars: FIXED, category: "BILL" },
-  // Store software went up: $89 for the last three months, $99 from Fri 13 Nov (the price-rise alert finds it).
-  { key: "software", name: "Store software", label: "the store software bill", kind: "BILL", status: "CONFIRMED", typicalAmountCents: 9_900, cadence: "MONTHLY", dayOfMonth: 13, pastJitterDollars: [-10], category: "BILL" },
+  { key: "beans", name: "Bean There", label: "the bean order", kind: "SUPPLIER", status: "DETECTED", typicalAmountCents: 40_000, cadence: "EVERY_N_DAYS", intervalDays: 10, paypalEmail: "orders@bean-there.example", pastJitterDollars: [5, -8, 12, 0, -10, 6, 0, -4, 4], category: "SUPPLIER" },
+  { key: "rent", name: "Rent", label: "rent", kind: "BILL", status: "CONFIRMED", typicalAmountCents: 150_000, cadence: "MONTHLY", dayOfMonth: 12, pastJitterDollars: FIXED, category: "BILL" },
+  // The card machine's auto-debit nobody wrote down: only in history, so Spot finds it.
+  { key: "card", name: "Card machine", label: "the card machine fee", kind: "BILL", status: "DETECTED", typicalAmountCents: 4_900, cadence: "MONTHLY", dayOfMonth: 13, pastJitterDollars: FIXED, category: "BILL" },
+  // Oat milk went up: $165 for the last three months, $180 from Sun 15 Nov (the price-rise alert finds it).
+  { key: "oat", name: "Oat of Office", label: "the oat milk order", kind: "SUPPLIER", status: "CONFIRMED", typicalAmountCents: 18_000, cadence: "MONTHLY", dayOfMonth: 15, paypalEmail: "billing@oat-of-office.example", pastJitterDollars: [-15], category: "SUPPLIER" },
   { key: "internet", name: "Internet", label: "the internet bill", kind: "BILL", status: "CONFIRMED", typicalAmountCents: 6_000, cadence: "MONTHLY", dayOfMonth: 3, pastJitterDollars: FIXED, category: "BILL" },
-  { key: "shipping", name: "Shipping supplies", label: "the shipping supplies bill", kind: "BILL", status: "CONFIRMED", typicalAmountCents: 24_000, cadence: "MONTHLY", dayOfMonth: 30, pastJitterDollars: FIXED, category: "BILL" },
-  { key: "loan", name: "Equipment loan", label: "the loan repayment", kind: "LOAN", status: "CONFIRMED", typicalAmountCents: 15_000, cadence: "MONTHLY", dayOfMonth: 25, pastJitterDollars: FIXED, category: "LOAN_REPAYMENT" },
-  { key: "owner", name: "Transfer to your bank", label: "your transfer to the bank", kind: "OWNER_TRANSFER", status: "DETECTED", typicalAmountCents: 250_000, cadence: "EVERY_N_WEEKS", intervalWeeks: 2, weekday: 1, pastJitterDollars: [30, -20, 0, 45, 0, -35], category: "OWNER_TRANSFER" },
+  { key: "loan", name: "Oven loan", label: "the oven loan repayment", kind: "LOAN", status: "CONFIRMED", typicalAmountCents: 25_000, cadence: "MONTHLY", dayOfMonth: 25, pastJitterDollars: FIXED, category: "LOAN_REPAYMENT" },
+  { key: "staff", name: "Staff pay", label: "staff pay", kind: "BILL", status: "CONFIRMED", typicalAmountCents: 160_000, cadence: "MONTHLY", dayOfMonth: 28, pastJitterDollars: FIXED, category: "BILL" },
 ];
 
-/** Dates a payee is paid in [from, to], anchored so the story lines up (Volta and rent on Thu 12 Nov). */
+/** Dates a payee is paid in [from, to], anchored so the story lines up (beans and rent on Thu 12 Nov). */
 function scheduleFor(plan: PayeePlan, today: IsoDate, from: IsoDate, to: IsoDate): IsoDate[] {
   const days = eachDay(from, Math.max(0, Math.round((Date.parse(to) - Date.parse(from)) / 86_400_000) + 1));
   switch (plan.cadence) {
     case "MONTHLY":
       return days.filter((d) => dayOfMonth(d) === plan.dayOfMonth);
     case "EVERY_N_DAYS": {
-      // Next Volta order is 7 days after today (Thu 12 Nov when today is Thu 5 Nov).
+      // Next bean order is 7 days after today (Thu 12 Nov when today is Thu 5 Nov).
       const anchor = addDays(today, 7);
       const step = plan.intervalDays!;
       return days.filter((d) => (((Date.parse(d) - Date.parse(anchor)) / 86_400_000) % step + step) % step === 0);
@@ -134,12 +136,11 @@ export function buildDemoSeed(storeId: StoreId, today: IsoDate, demoRunId: strin
   const firstSeen = new Map<number, IsoDate>();
   const customerId = (n: number) => id("cust", n + 1);
   const addCustomer = (index: number, name: string, consent: boolean, seenOn: IsoDate) => {
-    const [first, last] = name.toLowerCase().split(" ");
     customers.push({
       id: customerId(index),
       storeId,
       name,
-      email: `${first}.${last}@example.com`,
+      email: `${name.toLowerCase().replace(/[^a-z]+/g, ".")}@example.com`,
       contactConsent: consent,
       firstSeenOn: seenOn,
     });
@@ -233,23 +234,23 @@ export function buildDemoSeed(storeId: StoreId, today: IsoDate, demoRunId: strin
   });
 
   // --- The story's open orders (after the history) ---------------------------
-  const maya = DEMO_CUSTOMER_NAMES.indexOf("Maya Okafor");
+  const tiers = DEMO_CUSTOMER_NAMES.indexOf("Tiers of Joy");
   const hana = DEMO_CUSTOMER_NAMES.indexOf("Hana Sato");
-  // The abandoned $72 order the Recovery agent finds (consent given).
-  addOrder({ customerIndex: maya, date: addDays(today, -2), time: "19:42", lines: [{ key: "kids", quantity: 1 }, { key: "cushions", quantity: 1 }], status: "ABANDONED" });
-  // An abandoned order from a customer who did not allow contact (Guard rule 2 blocks a reminder).
+  // Tiers of Joy's $240 tiered cake: delivered, not paid yet (due 18 Nov). Consent given, so tmrw may remind them.
+  addOrder({ customerIndex: tiers, date: addDays(today, -2), time: "16:20", lines: [{ key: "tiered", quantity: 1 }], status: "ABANDONED" });
+  // An unpaid order from a customer who did not allow contact (Guard rule 2 blocks a reminder).
   customers[hana]!.contactConsent = false;
-  addOrder({ customerIndex: hana, date: yesterday, time: "08:15", lines: [{ key: "kids", quantity: 1 }], status: "ABANDONED" });
+  addOrder({ customerIndex: hana, date: yesterday, time: "08:15", lines: [{ key: "croissants", quantity: 1 }], status: "ABANDONED" });
   // Brand-new buyers for the risk check.
   const jordan = DEMO_CUSTOMER_NAMES.length;
   addCustomer(jordan, "Jordan Reyes", true, yesterday);
-  addOrder({ customerIndex: jordan, date: yesterday, time: "23:58", lines: [{ key: "studio", quantity: 3 }], status: "PENDING" });
+  addOrder({ customerIndex: jordan, date: yesterday, time: "23:58", lines: [{ key: "cake", quantity: 8 }], status: "PENDING" });
   const sam = DEMO_CUSTOMER_NAMES.length + 1;
   addCustomer(sam, "Sam Whitfield", true, yesterday);
-  addOrder({ customerIndex: sam, date: yesterday, time: "21:10", lines: [{ key: "buds-pro", quantity: 1 }], status: "FAILED", failedAttempts: 3 });
-  // A regular customer suddenly ordering six over-ear headphones: an unusual amount for the risk check.
+  addOrder({ customerIndex: sam, date: yesterday, time: "21:10", lines: [{ key: "brownies", quantity: 2 }], status: "FAILED", failedAttempts: 3 });
+  // A regular customer suddenly ordering ten brownie trays: an unusual amount for the risk check.
   const isla = DEMO_CUSTOMER_NAMES.indexOf("Isla Moreno");
-  addOrder({ customerIndex: isla, date: yesterday, time: "22:41", lines: [{ key: "one", quantity: 6 }], status: "PENDING" });
+  addOrder({ customerIndex: isla, date: yesterday, time: "22:41", lines: [{ key: "brownies", quantity: 10 }], status: "PENDING" });
 
   // --- Payees, past payments, future dues ------------------------------------
   const payees: Prisma.PayeeCreateManyInput[] = PAYEES.map((p) => ({
@@ -296,6 +297,24 @@ export function buildDemoSeed(storeId: StoreId, today: IsoDate, demoRunId: strin
         simulated: false,
       });
     }
+  }
+
+  // --- Penny's occasional moves to her savings ------------------------------------
+  // The café makes about $2,000 a month more than it spends; now and then Penny moves some to her bank. Irregular
+  // dates and amounts, with no payee, so the forecast never projects them as a regular payment.
+  const SAVINGS: readonly [daysAgo: number, cents: Cents][] = [[77, 200_000], [57, 110_000], [22, 240_000], [2, 170_000]];
+  for (const [daysAgo, cents] of SAVINGS) {
+    const date = addDays(today, -daysAgo);
+    ledgerEntries.push({
+      id: id("led", `savings_${date}`),
+      storeId,
+      occurredOn: date,
+      direction: "OUT",
+      amountCents: cents,
+      category: "OWNER_TRANSFER",
+      description: "Transfer from PayPal to your bank",
+      simulated: true,
+    });
   }
 
   // --- The opening balance ---------------------------------------------------------

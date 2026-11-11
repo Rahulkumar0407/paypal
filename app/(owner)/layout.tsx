@@ -10,14 +10,14 @@ import { today } from "@/lib/shared/clock";
 export default async function OwnerLayout({ children }: { children: React.ReactNode }) {
   const storeId = await getVisitorStoreId();
   const user = await getCurrentUser();
-  let storeName = "Loop Audio";
+  let storeName = "Dunder Mifflin & Co.";
   let isDemo = true;
 
   try {
     const copy = await ensureStore(storeId);
     const settings = await getStoreSettings(storeId);
     storeName = settings.name;
-    isDemo = settings.isDemo ?? (settings.name === "Loop Audio");
+    isDemo = settings.isDemo ?? (settings.name === "Dunder Mifflin & Co.");
 
     // Once the page is sent, let the reminder helper and the risk check do their round, so Approvals is ready.
     if (copy !== null && !agentsHaveRun(storeId)) after(() => runAgents(storeId));

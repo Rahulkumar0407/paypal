@@ -8,7 +8,7 @@ export interface NavItem {
 /** Primary owner navigation for modern fintech dashboard. */
 export const PRIMARY_NAV: NavItem[] = [
   { href: "/today", label: "Overview", icon: "overview", description: "Cash position & critical alerts" },
-  { href: "/dashboard", label: "Forecast", icon: "forecast", description: "14-day cashflow trajectory" },
+  { href: "/dashboard", label: "Forecast", icon: "forecast", description: "30-day cashflow trajectory" },
   { href: "/dues", label: "Payments", icon: "payments", description: "Bills, suppliers & dues" },
   { href: "/approvals", label: "Decisions", icon: "decisions", description: "Margin Guard approvals inbox" },
 ];

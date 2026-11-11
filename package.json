@@ -1,8 +1,8 @@
 {
-  "name": "nevershort",
+  "name": "tmrw",
   "version": "0.1.0",
   "private": true,
-  "description": "NeverShort: a money co-pilot for a small online store. PayPal AI Hackathon 2026.",
+  "description": "tmrw: your shop's month on one page, inside PayPal. PayPal AI Hackathon 2026.",
   "license": "MIT",
   "engines": {
     "node": "22.x"

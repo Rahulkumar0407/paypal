@@ -89,7 +89,7 @@ describe("Mandatory Security Gate — Two Independent Merchant Tenant Isolation"
     // Demo store for baseline comparison
     dbStores.set("st_demo_visitor_1", {
       id: "st_demo_visitor_1",
-      name: "Loop Audio",
+      name: "Dunder Mifflin & Co.",
       isDemo: true,
       minimumBalanceCents: 25_000,
     });
@@ -277,7 +277,7 @@ describe("Mandatory Security Gate — Two Independent Merchant Tenant Isolation"
       }
 
       // DEMO STORE:
-      return { allowed: true, storeName: "Loop Audio (Demo)" };
+      return { allowed: true, storeName: "Dunder Mifflin & Co. (Demo)" };
     }
 
     // 1. Attacker sets ns_store=st_alpha_retail with NO authentication -> BLOCKED

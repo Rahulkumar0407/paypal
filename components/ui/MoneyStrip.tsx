@@ -4,7 +4,7 @@ import { formatDollars, formatShortfall } from "@/lib/shared/money";
 import { DAY_FILL, DAY_WORD } from "./meaning";
 
 /**
- * Signature element 2: the 14-day money strip. Read like a weather forecast row:
+ * Signature element 2: the 30-day money strip. Read like a weather forecast row:
  * the day above, a coloured block with the day's closing balance, the condition below.
  * Phone: one scrolling row. Laptop: two weeks, seven columns each.
  * Text inside a coloured block is large and bold (21px bold / 27px semibold), so it stays readable on red.
@@ -13,7 +13,7 @@ export function MoneyStrip({ days, caption = true, inverse = false }: { days: Fo
   return (
     <figure className="min-w-0">
       <ol
-        aria-label="Your balance at the end of each of the next 14 days"
+        aria-label="Your balance at the end of each of the next 30 days"
         className="-mx-5 flex snap-x scroll-px-5 gap-2 overflow-x-auto px-5 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0 lg:grid lg:grid-cols-7 lg:gap-x-3 lg:gap-y-5 lg:overflow-visible"
       >
         {days.map((day) => (

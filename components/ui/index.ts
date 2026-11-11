@@ -1,4 +1,4 @@
-/** NeverShort design system (Person 1). See components/ui/README.md and the /design page. */
+/** tmrw design system. See components/ui/README.md and the app screens. */
 export { HeadlineSentence, PageSentence } from "./HeadlineSentence";
 export { MoneyStrip, StripTile, StripTileFace } from "./MoneyStrip";
 export { StatusChip } from "./StatusChip";

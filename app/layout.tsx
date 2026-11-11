@@ -9,11 +9,11 @@ const sans = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swa
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains-mono", display: "swap" });
 
 export const metadata: Metadata = {
-  title: { default: "NeverShort", template: "%s | NeverShort" },
-  description: "A calm money forecast for a small online store: get paid, stay safe, never come up short.",
-  applicationName: "NeverShort",
+  title: { default: "tmrw", template: "%s | tmrw" },
+  description: "See the short day before it arrives. Your shop's month, on one page, inside PayPal.",
+  applicationName: "tmrw",
   // Opens full-screen from the iPhone home screen; the deep green demo banner sits under the status bar.
-  appleWebApp: { capable: true, title: "NeverShort", statusBarStyle: "black-translucent" },
+  appleWebApp: { capable: true, title: "tmrw", statusBarStyle: "black-translucent" },
   formatDetection: { telephone: false },
 };
 

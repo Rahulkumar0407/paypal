@@ -14,7 +14,7 @@ const KINDS = [
 ] as const;
 
 /**
- * "Find your short day": a few numbers in, the app's own 14-day forecast out (tickets, the headline sentence, ways to
+ * "Find your short day": a few numbers in, the app's own 30-day forecast out (tickets, the headline sentence, ways to
  * fix it, each one judged by the Margin Guard). Opens with example numbers already worked out; nothing is stored.
  *
  * The form is made of the product's own objects: three big dials for the shop's numbers, and one bill slip per
@@ -83,7 +83,7 @@ function TryForm({
       </div>
 
       <fieldset>
-        <legend className="text-[17px] font-semibold text-ink">Payments in the next two weeks</legend>
+        <legend className="text-[17px] font-semibold text-ink">Payments in the next 30 days</legend>
         <p className="mt-0.5 text-[14px] text-ink-muted">Rent, supplier orders, bills, and money you move to your own bank.</p>
         <ol className="mt-4 space-y-4">
           {shown.map((on, i) =>
@@ -117,7 +117,7 @@ function TryForm({
 
       <div className="flex flex-wrap items-center gap-4">
         <button type="submit" disabled={pending} className="btn-chunky disabled:opacity-70">
-          {pending ? "Working it out" : "Show my two weeks"}
+          {pending ? "Working it out" : "Show my month"}
         </button>
         <p role="status" aria-live="polite" className="text-[15px] text-ink">
           {result.message || (result.attempt === 0 ? "These are example numbers. Change them to yours." : "")}
@@ -296,9 +296,9 @@ function Tickets({ days, base, round, fixed }: { days: TryDay[]; base: TryDay[];
 function YourTwoWeeks({ view, round, pending }: { view: TryView; round: number; pending: boolean }) {
   const applied = view.applied;
   return (
-    <section aria-label="Your next two weeks" className="till-board">
+    <section aria-label="Your next 30 days" className="till-board">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-[12px] font-semibold tracking-[0.16em] text-white/60 uppercase">{applied ? "Your two weeks, with this fix" : "Your next two weeks"}</p>
+        <p className="text-[12px] font-semibold tracking-[0.16em] text-white/60 uppercase">{applied ? "Your 30 days, with this fix" : "Your next 30 days"}</p>
         {applied ? (
           <button type="submit" form="try-form" name="fix" value="" disabled={pending} className="text-[13px] font-medium text-white underline decoration-white/40 underline-offset-4 hover:decoration-white">
             Back to my numbers
@@ -373,7 +373,7 @@ function YourTwoWeeks({ view, round, pending }: { view: TryView; round: number; 
         <p className="text-[16px] leading-6 font-semibold text-white">This was your shop, worked out from a few numbers.</p>
         <p className="mt-1.5 max-w-[56ch] text-[15px] leading-6 text-white/75">
           Nothing you typed is saved. The full app reads your real PayPal history, so the live demo runs on a sample shop,
-          Loop Audio, with 90 days of made-up sales. That&apos;s where you&apos;ll see reminders, the safety check and its
+          Dunder Mifflin & Co., with 90 days of made-up sales. That&apos;s where you&apos;ll see reminders, the safety check and its
           receipts at work.
         </p>
         <Link href="/demo" className="btn-chunky btn-light btn-sm mt-4">

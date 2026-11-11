@@ -4,9 +4,9 @@ import { previewDemoStore, type DemoScenario } from "@/lib/forecast";
 import { formatDollars } from "@/lib/shared/money";
 import { amountFrom, answerWith, dateFrom, plainAnswer, type AskData } from "./ask";
 
-/** Ask chat against the demo store's real forecast. FIXED is the story after steps 3 and 5 (where step 6 is asked). */
+/** Ask chat against the demo store's real forecast. FIXED is the story after Tiers of Joy pays. */
 const START: DemoScenario = {};
-const FIXED: DemoScenario = { recovered: true, setAsideDailyCents: 1_100 };
+const FIXED: DemoScenario = { recovered: true };
 
 function data(scenario: DemoScenario): AskData {
   const s = previewDemoStore(scenario);
@@ -21,32 +21,32 @@ const say = (text: string): Content => ({ type: "text", text });
 const model = (...steps: Content[][]) => new MockLanguageModelV4({ doGenerate: steps.map(step) });
 
 describe("five sample questions, answered from the forecast's numbers (no AI)", () => {
-  it("step 6: 'Can I afford a $200 order on Monday?' No: Mon 9 Nov ends at $808, Thu 12 Nov would be $144 short", async () => {
+  it("'Can I afford a $200 order on Monday?' No: Mon 9 Nov ends at $1,464, Thu 12 Nov would be $89 short", async () => {
     const d = data(FIXED);
     const check = await d.canAfford(20_000, "2026-11-09");
-    expect(check.balanceAfterOnDateCents).toBe(80_793);
+    expect(check.balanceAfterOnDateCents).toBe(146_445);
     const a = await answerWith("Can I afford a $200 order on Monday?", d, null);
-    expect(a).toMatchObject({ source: "fallback", toolsUsed: ["canAfford"], answer: "No. Mon 9 Nov itself ends at $808, but the order would leave Thu 12 Nov $144 short." });
+    expect(a).toMatchObject({ source: "fallback", toolsUsed: ["canAfford"], answer: "No. Mon 9 Nov itself ends at $1,464, but the order would leave Thu 12 Nov $89 short." });
     expect(a.facts).toEqual([
-      { label: "Mon 9 Nov, after a $200 order", cents: 80_793, date: "2026-11-09" },
-      { label: "Short on Thu 12 Nov with the order", cents: 14_400, date: "2026-11-12" },
+      { label: "Mon 9 Nov, after a $200 order", cents: 146_445, date: "2026-11-09" },
+      { label: "Short on Thu 12 Nov with the order", cents: 8_887, date: "2026-11-12" },
     ]);
   });
 
-  it("'When is my next shortfall?' Thu 12 Nov, $90 short", async () => {
+  it("'When is my next shortfall?' Thu 12 Nov, $120 short", async () => {
     const a = await answerWith("When is my next shortfall?", data(START), null);
-    expect(a.answer).toBe("Thu 12 Nov: you'll be $90 short, because the supplier order and rent land the same day.");
-    expect(a.facts).toEqual([{ label: "Short on Thu 12 Nov", cents: 9_000, date: "2026-11-12" }]);
+    expect(a.answer).toBe("Thu 12 Nov: you'll be $120 short, because the bean order and rent land the same day.");
+    expect(a.facts).toEqual([{ label: "Short on Thu 12 Nov", cents: 12_000, date: "2026-11-12" }]);
   });
 
-  it("'What do I have to pay this week?' the transfer, rent, and Volta with $210 ready", async () => {
+  it("'What do I have to pay this week?' rent, and Bean There with $280 ready", async () => {
     const a = await answerWith("What do I have to pay this week?", data(START), null);
-    expect(a.answer).toBe("In the next week: Transfer to your bank $2,500 on Mon 9 Nov; Rent $1,200 on Thu 12 Nov; Volta Audio Parts $300 on Thu 12 Nov ($210 ready).");
+    expect(a.answer).toBe("In the next week: Rent $1,500 on Thu 12 Nov; Bean There $400 on Thu 12 Nov ($280 ready).");
   });
 
-  it("'How much do I usually pay Volta?' its last three payments and the next", async () => {
-    const a = await answerWith("How much do I usually pay Volta?", data(START), null);
-    expect(a.answer).toBe("Your last 3 payments to Volta Audio Parts: $305 on Mon 2 Nov, $297 on Fri 23 Oct, $300 on Tue 13 Oct. The next one is $300 on Thu 12 Nov.");
+  it("'How much do I usually pay Bean There?' its last three payments and the next", async () => {
+    const a = await answerWith("How much do I usually pay Bean There?", data(START), null);
+    expect(a.answer).toBe("Your last 3 payments to Bean There: $404 on Mon 2 Nov, $396 on Fri 23 Oct, $400 on Tue 13 Oct. The next one is $400 on Thu 12 Nov.");
   });
 
   it("'How much did I sell in the last 7 days?' the week's sales after PayPal's fees", async () => {
@@ -79,28 +79,28 @@ describe("reading a question", () => {
 
 describe("with the AI", () => {
   it("keeps an answer whose numbers all come from the tool, with code-built facts", async () => {
-    const m = model([call("canAfford", { amountDollars: 200, date: "2026-11-09" })], [say("Not yet. Mon 9 Nov ends at $808 after the order, but Thu 12 Nov would be $144 short.")]);
+    const m = model([call("canAfford", { amountDollars: 200, date: "2026-11-09" })], [say("Not yet. Mon 9 Nov ends at $1,464 after the order, but Thu 12 Nov would be $89 short.")]);
     const a = await answerWith("Can I afford a $200 order on Monday?", data(FIXED), m);
-    expect(a).toMatchObject({ source: "ai", toolsUsed: ["canAfford"], answer: "Not yet. Mon 9 Nov ends at $808 after the order, but Thu 12 Nov would be $144 short." });
-    expect(a.facts[0]).toEqual({ label: "Mon 9 Nov, after a $200 order", cents: 80_793, date: "2026-11-09" });
+    expect(a).toMatchObject({ source: "ai", toolsUsed: ["canAfford"], answer: "Not yet. Mon 9 Nov ends at $1,464 after the order, but Thu 12 Nov would be $89 short." });
+    expect(a.facts[0]).toEqual({ label: "Mon 9 Nov, after a $200 order", cents: 146_445, date: "2026-11-09" });
   });
 
   it("replaces an answer with a number no tool gave", async () => {
     const m = model([call("canAfford", { amountDollars: 200, date: "2026-11-09" })], [say("Yes, you'll have about $950 left on Monday.")]);
     const a = await answerWith("Can I afford a $200 order on Monday?", data(FIXED), m);
-    expect(a).toMatchObject({ source: "fallback", answer: "No. Mon 9 Nov itself ends at $808, but the order would leave Thu 12 Nov $144 short." });
+    expect(a).toMatchObject({ source: "fallback", answer: "No. Mon 9 Nov itself ends at $1,464, but the order would leave Thu 12 Nov $89 short." });
   });
 
   it("replaces an answer that used no tool, or breaks the voice rules", async () => {
     expect((await answerWith("When is my next shortfall?", data(START), model([say("Probably Thursday.")]))).source).toBe("fallback");
-    const shouting = model([call("getForecast", {})], [say("Thu 12 Nov is $90 short!")]);
+    const shouting = model([call("getForecast", {})], [say("Thu 12 Nov is $120 short!")]);
     expect((await answerWith("When is my next shortfall?", data(START), shouting)).source).toBe("fallback");
   });
 
   it("falls back calmly when the AI fails", async () => {
     const broken = new MockLanguageModelV4({ doGenerate: async () => Promise.reject(new Error("quota exceeded")) });
     const a = await answerWith("When is my next shortfall?", data(START), broken);
-    expect(a).toMatchObject({ source: "fallback", answer: "Thu 12 Nov: you'll be $90 short, because the supplier order and rent land the same day." });
+    expect(a).toMatchObject({ source: "fallback", answer: "Thu 12 Nov: you'll be $120 short, because the bean order and rent land the same day." });
   });
 
   it("answers from code with a note when the visitor is over the limit", async () => {

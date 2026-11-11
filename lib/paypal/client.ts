@@ -1,5 +1,5 @@
 /**
- * The ONE file that talks to PayPal (AGENTS.md section 6). Owner: Person 1.
+ * The ONE file that talks to PayPal (AGENTS.md section 6).
  *
  * Three modes, chosen from the environment on every call (no code change to switch):
  *   sandbox  PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET are set: the real PayPal sandbox, over a small typed REST wrapper.
@@ -72,7 +72,7 @@ let token: { value: string; expiresAt: number } | null = null;
 
 function sandboxBase(): string {
   const base = getEnv().PAYPAL_API_BASE.replace(/\/$/, "");
-  if (base !== PAYPAL_SANDBOX_BASE) throw new Error(`Refusing PayPal base URL ${base}: NeverShort only talks to the sandbox (${PAYPAL_SANDBOX_BASE}).`);
+  if (base !== PAYPAL_SANDBOX_BASE) throw new Error(`Refusing PayPal base URL ${base}: tmrw only talks to the sandbox (${PAYPAL_SANDBOX_BASE}).`);
   return base;
 }
 
@@ -258,7 +258,7 @@ export async function createOrder(input: CreateOrderInput): Promise<PayPalOrderR
       ],
       payment_source: {
         paypal: {
-          experience_context: { brand_name: "Loop Audio", user_action: "PAY_NOW", shipping_preference: "NO_SHIPPING", return_url: input.returnUrl, cancel_url: input.cancelUrl },
+          experience_context: { brand_name: "Dunder Mifflin & Co.", user_action: "PAY_NOW", shipping_preference: "NO_SHIPPING", return_url: input.returnUrl, cancel_url: input.cancelUrl },
         },
       },
     },
@@ -317,7 +317,7 @@ export async function createCheckoutForOrder(input: { storeId: StoreId; orderId:
     storeId: input.storeId,
     orderId: input.orderId,
     amountCents: input.amountCents,
-    description: `Loop Audio order #${input.orderNumber}`,
+    description: `Dunder Mifflin & Co. order #${input.orderNumber}`,
     idempotencyKey: input.idempotencyKey,
     returnUrl: `${appUrl}/store/return`,
     cancelUrl: `${appUrl}/store/cancel`,
@@ -348,7 +348,7 @@ export async function createPayout(input: { receiverEmail: string; amountCents: 
   const batch = await call("POST", "/v1/payments/payouts", z.object({ batch_header: z.object({ payout_batch_id: z.string() }) }), {
     requestId: requestId(input.idempotencyKey),
     body: {
-      sender_batch_header: { sender_batch_id: input.idempotencyKey.slice(0, 127), email_subject: "A payment from Loop Audio" },
+      sender_batch_header: { sender_batch_id: input.idempotencyKey.slice(0, 127), email_subject: "A payment from Dunder Mifflin & Co." },
       items: [{ recipient_type: "EMAIL", receiver: input.receiverEmail, note: input.note, amount: { currency: "USD", value: toPayPalValue(input.amountCents) } }],
     },
   });

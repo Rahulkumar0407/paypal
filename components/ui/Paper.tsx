@@ -1,7 +1,7 @@
 /**
  * The counting mat: green felt lying on the desk, behind every owner page, with a stitched edge and the maker's
  * mark sewn into a corner. The felt itself (colour and grain) is `.mat-surface` in globals.css. Fixed, so pages
- * slide over it like paper. Decorative only. Owner: Person 1.
+ * slide over it like paper. Decorative only.
  */
 export function MatBackdrop() {
   return (
@@ -12,7 +12,7 @@ export function MatBackdrop() {
       <div className="absolute inset-1.5 rounded-[19px] shadow-[inset_0_0_0_1px_rgb(0_0_0_/_0.35)] max-lg:hidden" />
       <div className="absolute inset-2 rounded-[10px] border-2 border-dashed border-white/[0.2] lg:inset-3 lg:rounded-[16px]" />
       <p className="absolute right-8 bottom-6 hidden text-[11px] font-bold tracking-[0.32em] text-white/30 uppercase lg:block">
-        NeverShort · counting mat
+        tmrw · counting mat
       </p>
     </div>
   );

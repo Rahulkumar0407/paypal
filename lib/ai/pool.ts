@@ -1,7 +1,7 @@
 import { APICallError, wrapLanguageModel, type LanguageModel, type LanguageModelMiddleware } from "ai";
 
 /**
- * Keeps NeverShort inside the free Gemini limits. Every (model, key) pair is a slot, named "<model>#<key>", with its
+ * Keeps tmrw inside the free Gemini limits. Every (model, key) pair is a slot, named "<model>#<key>", with its
  * own budget: at most `perMinute` requests in any minute and `perDay` in any 24 hours, counted here, kept under
  * Google's own limits. Models are tried in order; within a model, keys take turns (round robin), so a later model is
  * only used when every key for the earlier ones is spent. If Google still says a
