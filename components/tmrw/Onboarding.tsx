@@ -1,5 +1,4 @@
 "use client";
-/* eslint-disable @next/next/no-img-element -- the logo is a small pre-sized PNG. */
 
 /** The wordmark: "tm" in PayPal navy, "rw" in PayPal blue, split the way "Pay" and "Pal" are. */
 export function Wordmark({ size = 58 }: { size?: number }) {
@@ -36,8 +35,7 @@ export function Login({ onContinue }: { onContinue: () => void }) {
         }}
       >
         <h1 style={{ margin: 0 }}>
-          {/* The light logo on the light glass card; multiply drops its white background into the glass. */}
-          <img src="/tmrw/brand/logo-light.png" alt="tmrw" width={240} height={190} style={{ display: "block", margin: "0 auto", width: 240, height: "auto", mixBlendMode: "multiply" }} />
+          <Wordmark />
         </h1>
         <p
           className="tmrw-muted"

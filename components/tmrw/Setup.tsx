@@ -223,7 +223,8 @@ function whatsAppInvite(shop: string, name: string, role: string, phone: string)
 }
 
 const toggle = (list: string[], o: string) => (list.includes(o) ? list.filter((x) => x !== o) : [...list, o]);
-const TABLE = { display: "grid", gridTemplateColumns: "1.7fr .8fr 1.3fr auto", gap: 12, alignItems: "center" } as const;
+/** Name, amount (right-aligned), schedule, and a fixed last column, so the header and every row line up. */
+const TABLE = { display: "grid", gridTemplateColumns: "minmax(0, 1.5fr) 112px minmax(0, 1.1fr) 178px", columnGap: 16, alignItems: "center" } as const;
 const HEAD = { ...TABLE, padding: "10px 0", fontSize: 12, fontWeight: 700, letterSpacing: ".04em", color: "#6E6E73", borderBottom: "1px solid rgba(0,0,0,.08)" } as const;
 
 function Step({ n, a, set }: { n: number; a: Answers; set: (f: (a: Answers) => Answers) => void }) {
@@ -285,7 +286,7 @@ function Step({ n, a, set }: { n: number; a: Answers; set: (f: (a: Answers) => A
               <span>EXPENSE</span>
               <span style={{ textAlign: "right" }}>AMOUNT</span>
               <span>SCHEDULE</span>
-              <span style={{ width: 178 }}>DATE</span>
+              <span>DATE</span>
             </div>
             {EXPENSES.map((o) => (
               <div key={o.name} style={{ ...TABLE, padding: "6px 0", borderBottom: "1px solid rgba(0,0,0,.06)" }}>
@@ -295,7 +296,7 @@ function Step({ n, a, set }: { n: number; a: Answers; set: (f: (a: Answers) => A
                   {o.when}
                   <span style={{ display: "block", fontSize: 12, color: "#6E6E73" }}>{o.how}</span>
                 </span>
-                <div style={{ width: 178 }}>
+                <div>
                   <Segmented
                     label={`${o.name}: date`}
                     options={["Fixed date", "Can move"]}
@@ -321,7 +322,7 @@ function Step({ n, a, set }: { n: number; a: Answers; set: (f: (a: Answers) => A
               <span>SOURCE</span>
               <span style={{ textAlign: "right" }}>AMOUNT</span>
               <span>SCHEDULE</span>
-              <span style={{ width: 178 }}>NOTE</span>
+              <span>NOTE</span>
             </div>
             {REVENUE.map((o) => (
               <div key={o.name} style={{ ...TABLE, padding: "8px 0", borderBottom: "1px solid rgba(0,0,0,.06)" }}>
@@ -331,7 +332,7 @@ function Step({ n, a, set }: { n: number; a: Answers; set: (f: (a: Answers) => A
                   {o.when}
                   <span style={{ display: "block", fontSize: 12, color: "#6E6E73" }}>{o.how}</span>
                 </span>
-                <span style={{ width: 178, fontSize: 13, fontWeight: 600, color: "#3A3A3C" }}>{o.note}</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: "#3A3A3C" }}>{o.note}</span>
               </div>
             ))}
             <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0 12px", fontSize: 14, fontWeight: 700 }}>

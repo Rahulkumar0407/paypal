@@ -22,14 +22,14 @@ export const SETUP_STEPS = 10;
 export const STEP_DEBOUNCE_MS = 1100;
 /**
  * The train's arrival, from the moment you scroll down from the station. Slower than SPEC 4.2 (5.2 s to the doors):
- * the train glides in over 8 s, so it reads as a train pulling into a station, not a blur.
+ * the train glides in over about 6 s, and the doors start opening as it settles, with no pause between.
  */
 export const ARRIVAL_TIMELINE: readonly (readonly [number, Arrival])[] = [
   [60, "moving"],
-  [3800, "slowing"],
-  [6200, "settle"],
-  [8000, "stopped"],
-  [8500, "open"],
+  [3000, "slowing"],
+  [4800, "settle"],
+  [6000, "stopped"],
+  [6250, "open"],
 ];
 
 export interface StageState {
