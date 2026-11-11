@@ -7,6 +7,8 @@ import { z } from "zod";
 import { getDb, isDatabaseConfigured } from "@/lib/shared/db";
 import { hashPassword, verifyPassword } from "./crypto";
 import { createSession, revokeCurrentSession } from "./session";
+import { createEmailVerificationToken, sendVerificationEmail } from "./verification";
+import { ensureStore } from "@/lib/demo";
 import { checkRateLimit, resetRateLimit } from "./rate-limit";
 
 export interface AuthActionResult {
@@ -96,7 +98,7 @@ export async function registerAction(
           email,
           name,
           passwordHash,
-          emailVerified: true, // auto-verified for onboarding
+          emailVerified: false,
         },
       });
 
@@ -106,11 +108,12 @@ export async function registerAction(
           name: storeName,
           currency: "USD",
           timezone: "America/New_York",
-          minimumBalanceCents: 25_000, // $250 default minimum reserve
-          tightMarginCents: 12_500, // $125 default warning margin
-          openingBalanceCents: 150_000, // $1,500 initial cash balance
+          minimumBalanceCents: 0,
+          tightMarginCents: 0,
+          openingBalanceCents: 0,
           openingBalanceOn: new Date().toISOString().slice(0, 10),
-          whatYouSell: "General Goods & Services",
+          openingBalanceSource: "USER",
+          whatYouSell: "",
           supplierPaymentMethod: "PAYPAL_PAYOUTS",
           busySeasons: [],
           demoRunId,
@@ -129,6 +132,12 @@ export async function registerAction(
       return newUser;
     });
 
+    // Create verification token (not logged, not exposed)
+    const token = await createEmailVerificationToken(user.id);
+    if (token) {
+      await sendVerificationEmail();
+    }
+
     await createSession(user.id);
   } catch (err) {
     console.error("[auth] registration failed:", err);
@@ -136,7 +145,7 @@ export async function registerAction(
   }
 
   revalidatePath("/", "layout");
-  redirect("/today");
+  redirect("/onboarding");
 }
 
 export async function loginAction(
@@ -210,5 +219,31 @@ export async function logoutAction(): Promise<void> {
   await revokeCurrentSession();
   revalidatePath("/", "layout");
   redirect("/login");
+}
+
+export async function demoLoginAction(): Promise<void> {
+  if (!isDatabaseConfigured()) {
+    redirect("/today");
+  }
+  const db = getDb();
+  const storeId = `st_demo_${crypto.randomUUID().replace(/-/g, "").slice(0, 12)}`;
+  await ensureStore(storeId);
+
+  const email = `demo-${storeId}@nevershort.app`;
+  const user = await db.user.create({
+    data: {
+      email,
+      name: "Demo Merchant",
+      passwordHash: hashPassword(crypto.randomUUID()),
+      emailVerified: true,
+    },
+  });
+  await db.userStore.create({
+    data: { userId: user.id, storeId, role: "OWNER" },
+  });
+
+  await createSession(user.id);
+  revalidatePath("/", "layout");
+  redirect("/today");
 }
 

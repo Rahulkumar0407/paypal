@@ -29,7 +29,7 @@ export default async function OnboardingPage() {
         currentName={settings.name}
         currentWhatYouSell={settings.whatYouSell}
         currentMinimumBalanceCents={settings.minimumBalanceCents}
-        currentOpeningBalanceCents={150_000}
+        currentOpeningBalanceCents={settings.openingBalanceCents}
         isDemo={isDemo}
       />
     </div>

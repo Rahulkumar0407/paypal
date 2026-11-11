@@ -212,6 +212,618 @@
   }
 }
 
+/* ── Hero character respiration & editorial motion ── */
+@keyframes heroShopkeeperBreathe {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  45% {
+    transform: translateY(-1.2px) scale(1.002);
+  }
+}
+
+.hero-shopkeeper-respiration {
+  transform-origin: 52% 54%;
+  animation: heroShopkeeperBreathe 4.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform;
+}
+
+/* ── Handcrafted 240ms human eye blink cadence (6.5s periodic cycle) ── */
+@keyframes heroLidClosedCycle {
+  0%, 24.2% {
+    opacity: 0;
+  }
+  24.6%, 26.0% {
+    opacity: 1;
+  }
+  26.6%, 100% {
+    opacity: 0;
+  }
+}
+
+@keyframes heroLidHalfCycle {
+  0%, 23.6% {
+    opacity: 0;
+  }
+  24.0%, 24.5% {
+    opacity: 0.85;
+  }
+  24.6%, 26.0% {
+    opacity: 0;
+  }
+  26.2%, 26.6% {
+    opacity: 0.85;
+  }
+  27.2%, 100% {
+    opacity: 0;
+  }
+}
+
+.hero-lid-closed {
+  opacity: 0;
+  animation: heroLidClosedCycle 6.5s ease-in-out infinite;
+  will-change: opacity;
+}
+
+.hero-lid-half {
+  opacity: 0;
+  animation: heroLidHalfCycle 6.5s ease-in-out infinite;
+  will-change: opacity;
+}
+
+/* ── Calendar Reveal Sequence (2.0s – 3.1s) ── */
+@keyframes heroCleanCalFade {
+  0%, 82% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.hero-clean-cal-patch {
+  opacity: 0;
+  animation: heroCleanCalFade 2.45s ease-out forwards;
+}
+
+@keyframes heroMarkerDraw {
+  0%, 72% {
+    stroke-dashoffset: 660;
+    opacity: 0;
+  }
+  75% {
+    opacity: 1;
+  }
+  92% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+.hero-marker-ink-stroke {
+  stroke-dasharray: 660;
+  stroke-dashoffset: 660;
+  animation: heroMarkerDraw 2.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes heroCalendarFocalGlow {
+  0%, 65% {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  85% {
+    opacity: 0.85;
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+}
+
+.hero-calendar-focal-glow {
+  opacity: 0.45;
+  animation: heroCalendarFocalGlow 3.2s ease-out forwards;
+}
+
+@keyframes heroEventCalloutReveal {
+  0%, 68% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.95);
+  }
+  88% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.hero-event-callout-anim {
+  animation: heroEventCalloutReveal 3.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes heroEventArrive {
+  from {
+    opacity: 0;
+    transform: translateY(9px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes threadDraw {
+  from {
+    transform: rotate(-1.6deg) scaleX(0);
+  }
+  to {
+    transform: rotate(-1.6deg) scaleX(1);
+  }
+}
+
+/* ── Hero scene and the Future Lens ── */
+.v2-page {
+  --v2-ivory: #f7f3e9;
+  --v2-ink: #001435;
+  --v2-blue: #0070e0;
+  --v2-risk: #b4232f;
+  --v2-muted: #52627a;
+}
+
+.v2-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+  align-items: center;
+  min-height: min(660px, calc(100svh - 76px));
+  margin-inline: -1.5rem;
+  padding: clamp(2.5rem, 5vw, 5rem) clamp(1.25rem, 6vw, 6.5rem);
+  overflow: hidden;
+  background: var(--v2-ivory);
+}
+
+.v2-hero-copy {
+  position: relative;
+  z-index: 2;
+  max-width: 470px;
+  padding-block: 1rem;
+}
+
+.v2-kicker {
+  color: var(--v2-muted);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.v2-primary-cta {
+  min-height: 52px;
+  box-shadow: 0 5px 0 #004f9f;
+  transition: background-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.v2-primary-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 0 #004f9f;
+}
+
+.v2-primary-cta:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #004f9f;
+}
+
+.v2-hero-art {
+  position: relative;
+  width: calc(100% + clamp(1rem, 4vw, 3.75rem));
+  margin-left: clamp(-4rem, -4vw, -1rem);
+  align-self: center;
+}
+
+.v2-hero-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  mix-blend-mode: multiply;
+}
+
+.v2-hero-thread {
+  position: absolute;
+  z-index: 1;
+  left: 7%;
+  right: 3%;
+  bottom: 17%;
+  height: 2px;
+  background: var(--v2-blue);
+  opacity: 0.72;
+  transform: rotate(-1.6deg) scaleX(0);
+  transform-origin: left center;
+  animation: threadDraw 1.2s ease-out both;
+}
+
+.v2-hero-thread::after {
+  position: absolute;
+  top: -4px;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--v2-blue);
+  border-radius: 50%;
+  background: var(--v2-ivory);
+  content: "";
+}
+
+.v2-hero-event {
+  position: absolute;
+  z-index: 3;
+  left: 41%;
+  bottom: 11%;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: calc(100% - 1rem);
+  padding: 0.55rem 0.8rem;
+  border: 1px solid rgb(0 20 53 / 0.18);
+  border-radius: 999px;
+  background: #fffdf8;
+  color: var(--v2-ink);
+  font-size: clamp(0.62rem, 0.8vw, 0.76rem);
+  font-weight: 800;
+  line-height: 1.2;
+  box-shadow: 0 3px 12px rgb(0 20 53 / 0.1);
+  animation: heroEventArrive 700ms 350ms both;
+  transition: border-color 180ms ease, transform 180ms ease;
+}
+
+.v2-hero-event:hover {
+  border-color: var(--v2-risk);
+  transform: translateY(-2px);
+}
+
+.v2-hero-event:focus-visible,
+.v2-day-stop:focus-visible {
+  outline: 3px solid var(--v2-blue);
+  outline-offset: 4px;
+}
+
+.v2-hero-event-pin {
+  width: 0.6rem;
+  height: 0.6rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--v2-risk);
+  box-shadow: 0 0 0 3px rgb(180 35 47 / 0.12);
+}
+
+.v2-future-lens {
+  position: relative;
+  margin-inline: -1.5rem;
+  padding: clamp(3.75rem, 7vw, 6.5rem) clamp(1.25rem, 6vw, 6.5rem);
+  overflow: hidden;
+  background: var(--v2-ivory);
+}
+
+.v2-future-heading {
+  position: relative;
+  z-index: 1;
+  max-width: 760px;
+  margin: 0 auto clamp(2.25rem, 4vw, 3.5rem);
+  text-align: center;
+}
+
+.v2-future-heading h2 {
+  margin-top: 0.55rem;
+}
+
+.v2-future-heading > p:last-child {
+  margin: 0.9rem auto 0;
+}
+
+.v2-lens-scene {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 4.5rem);
+  max-width: 1320px;
+  margin-inline: auto;
+}
+
+.v2-lens-art {
+  position: relative;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.v2-lens-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  mix-blend-mode: multiply;
+}
+
+.v2-lens-marker {
+  position: absolute;
+  top: 57%;
+  left: 55%;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  max-width: 48%;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid rgb(0 20 53 / 0.2);
+  border-radius: 999px;
+  background: #fffdf8;
+  color: var(--v2-ink);
+  font-size: clamp(0.58rem, 0.75vw, 0.72rem);
+  font-weight: 800;
+  line-height: 1.2;
+  box-shadow: 0 2px 8px rgb(0 20 53 / 0.12);
+  transition: border-color 220ms ease, color 220ms ease, top 260ms ease, left 260ms ease;
+}
+
+.v2-lens-marker-short {
+  border-color: var(--v2-risk);
+}
+
+.v2-lens-marker-short .v2-lens-marker-dot {
+  background: var(--v2-risk);
+}
+
+.v2-lens-marker-tight .v2-lens-marker-dot {
+  background: #a45b00;
+}
+
+.v2-lens-marker-covered .v2-lens-marker-dot {
+  background: #167447;
+}
+
+.v2-lens-marker-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+}
+
+.v2-lens-art-caption {
+  position: absolute;
+  bottom: 0.4rem;
+  left: 0;
+  color: var(--v2-muted);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.v2-lens-reading {
+  min-width: 0;
+}
+
+.v2-lens-date {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid rgb(0 20 53 / 0.16);
+}
+
+.v2-lens-date-label {
+  color: var(--v2-ink);
+  font-family: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
+  font-size: clamp(1.45rem, 2.4vw, 2.2rem);
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.v2-day-rail {
+  position: relative;
+  display: flex;
+  gap: 0.1rem;
+  margin: 1.2rem 0 1.45rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-color: rgb(0 112 224 / 0.45) transparent;
+  scrollbar-width: thin;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.v2-rail-hint {
+  display: none;
+}
+
+.v2-day-rail-line {
+  position: absolute;
+  top: 0.36rem;
+  left: 1rem;
+  right: 1rem;
+  height: 2px;
+  background: rgb(0 112 224 / 0.25);
+  pointer-events: none;
+}
+
+.v2-day-stop {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.12rem;
+  min-width: 2.45rem;
+  min-height: 4.55rem;
+  padding: 0 0.2rem 0.4rem;
+  border: 0;
+  border-radius: 0.35rem;
+  background: transparent;
+  color: var(--v2-muted);
+  cursor: pointer;
+  scroll-snap-align: center;
+  transition: color 180ms ease, background-color 180ms ease, transform 180ms ease;
+}
+
+.v2-day-stop:hover {
+  background: rgb(255 255 255 / 0.55);
+  color: var(--v2-ink);
+}
+
+.v2-day-stop:active {
+  transform: scale(0.96);
+}
+
+.v2-day-stop-pin {
+  width: 0.78rem;
+  height: 0.78rem;
+  margin-bottom: 0.13rem;
+  border: 2px solid var(--v2-ivory);
+  border-radius: 50%;
+  background: #167447;
+  box-shadow: 0 0 0 1px #167447;
+}
+
+.v2-day-stop-tight .v2-day-stop-pin {
+  background: #a45b00;
+  box-shadow: 0 0 0 1px #a45b00;
+}
+
+.v2-day-stop-short .v2-day-stop-pin {
+  background: var(--v2-risk);
+  box-shadow: 0 0 0 1px var(--v2-risk);
+}
+
+.v2-day-stop.is-selected {
+  background: #fffdf8;
+  color: var(--v2-ink);
+  box-shadow: inset 0 0 0 1px rgb(0 20 53 / 0.12);
+}
+
+.v2-day-stop.is-selected .v2-day-stop-pin {
+  box-shadow: 0 0 0 3px rgb(0 112 224 / 0.18), 0 0 0 1px var(--v2-blue);
+  transform: scale(1.12);
+}
+
+.v2-day-stop-weekday {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.v2-day-stop-date {
+  font-size: 0.95rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.v2-day-stop-status {
+  font-size: 0.52rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.v2-day-stop-short .v2-day-stop-status {
+  color: var(--v2-risk);
+}
+
+.v2-day-stop-tight .v2-day-stop-status {
+  color: #854900;
+}
+
+.v2-lens-details {
+  padding-top: 1.1rem;
+  border-top: 1px solid rgb(0 20 53 / 0.16);
+}
+
+.v2-lens-narrator {
+  min-height: 2.8em;
+  color: var(--v2-ink);
+  font-size: clamp(0.93rem, 1.1vw, 1.05rem);
+  font-weight: 600;
+  line-height: 1.55;
+}
+
+.v2-lens-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.v2-lens-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.v2-lens-metric > span {
+  color: var(--v2-muted);
+  font-size: 0.66rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.v2-lens-metric > strong {
+  color: var(--v2-ink);
+  font-size: clamp(1rem, 1.6vw, 1.38rem);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.v2-lens-gap > strong {
+  color: #167447;
+}
+
+.v2-lens-details-short .v2-lens-gap > strong {
+  color: var(--v2-risk);
+}
+
+.v2-lens-obligations {
+  margin-top: 1.35rem;
+}
+
+.v2-lens-obligations ul {
+  margin-top: 0.4rem;
+  border-top: 1px solid rgb(0 20 53 / 0.12);
+}
+
+.v2-lens-obligations li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid rgb(0 20 53 / 0.12);
+  color: var(--v2-ink);
+  font-size: 0.78rem;
+}
+
+.v2-lens-obligations li strong {
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.v2-lens-obligations .is-inflow strong {
+  color: #167447;
+}
+
+.v2-lens-obligations .is-outflow strong {
+  color: var(--v2-risk);
+}
+
 /* ── Class Hooks ── */
 .animate-breathe {
   animation: merchantBreathe 6s ease-in-out infinite;
@@ -263,6 +875,15 @@
 
 /* ── Reduced Motion Accessibility ── */
 @media (prefers-reduced-motion: reduce) {
+  .v2-page *,
+  .v2-page *::before,
+  .v2-page *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
   .animate-breathe,
   .animate-float-gentle,
   .animate-bag-handover,
@@ -277,5 +898,227 @@
   .animate-stamp-slam {
     animation: none !important;
     transform: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .v2-lens-reading {
+    padding-block: 0.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .v2-day-stop {
+    min-width: 0;
+    padding-inline: 0.05rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .v2-hero {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.7rem;
+    margin-inline: -1rem;
+    padding: 2.4rem 1rem 1.2rem;
+  }
+
+  .v2-hero-copy {
+    max-width: 34rem;
+    padding: 0 0.15rem;
+  }
+
+  .v2-hero-copy h1 {
+    max-width: 12ch;
+    font-size: clamp(2.55rem, 11vw, 3.25rem);
+  }
+
+  .v2-hero-copy > p:not(.v2-kicker) {
+    max-width: 29rem;
+  }
+
+  .v2-hero-art {
+    width: calc(100% + 2rem);
+    margin: -0.3rem -1rem 0;
+  }
+
+  .v2-hero-thread {
+    left: 9%;
+    right: 1%;
+    bottom: 17%;
+  }
+
+  .v2-hero-event {
+    left: 36%;
+    bottom: 9%;
+    gap: 0.35rem;
+    padding: 0.48rem 0.62rem;
+    font-size: 0.59rem;
+  }
+
+  .v2-future-lens {
+    margin-inline: -1rem;
+    padding: 3.25rem 1rem 3.5rem;
+  }
+
+  .v2-future-heading {
+    margin-bottom: 1.4rem;
+    text-align: left;
+  }
+
+  .v2-future-heading > p:last-child {
+    margin-inline: 0;
+  }
+
+  .v2-lens-scene {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.1rem;
+  }
+
+  .v2-lens-art {
+    width: calc(100% + 1.5rem);
+    min-height: 0;
+    margin-inline: -0.75rem;
+  }
+
+  .v2-lens-image {
+    width: 100%;
+  }
+
+  .v2-lens-marker {
+    top: 56%;
+    left: 54%;
+    gap: 0.3rem;
+    max-width: 51%;
+    padding: 0.38rem 0.48rem;
+    font-size: 0.55rem;
+  }
+
+  .v2-lens-art-caption {
+    position: static;
+    align-self: flex-start;
+    margin: -0.15rem 0 0 0.75rem;
+    font-size: 0.58rem;
+  }
+
+  .v2-lens-reading {
+    width: 100%;
+    padding-top: 0.4rem;
+  }
+
+  .v2-lens-date-label {
+    font-size: 1.65rem;
+  }
+
+  .v2-day-rail {
+    gap: 0.05rem;
+    margin: 1rem -1rem 1.1rem;
+    padding: 0.25rem 1rem 0.6rem;
+  }
+
+  .v2-rail-hint {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.35rem;
+    margin-top: -0.55rem;
+    color: var(--v2-muted);
+    font-size: 0.62rem;
+    font-weight: 700;
+  }
+
+  .v2-day-stop {
+    flex: 0 0 3.25rem;
+    min-width: 3.25rem;
+    min-height: 4.4rem;
+  }
+
+  .v2-day-rail-line {
+    left: 2rem;
+    right: 2rem;
+  }
+
+  .v2-lens-details {
+    padding-top: 0.9rem;
+  }
+
+  .v2-lens-narrator {
+    min-height: 0;
+    font-size: 0.92rem;
+  }
+
+  .v2-lens-metrics {
+    gap: 0.55rem;
+  }
+
+  .v2-lens-metric > span {
+    font-size: 0.62rem;
+  }
+
+  .v2-lens-metric > strong {
+    font-size: 1.08rem;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   SCENIC STORYBOOK FOOTER AMBIENT MOTION
+   ══════════════════════════════════════════════════════════════ */
+@keyframes scenicTreeSway {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(1.2deg);
+  }
+  100% {
+    transform: rotate(-0.8deg);
+  }
+}
+
+@keyframes scenicTreeSwayGentle {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-1deg);
+  }
+  100% {
+    transform: rotate(0.6deg);
+  }
+}
+
+@keyframes scenicPlantBreeze {
+  0%, 100% {
+    transform: scale(1) translateY(0);
+  }
+  50% {
+    transform: scale(1.02) translateY(-1.5px);
+  }
+}
+
+.scenic-sway-1 {
+  transform-origin: 248px 254px;
+  animation: scenicTreeSway 7s ease-in-out infinite alternate;
+}
+
+.scenic-sway-2 {
+  transform-origin: 338px 252px;
+  animation: scenicTreeSwayGentle 5.5s ease-in-out infinite alternate;
+}
+
+.scenic-plant-breeze {
+  transform-origin: 40px 254px;
+  animation: scenicPlantBreeze 4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scenic-sway-1,
+  .scenic-sway-2,
+  .scenic-plant-breeze {
+    animation: none !important;
   }
 }

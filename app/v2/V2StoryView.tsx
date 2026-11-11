@@ -4,6 +4,9 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import type { LandingStory } from "@/lib/landing";
+import { formatCents, formatDollars, formatShortfall } from "@/lib/shared/money";
+import { ScenicFooterV2 } from "@/components/landing/ScenicFooterV2";
+import { HeroAnimatedIllustration } from "@/components/landing/HeroAnimatedIllustration";
 import "./v2.css";
 
 interface V2StoryProps {
@@ -20,10 +23,10 @@ export function V2StoryView({ story }: V2StoryProps) {
   const [isMayaPaid, setIsMayaPaid] = useState(false);
   const [isAnimatingCoins, setIsAnimatingCoins] = useState(false);
   const [sliderStep, setSliderStep] = useState(0); // 0 = $0, 1 = $7/day ($21 total), 2 = $14/day ($42 total), 3 = $21/day ($63 total)
-  const [selectedDayIndex, setSelectedDayIndex] = useState(7); // default Thu 12 (the crunch)
+  const [selectedDayIndex, setSelectedDayIndex] = useState(story.shortIndex ?? 0);
   const [activePaddle, setActivePaddle] = useState<"approve" | "escalate" | "block">("approve");
   const [showReceipt, setShowReceipt] = useState(false);
-  const [copiedLogin, setCopiedLogin] = useState(false);
+  const timelineButtons = useRef<Array<HTMLButtonElement | null>>([]);
 
   // Device & PWA Showcase State
   const [deviceScreenMode, setDeviceScreenMode] = useState<"pwa" | "homescreen">("pwa");
@@ -77,52 +80,44 @@ export function V2StoryView({ story }: V2StoryProps) {
   const handleResetStory = () => {
     setIsMayaPaid(false);
     setSliderStep(0);
-    setSelectedDayIndex(7);
+    setSelectedDayIndex(story.shortIndex ?? 0);
     setActivePaddle("approve");
     setShowReceipt(false);
     setDeviceScreenMode("pwa");
   };
 
-  const handleCopyCredentials = () => {
-    navigator.clipboard.writeText("buyer@loopaudio.com / SandboxPass123!");
-    setCopiedLogin(true);
-    setTimeout(() => setCopiedLogin(false), 2000);
+  const selectedDay = story.days[selectedDayIndex] ?? story.days[story.shortIndex ?? 0]!;
+  const firstShortDay = story.shortIndex === null ? null : story.days[story.shortIndex]!;
+  const shortDayOutflows = firstShortDay?.moves.filter((move) => move.kind === "out") ?? [];
+  const supplierDue = shortDayOutflows.find((move) => move.label === "Volta Audio Parts");
+  const rentDue = shortDayOutflows.find((move) => move.label === "Rent");
+  const openingBalance = formatCents(story.days[0]!.openingCents);
+  const selectedDayStatus = selectedDay.state === "short"
+    ? `Short by ${formatShortfall(selectedDay.shortByCents)}`
+    : selectedDay.state === "tight"
+      ? "Tight"
+      : "Covered";
+
+  const handleTimelineKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+    const nextIndex = event.key === "ArrowRight" || event.key === "ArrowDown"
+      ? Math.min(index + 1, story.days.length - 1)
+      : event.key === "ArrowLeft" || event.key === "ArrowUp"
+        ? Math.max(index - 1, 0)
+        : event.key === "Home"
+          ? 0
+          : event.key === "End"
+            ? story.days.length - 1
+            : null;
+
+    if (nextIndex !== null) {
+      event.preventDefault();
+      setSelectedDayIndex(nextIndex);
+      timelineButtons.current[nextIndex]?.focus();
+    }
   };
 
-  // 14-day horizon timeline data
-  const timelineDays = [
-    { label: "Thu 5", day: "Thu", date: "Nov 5", status: "covered", balance: 2197, note: "Daily sales net of PayPal fee" },
-    { label: "Fri 6", day: "Fri", date: "Nov 6", status: "covered", balance: 2427, note: "Weekend audio boutique orders" },
-    { label: "Sat 7", day: "Sat", date: "Nov 7", status: "covered", balance: 2667, note: "Saturday store sales" },
-    { label: "Sun 8", day: "Sun", date: "Nov 8", status: "covered", balance: 2867, note: "Sunday settlement batch" },
-    { label: "Mon 9", day: "Mon", date: "Nov 9", status: "covered", balance: 3077, note: "Owner bank transfer covered" },
-    { label: "Tue 10", day: "Tue", date: "Nov 10", status: "covered", balance: 3327, note: "Midweek sales clear" },
-    { label: "Wed 11", day: "Wed", date: "Nov 11", status: "covered", balance: 3607, note: "High cushion ($3,607 balance)" },
-    {
-      label: "Thu 12",
-      day: "Thu",
-      date: "Nov 12",
-      status: isThursdayCovered ? "covered" : "short",
-      balance: isThursdayCovered ? 3037 : 2947 - currentShortfall,
-      note: isThursdayCovered
-        ? "THURSDAY COVERED: Volta ($300) + Rent ($600) fully funded"
-        : `CRUNCH DAY: Volta ($300) + Rent ($600) — -$${currentShortfall} shortfall`,
-    },
-    { label: "Fri 13", day: "Fri", date: "Nov 13", status: "covered", balance: 3297, note: "Post-crunch recovery day" },
-    { label: "Sat 14", day: "Sat", date: "Nov 14", status: "covered", balance: 3537, note: "Weekend audio traffic" },
-    { label: "Sun 15", day: "Sun", date: "Nov 15", status: "covered", balance: 3757, note: "Clean runway" },
-    { label: "Mon 16", day: "Mon", date: "Nov 16", status: "covered", balance: 4007, note: "Comfortable buffer" },
-    { label: "Tue 17", day: "Tue", date: "Nov 17", status: "covered", balance: 4277, note: "Pacing ahead of targets" },
-    { label: "Wed 18", day: "Wed", date: "Nov 18", status: "covered", balance: 4547, note: "Full 14-day horizon clear" },
-  ];
-
-  const currentActiveDay = timelineDays[selectedDayIndex] || timelineDays[7];
-  const openingBalance = story.days[0]
-    ? (story.days[0].openingCents / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })
-    : "1,987.56";
-
   return (
-    <div className="min-h-screen bg-white text-[#001435] font-sans antialiased selection:bg-[#0070E0]/20 selection:text-[#001435] overflow-x-hidden">
+    <div className="v2-page min-h-screen bg-white text-[#001435] font-sans antialiased selection:bg-[#0070E0]/20 selection:text-[#001435] overflow-x-hidden">
       
       {/* ── CLEAN TOP BAR ── */}
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#F1F5F9] px-6 py-4">
@@ -143,7 +138,7 @@ export function V2StoryView({ story }: V2StoryProps) {
           <div className="flex items-center gap-4">
             <span className="hidden sm:inline-flex items-center gap-2 text-xs text-[#52627A] font-semibold bg-[#F8FAFC] border border-[#E2E8F0] px-3.5 py-1.5 rounded-full">
               <span className="w-2 h-2 rounded-full bg-[#16A34A]" />
-              <span>Loop Audio • ${openingBalance}</span>
+              <span>Loop Audio • {openingBalance}</span>
             </span>
 
             <Link
@@ -163,58 +158,33 @@ export function V2StoryView({ story }: V2StoryProps) {
             CINEMATIC MOMENT A: THE EMOTIONAL TRANSITION
             Happy Shop Sale → Dropping Bills → Worried Merchant → Forecast Reveal
             ══════════════════════════════════════════════════════════════ */}
-        <section id="moment-a" className="py-12 md:py-20 space-y-16 lg:space-y-24">
+        <section id="moment-a" className="py-8 md:py-12 space-y-16 lg:space-y-24">
           
           {/* Act 1: Thriving Business */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            <div className="lg:col-span-5 space-y-6 text-left">
+          <div className="v2-hero relative">
+            <div className="v2-hero-copy">
+              <p className="v2-kicker">A money forecast for Loop Audio</p>
               <h1 className="text-4xl sm:text-5xl lg:text-[56px] font-black text-[#001435] leading-[1.06] tracking-tight">
                 Know when your money might run low.
               </h1>
-              <p className="text-base sm:text-lg text-[#52627A] font-medium leading-relaxed max-w-lg">
-                NeverShort watches your bills, forecasts upcoming cash flow, and protects your store before shortfalls happen.
+              <p className="mt-5 max-w-md text-base sm:text-lg text-[#52627A] font-medium leading-relaxed">
+                Know what is coming in, what is due, and when the balance needs attention.
               </p>
-              <div>
-                <Link
-                  href="/demo"
-                  className="inline-flex items-center gap-2 bg-[#0070E0] hover:bg-[#005bb8] text-white font-black text-sm sm:text-base px-8 py-3.5 rounded-full shadow-md shadow-[#0070E0]/20 transition-all hover:scale-[1.02] active:scale-95"
-                >
-                  <span>Try the demo</span>
-                  <span>→</span>
-                </Link>
-              </div>
+              <Link
+                href="/demo"
+                className="v2-primary-cta mt-7 inline-flex items-center gap-3 bg-[#0070E0] hover:bg-[#005bb8] text-white font-black text-sm sm:text-base px-8 py-3.5 rounded-full transition-colors"
+              >
+                <span>Try the demo</span>
+                <span aria-hidden="true">→</span>
+              </Link>
             </div>
 
-            {/* Living Hero Illustration with Shopping Bag Delivery Animation */}
-            <div className="lg:col-span-7 relative">
-              <div className="relative w-full rounded-3xl overflow-hidden bg-white min-h-[320px]">
-                <Image
-                  src="/landing/scene_hero_custom.jpg"
-                  alt="Shopkeeper serving customer at counter with calendar scroll rolling out"
-                  width={1376}
-                  height={768}
-                  priority
-                  loading="eager"
-                  unoptimized
-                  className="w-full h-auto object-contain transition-transform duration-700 hover:scale-[1.008]"
-                />
-
-                {/* Animated Bag Delivery */}
-                <div className="absolute top-[32%] right-[22%] pointer-events-none animate-bag-handover z-20">
-                  <span className="text-2xl filter drop-shadow">🛍️</span>
-                </div>
-
-                {/* Clean Bottom Calendar Hotspot (Positioned on desk, far away from faces) */}
-                <div className="absolute bottom-[14%] left-[47%] -translate-x-1/2 pointer-events-auto z-20">
-                  <a
-                    href="#the-problem"
-                    className="group relative flex items-center gap-2 bg-white/95 backdrop-blur-sm border-2 border-[#DC2626] text-[#DC2626] px-4 py-1.5 rounded-full shadow-lg text-xs font-black hover:bg-[#DC2626] hover:text-white transition-all transform hover:scale-105"
-                  >
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#DC2626] group-hover:bg-white animate-ping" />
-                    <span>Thu 12: -$90 Crunch ↓</span>
-                  </a>
-                </div>
-              </div>
+            <div className="v2-hero-art">
+              <div className="v2-hero-thread" aria-hidden="true" />
+              <HeroAnimatedIllustration
+                firstShortDay={firstShortDay}
+                onSelectShortDay={() => setSelectedDayIndex(story.shortIndex ?? 0)}
+              />
             </div>
           </div>
 
@@ -234,27 +204,31 @@ export function V2StoryView({ story }: V2StoryProps) {
                   className="w-full h-auto object-contain"
                 />
 
-                {/* Physical Bill Drop 1: Volta Audio Parts (Lands on center-right counter desk) */}
+                {/* Physical Bill Drop 1: the supplier payment from the forecast */}
                 <div className="absolute top-[52%] left-[46%] z-20 animate-bill-1">
                   <div className="bg-[#FFFDFB] border border-[#CBD5E1] shadow-[0_16px_32px_-8px_rgba(0,0,0,0.15)] rounded-2xl p-3 text-left w-44 rotate-[-4deg]">
                     <div className="flex items-center justify-between text-[10px] font-bold text-[#64748B] uppercase">
                       <span>Supplier Due</span>
-                      <span className="text-[#DC2626]">Thu 12</span>
+                      <span className="text-[#DC2626]">{firstShortDay?.label ?? "Scheduled"}</span>
                     </div>
                     <div className="text-xs font-black text-[#001435] mt-0.5">Volta Audio Parts</div>
-                    <div className="text-sm font-extrabold text-[#DC2626] mt-0.5">-$300.00</div>
+                    <div className="text-sm font-extrabold text-[#DC2626] mt-0.5">
+                      {supplierDue ? `−${formatDollars(supplierDue.amountCents)}` : "No supplier order"}
+                    </div>
                   </div>
                 </div>
 
-                {/* Physical Bill Drop 2: Rent (Lands on far right counter desk) */}
+                {/* Physical Bill Drop 2: rent from the forecast */}
                 <div className="absolute top-[60%] left-[66%] z-20 animate-bill-2">
                   <div className="bg-[#FFFDFB] border border-[#CBD5E1] shadow-[0_16px_32px_-8px_rgba(0,0,0,0.15)] rounded-2xl p-3 text-left w-44 rotate-[4deg]">
                     <div className="flex items-center justify-between text-[10px] font-bold text-[#64748B] uppercase">
                       <span>Store Rent</span>
-                      <span className="text-[#DC2626]">Thu 12</span>
+                      <span className="text-[#DC2626]">{firstShortDay?.label ?? "Scheduled"}</span>
                     </div>
                     <div className="text-xs font-black text-[#001435] mt-0.5">Commercial Lease</div>
-                    <div className="text-sm font-extrabold text-[#DC2626] mt-0.5">-$600.00</div>
+                    <div className="text-sm font-extrabold text-[#DC2626] mt-0.5">
+                      {rentDue ? `−${formatDollars(rentDue.amountCents)}` : "No rent due"}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -265,87 +239,113 @@ export function V2StoryView({ story }: V2StoryProps) {
                 Bills don’t wait.
               </h2>
               <p className="text-base sm:text-lg text-[#52627A] font-medium leading-relaxed">
-                Supplier orders, store rent, and owner payouts cluster on the exact same dates. When bills land at once, a healthy balance can plunge into the red in a single afternoon.
+                Supplier orders, store rent, and owner payouts can cluster on the same date. The forecast shows when those payments would take the shop below its minimum reserve.
               </p>
             </div>
           </div>
 
           {/* Act 3: The Forecast Spots Trouble in Advance */}
-          <div id="see-it-coming" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center pt-8">
-            <div className="lg:col-span-5 space-y-6 text-left">
+          <div id="see-it-coming" className="v2-future-lens">
+            <div className="v2-future-heading">
+              <p className="v2-kicker">The next fourteen days</p>
               <h2 className="text-4xl sm:text-5xl font-black text-[#001435] leading-tight tracking-tight">
                 See it coming.
               </h2>
-              <p className="text-base sm:text-lg text-[#52627A] font-medium leading-relaxed">
-                A rolling 14-day cash forecast maps every scheduled expense against expected sales after PayPal fees. You spot the gap eight days before it happens.
+              <p className="max-w-2xl text-base sm:text-lg text-[#52627A] font-medium leading-relaxed">
+                Follow the shop’s cash day by day. Choose a date to see its projected balance, what is due, and whether it stays above the reserve.
               </p>
+            </div>
 
-              {/* Seamless Interactive 7-Day Horizon */}
-              <div className="space-y-3 pt-2">
-                <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
-                  {timelineDays.slice(4, 11).map((t, sliceIdx) => {
-                    const actualIdx = sliceIdx + 4;
-                    const isSelected = selectedDayIndex === actualIdx;
-                    const isCrunch = actualIdx === 7;
-                    const isDayCovered = isCrunch ? isThursdayCovered : true;
+            <div className="v2-lens-scene">
+              <div className="v2-lens-art">
+                <Image
+                  src="/landing/scene_forecast_custom.jpg"
+                  alt="The shopkeeper studies a calendar through a magnifying glass."
+                  width={1376}
+                  height={768}
+                  loading="lazy"
+                  unoptimized
+                  className="v2-lens-image"
+                />
+                <div className={`v2-lens-marker v2-lens-marker-${selectedDay.state}`} aria-hidden="true">
+                  <span className="v2-lens-marker-dot" />
+                  <span>{selectedDay.flap.weekday} {selectedDay.flap.day}</span>
+                  <span>{selectedDayStatus}</span>
+                </div>
+                <p className="v2-lens-art-caption">Loop Audio · November 2026</p>
+              </div>
 
+              <div className="v2-lens-reading">
+                <div className="v2-lens-date">
+                  <span className="v2-kicker">Selected day</span>
+                  <span className="v2-lens-date-label" aria-live="polite">{selectedDay.label}</span>
+                </div>
+
+                <div
+                  className="v2-day-rail"
+                  role="group"
+                  aria-label="Choose a day in the 14-day forecast. Use arrow keys to move between dates."
+                  tabIndex={0}
+                >
+                  <div className="v2-day-rail-line" aria-hidden="true" />
+                  {story.days.map((day, index) => {
+                    const selected = selectedDayIndex === index;
+                    const stateText = day.state === "short"
+                      ? `Short by ${formatShortfall(day.shortByCents)}`
+                      : day.state === "tight"
+                        ? "Tight"
+                        : "Covered";
                     return (
                       <button
-                        key={t.label}
+                        key={day.date}
+                        ref={(element) => { timelineButtons.current[index] = element; }}
                         type="button"
-                        onClick={() => setSelectedDayIndex(actualIdx)}
-                        className={`py-2 px-1 rounded-xl text-center transition-all ${
-                          isSelected
-                            ? "ring-2 ring-[#0070E0] shadow-md scale-105"
-                            : "hover:bg-[#F1F5F9]"
-                        } ${
-                          isDayCovered
-                            ? "bg-[#F0FDF4] text-[#16A34A] border border-[#BBF7D0]"
-                            : "bg-[#FEF2F2] text-[#DC2626] border border-[#F87171] font-bold"
-                        }`}
+                        aria-pressed={selected}
+                        aria-label={`${day.label}: ${stateText}; projected cash balance ${formatCents(day.closingCents)}`}
+                        onClick={() => setSelectedDayIndex(index)}
+                        onKeyDown={(event) => handleTimelineKeyDown(event, index)}
+                        className={`v2-day-stop v2-day-stop-${day.state}${selected ? " is-selected" : ""}`}
                       >
-                        <div className="text-[10px] font-semibold opacity-80">{t.day}</div>
-                        <div className="text-xs font-extrabold">{t.date.split(" ")[1]}</div>
-                        <div className="text-[9px] mt-1 font-bold">
-                          {isDayCovered ? "✓" : `-$${currentShortfall}`}
-                        </div>
+                        <span className="v2-day-stop-pin" aria-hidden="true" />
+                        <span className="v2-day-stop-weekday">{day.flap.weekday}</span>
+                        <span className="v2-day-stop-date">{day.flap.day}</span>
+                        <span className="v2-day-stop-status">{day.state === "short" ? "Short" : day.state === "tight" ? "Tight" : "Clear"}</span>
                       </button>
                     );
                   })}
                 </div>
+                <p className="v2-rail-hint" aria-hidden="true">Swipe for the remaining dates <span>→</span></p>
 
-                <div className="p-3.5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] flex items-center justify-between text-xs shadow-sm">
-                  <div>
-                    <span className="font-extrabold text-[#001435] mr-1.5">{currentActiveDay.label}:</span>
-                    <span className="text-[#52627A] font-medium">{currentActiveDay.note}</span>
+                <div className={`v2-lens-details v2-lens-details-${selectedDay.state}`} aria-live="polite" aria-atomic="true">
+                  <p className="v2-lens-narrator">{selectedDay.narrator}</p>
+                  <div className="v2-lens-metrics">
+                    <div className="v2-lens-metric">
+                      <span>Projected cash balance</span>
+                      <strong>{formatCents(selectedDay.closingCents)}</strong>
+                    </div>
+                    <div className="v2-lens-metric">
+                      <span>Minimum reserve</span>
+                      <strong>{formatCents(story.minimumCents)}</strong>
+                    </div>
+                    <div className="v2-lens-metric v2-lens-gap">
+                      <span>{selectedDay.state === "short" ? "Below reserve" : "Reserve gap"}</span>
+                      <strong>{selectedDay.state === "short" ? formatShortfall(selectedDay.shortByCents) : "$0"}</strong>
+                    </div>
                   </div>
-                  <div className="font-mono font-bold text-[#0070E0] whitespace-nowrap ml-3">
-                    ${currentActiveDay.balance.toLocaleString()}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Magnifying Glass Floating Animation over Calendar */}
-            <div className="lg:col-span-7 relative">
-              <div className="relative w-full rounded-3xl overflow-hidden bg-white min-h-[320px]">
-                <Image
-                  src="/landing/scene_forecast_custom.jpg"
-                  alt="Shopkeeper looking through magnifying glass at crunch calendar date"
-                  width={1376}
-                  height={768}
-                  priority
-                  loading="eager"
-                  unoptimized
-                  className="w-full h-auto object-contain transition-transform duration-500 hover:scale-[1.008]"
-                />
-
-                {/* Gliding Optical Lens Highlighting Thu 12 */}
-                <div className="absolute top-[34%] right-[30%] pointer-events-none animate-lens-glide z-20">
-                  <div className="w-24 h-24 rounded-full border-[3.5px] border-[#0070E0] shadow-[0_20px_50px_rgba(0,112,224,0.35)] bg-[#0070E0]/15 flex items-center justify-center backdrop-blur-[1.5px] animate-lens-pulse">
-                    <span className="text-xs font-black text-[#DC2626] bg-white/95 px-2.5 py-1 rounded-full shadow-md border border-[#FCA5A5]">
-                      {isThursdayCovered ? "✓ Covered" : `-$${currentShortfall}`}
-                    </span>
+                  <div className="v2-lens-obligations">
+                    <span className="v2-kicker">Expected that day</span>
+                    <ul>
+                      {selectedDay.moves.length === 0 ? (
+                        <li><span>Expected sales</span><strong>{formatDollars(story.forecast.days[selectedDayIndex]!.expectedInCents)}</strong></li>
+                      ) : (
+                        selectedDay.moves.map((move, moveIndex) => (
+                          <li key={`${selectedDay.date}-${moveIndex}`} className={move.kind === "out" ? "is-outflow" : "is-inflow"}>
+                            <span>{move.label}</span>
+                            <strong>{move.kind === "out" ? "−" : "+"}{formatDollars(move.amountCents)}</strong>
+                          </li>
+                        ))
+                      )}
+                    </ul>
                   </div>
                 </div>
               </div>
@@ -904,7 +904,7 @@ export function V2StoryView({ story }: V2StoryProps) {
               className="w-full h-auto object-contain"
             />
 
-            {/* Tactile Stamp Slam: ONLY appears when Thursday is mathematically 100% covered */}
+            {/* Tactile stamp appears when the target date stays above the minimum reserve. */}
             {isThursdayCovered && (
               <div className="absolute top-[28%] right-[22%] pointer-events-none animate-stamp-slam z-30">
                 <span className="inline-block border-[3px] border-[#16A34A] text-[#16A34A] font-black text-sm md:text-base px-5 py-2.5 rounded-lg shadow-xl bg-white/95 tracking-wide">
@@ -917,8 +917,10 @@ export function V2StoryView({ story }: V2StoryProps) {
           {/* Interactive Daily Set-Aside Solver */}
           <div className="max-w-md mx-auto bg-[#F8FAFC] border border-[#E2E8F0] p-5 rounded-2xl shadow-sm space-y-4 text-center">
             <div className="flex items-center justify-between text-xs font-bold">
-              <span className="text-[#64748B]">Set aside from daily sales:</span>
-              <span className="text-[#0070E0] text-sm font-mono font-black">${sliderStep * 7}.00 / day (${sliderStep * 21}.00 total)</span>
+              <span className="text-[#64748B]">Keep in PayPal each day:</span>
+              <span className="text-[#0070E0] text-sm font-mono font-black">
+                ${sliderStep * 7} / day (${savedAmount} total)
+              </span>
             </div>
 
             <input
@@ -929,7 +931,7 @@ export function V2StoryView({ story }: V2StoryProps) {
               value={sliderStep}
               onChange={(e) => setSliderStep(Number(e.target.value))}
               className="w-full accent-[#0070E0] cursor-pointer"
-              aria-label="Daily set aside amount"
+              aria-label="Daily amount kept in PayPal from the owner's regular bank transfers"
             />
 
             <div className="flex justify-between text-[11px] text-[#94A3B8] font-bold">
@@ -939,84 +941,23 @@ export function V2StoryView({ story }: V2StoryProps) {
               <span>$21/day</span>
             </div>
 
-            <div className="pt-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs">
-              <span className="text-[#64748B] font-semibold">Thursday 12 Nov Status:</span>
+            <div className="pt-2 border-t border-[#E2E8F0] flex items-center justify-between text-xs font-bold">
+              <span className="text-[#64748B]">Thursday 12 Nov status:</span>
               <span
-                className={`font-mono font-black text-sm ${
+                className={`font-mono text-sm ${
                   isThursdayCovered ? "text-[#16A34A]" : "text-[#DC2626]"
                 }`}
               >
-                {isThursdayCovered ? "FULLY COVERED ✓" : `-$${currentShortfall}.00 SHORT`}
+                {isThursdayCovered ? "100% COVERED ✓" : `-$${currentShortfall}.00 SHORT`}
               </span>
-            </div>
-          </div>
-
-          {/* Grand Finale CTAs */}
-          <div className="pt-8 text-center space-y-4 max-w-xl mx-auto">
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <Link
-                href="/demo"
-                className="bg-[#0070E0] hover:bg-[#005bb8] text-white font-black text-base sm:text-lg px-10 py-4 rounded-full shadow-lg shadow-[#0070E0]/25 transition-all hover:scale-105 active:scale-95"
-              >
-                Launch Demo Store →
-              </Link>
-              <Link
-                href="/today"
-                className="bg-[#001435] hover:bg-[#002868] text-white font-bold text-base px-8 py-4 rounded-full shadow transition-all hover:scale-[1.02]"
-              >
-                Open Live Store Till ↗
-              </Link>
-            </div>
-
-            {/* Sandbox Credentials Badge with 1-Click Copy */}
-            <div className="pt-2">
-              <button
-                type="button"
-                onClick={handleCopyCredentials}
-                className="text-xs text-[#64748B] hover:text-[#001435] inline-flex items-center gap-1.5 transition-colors bg-[#F1F5F9] hover:bg-[#E2E8F0] px-3.5 py-1.5 rounded-full border border-[#CBD5E1]"
-              >
-                <span>PayPal Sandbox Buyer:</span>
-                <code className="font-mono text-[#0070E0] font-bold">
-                  buyer@loopaudio.com
-                </code>
-                <span>{copiedLogin ? "✓ Copied!" : "(Click to copy)"}</span>
-              </button>
-            </div>
-
-            <div>
-              <button
-                type="button"
-                onClick={handleResetStory}
-                className="text-xs text-[#94A3B8] hover:text-[#64748B] underline transition-colors"
-              >
-                Reset Story to Day 1
-              </button>
             </div>
           </div>
         </section>
 
       </main>
 
-      {/* ── FOOTER ── */}
-      <footer className="border-t border-[#F1F5F9] bg-white py-12 px-6">
-        <div className="max-w-6xl xl:max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-[#64748B]">
-          <div className="flex items-center gap-3">
-            <span className="font-extrabold text-[#001435] text-base">NeverShort</span>
-            <span>•</span>
-            <span>PayPal AI Hackathon 2026</span>
-          </div>
-
-          <div className="flex items-center gap-6 font-semibold">
-            <Link href="/demo" className="hover:text-[#0070E0]">Judge Walkthrough</Link>
-            <Link href="/today" className="hover:text-[#0070E0]">Store Till</Link>
-            <Link href="/" className="hover:text-[#0070E0]">Home</Link>
-          </div>
-
-          <div className="text-[11px] text-[#94A3B8]">
-            Simulated store copy per visitor. PayPal Sandbox only.
-          </div>
-        </div>
-      </footer>
+      {/* ── SCENIC STORYBOOK FOOTER & FINAL CTA ── */}
+      <ScenicFooterV2 onResetStory={handleResetStory} />
     </div>
   );
 }
