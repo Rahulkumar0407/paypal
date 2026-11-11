@@ -1,0 +1,311 @@
+/* tmrw laptop intro flow (design/tmrw-handoff/SPEC.md). Values copied from the prototype. */
+
+.tmrw-viewport {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #0e1a2b;
+  touch-action: none;
+  overscroll-behavior: none;
+}
+
+.tmrw-frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1440px;
+  height: 900px;
+  overflow: hidden;
+  background: #0e1a2b;
+  color: #1d1d1f;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", var(--font-inter), "Inter", sans-serif;
+  letter-spacing: -0.01em;
+  transform-origin: 50% 50%;
+}
+
+.tmrw-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* Every painting is 1672 × 941, drawn in a 1600 × 900 box at left -80px (SPEC section 3). */
+.tmrw-paint {
+  position: absolute;
+  left: -80px;
+  top: 0;
+  width: 1600px;
+  height: 900px;
+}
+.tmrw-paint > img.tmrw-full {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tmrw-btn {
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+.tmrw-glass {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+.tmrw-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 99px;
+  font-weight: 600;
+  font-size: 15px;
+}
+.tmrw-blue {
+  background: #0071e3;
+  color: #ffffff;
+}
+.tmrw-ghost {
+  background: rgba(0, 0, 0, 0.05);
+  color: #1d1d1f;
+}
+.tmrw-muted {
+  color: #6e6e73;
+}
+.tmrw-icon {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Scroll hint: the chevron bobs 6px over 1.8s. */
+.tmrw-hint {
+  animation: tmrw-hint 1.8s ease-in-out infinite;
+}
+@keyframes tmrw-hint {
+  50% {
+    transform: translateY(6px);
+    opacity: 0.6;
+  }
+}
+
+.tmrw-fade-up {
+  animation: tmrw-fade-up 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes tmrw-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Station: slow drift, wind, lamp glow (SPEC 4.1). */
+.tmrw-kb {
+  animation: tmrw-kb 26s ease-in-out infinite alternate;
+}
+@keyframes tmrw-kb {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.045) translate(-0.6%, -0.4%);
+  }
+}
+.tmrw-leaf {
+  position: absolute;
+  width: 12px;
+  height: 7px;
+  border-radius: 12px 0 12px 0;
+  opacity: 0;
+  animation: tmrw-leaf linear infinite;
+}
+@keyframes tmrw-leaf {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(0);
+  }
+  10% {
+    opacity: 0.9;
+  }
+  50% {
+    transform: translate(-520px, 90px) rotate(260deg);
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-1100px, 40px) rotate(560deg);
+  }
+}
+.tmrw-glow {
+  animation: tmrw-glow 4s ease-in-out infinite;
+}
+@keyframes tmrw-glow {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* Seat: rocking and passing scenery (SPEC 4.3). */
+.tmrw-rock {
+  animation: tmrw-rock 3.4s ease-in-out infinite;
+}
+@keyframes tmrw-rock {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(1.4px);
+  }
+  60% {
+    transform: translateY(-0.6px);
+  }
+}
+.tmrw-skyrun {
+  animation: tmrw-run 140s linear infinite;
+}
+.tmrw-groundrun {
+  animation: tmrw-run 9s linear infinite;
+}
+@keyframes tmrw-run {
+  to {
+    background-position: -1356px 0;
+  }
+}
+
+/* Windows (SPEC 6). */
+.tmrw-panel-in {
+  animation: tmrw-panel-in 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes tmrw-panel-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Setup controls. */
+.tmrw-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 99px;
+  font-size: 14px;
+  font-weight: 500;
+  background: rgba(0, 0, 0, 0.05);
+  color: #1d1d1f;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+.tmrw-chip[aria-pressed="true"] {
+  background: #0071e3;
+  color: #ffffff;
+}
+.tmrw-seg {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.06);
+}
+.tmrw-seg button {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6e6e73;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+.tmrw-seg button[aria-pressed="true"] {
+  background: #ffffff;
+  color: #1d1d1f;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+.tmrw-card {
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 18px rgba(0, 0, 0, 0.05);
+}
+.tmrw-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+}
+.tmrw-switch {
+  position: relative;
+  width: 46px;
+  height: 28px;
+  border-radius: 14px;
+  border: 0;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.12);
+  transition: background 0.2s;
+}
+.tmrw-switch[aria-checked="true"] {
+  background: #34c759;
+}
+.tmrw-switch::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s;
+}
+.tmrw-switch[aria-checked="true"]::after {
+  transform: translateX(18px);
+}
+.tmrw-range {
+  width: 100%;
+  accent-color: #0071e3;
+}
+.tmrw-wordmark {
+  margin: 0;
+  font-family: var(--font-jakarta), "Plus Jakarta Sans", sans-serif;
+  font-style: italic;
+  font-size: 58px;
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  line-height: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tmrw-frame *,
+  .tmrw-frame *::before,
+  .tmrw-frame *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .tmrw-fade-up {
+    opacity: 1;
+  }
+}

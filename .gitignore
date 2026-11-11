@@ -33,3 +33,6 @@ next-env.d.ts
 
 # Claude Code: shared project settings are committed, personal ones are not
 .claude/settings.local.json
+
+# Design handoff (local only)
+/design/

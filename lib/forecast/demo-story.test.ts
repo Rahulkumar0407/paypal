@@ -98,7 +98,7 @@ describe("story step 1: the 30-day forecast on Thu 5 Nov", () => {
   });
 });
 
-describe("story step 3: Tiers of Joy pays its $240 cake", () => {
+describe("story step 3: Ivory & Vow pays its $240 cake", () => {
   it("nets $231.13 after PayPal's estimated fee of $8.87", () => {
     expect(paypalFeeCents(24_000)).toBe(887);
   });
@@ -113,7 +113,7 @@ describe("story step 3: Tiers of Joy pays its $240 cake", () => {
 });
 
 describe("can I afford a $200 order on Monday?", () => {
-  it("not yet, even after Tiers of Joy pays: it makes Thu 12 Nov $89 short", () => {
+  it("not yet, even after Ivory & Vow pays: it makes Thu 12 Nov $89 short", () => {
     const check = affordability(input(PAID), 20_000, "2026-11-09");
     expect(check).toMatchObject({ affordable: false, balanceAfterOnDateCents: 146_445, shortfallBefore: null, shortfallAfter: { date: "2026-11-12", amountCents: 8_887 } });
   });

@@ -41,7 +41,7 @@ has most of this data; tmrw puts it on one page that actually helps. **It is not
 
 The guiding picture is a hand-drawn monthly planner with four parts:
 
-- **Must pay:** rent, staff, suppliers, auto-debits (marked ⚡).
+- **Must pay:** rent, staff, suppliers, auto-debits (labelled "Auto-debit").
 - **Coming in:** expected sales by day, and money people owe.
 - **Want to do:** growth goals (new stock, a second oven, ads), fitted in only after every must-pay is safe.
 - **Focus line:** one line for the month, for example "second oven before Christmas".
@@ -72,7 +72,7 @@ big plan this month. Everything else comes from history.
    ("3 requests about the mixer"), then code checks money and timing ("buy on 27 Nov, set aside $8 a day; rent and
    staff pay stay covered"). The owner taps Add and it goes into Want to do.
 5. **Bring lost payments back** (part of Steer). tmrw finds money the shop is owed but never received: unpaid
-   invoices (Tiers of Joy's $240 cake), abandoned checkouts and failed payments (card declined, PayPal attempt
+   invoices (Ivory & Vow's $240 cake), abandoned checkouts and failed payments (card declined, PayPal attempt
    dropped). It drafts a reminder with a fresh PayPal checkout link, only if the customer agreed to be contacted,
    and never twice in 48 hours. If PayPal shows the order already paid, the reminder is blocked. When the customer
    pays, the webhook confirms it and the month page updates with what actually arrived after PayPal's fee. Risky
@@ -88,10 +88,10 @@ big plan this month. Everything else comes from history.
 | People | Penny, the owner, minds the money. Flo, the baker, minds the flour |
 | Coffee supplier | Bean There, about $400 every 10 days (2, 12, 22 Nov) |
 | Oat milk supplier | Oat of Office, $180 auto-debit |
-| Customer who owes | Tiers of Joy, a wedding planner; owes $240 for a tiered cake, due 18 Nov |
-| Bills | Rent $1,500 on the 12th · card machine $49 ⚡ on the 13th · internet $60 ⚡ on the 3rd · oven loan $250 ⚡ on the 25th · staff pay $1,600 on the 28th |
+| Customer who owes | Ivory & Vow, a wedding planner; owes $240 for a tiered cake, due 18 Nov |
+| Bills | Rent $1,500 on the 12th - card machine $49 (auto-debit) on the 13th - internet $60 (auto-debit) on the 3rd - oven loan $250 (auto-debit) on the 25th - staff pay $1,600 on the 28th |
 | Short day | Thu 12 Nov: rent + beans = $1,900 due; $1,780 free above the $200 minimum, so $120 short |
-| Fixes | Remind Tiers of Joy (fully covers it), set money aside, move the bean order, or a $120 loan at a 2% fee ($122.40 back on 13 Nov) |
+| Fixes | Remind Ivory & Vow (fully covers it), set money aside, move the bean order, or a $120 loan at a 2% fee ($122.40 back on 13 Nov) |
 | November | Must pay $4,839; about $6,900 coming in; about $2,060 left for plans. Sales about $180 a day on weekdays, $320 on weekends |
 
 Today in the demo is Thu 5 Nov 2026. The code's seed still uses the older "Loop Audio" headphone shop; it is being
@@ -256,8 +256,12 @@ never edited in. A receipt holds:
 
 ## 7. Design
 
-The visual design is being redone (the old "banknote / money desk" look is going away). Until the new design is in
-the repo, follow these rules, which stay:
+The new laptop flow lives at `/` (`components/tmrw/`): login → 9-step setup → station → train arrival → window seats
+(Calendar, Ventures, Insights) with a top dock (Settings, Daily brief, Requests, Pro). It follows the design handoff
+in `design/tmrw-handoff/` (kept local, gitignored; the artwork is copied to `public/tmrw/`). The windows are
+"Coming soon" placeholders until they're designed. The assistant is called Pip. Writing rules from the handoff: use a
+hyphen, never a middle dot; no lightning-bolt icons. The old "banknote / money desk" screens under `/today` are going
+away. These rules stay:
 
 - **Planner, not dashboard.** Inspired by Notion and calendar apps. No KPI tiles, no acronyms (GMV, AOV, WoW), no
   past-only charts. Show one clear next action, not a list of metrics. Presenting information well is the product.

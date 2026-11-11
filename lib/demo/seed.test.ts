@@ -67,12 +67,12 @@ describe("buildDemoSeed", () => {
     expect(dues.every((d) => confirmed.has(d.payeeId))).toBe(true);
   });
 
-  it("has Tiers of Joy's unpaid $240 tiered cake, from a customer who allowed contact", () => {
+  it("has Ivory & Vow's unpaid $240 tiered cake, from a customer who allowed contact", () => {
     const { orders, customers } = build();
     const unpaid = orders.filter((o) => o.status === "ABANDONED" && o.totalCents === 24_000);
     expect(unpaid).toHaveLength(1);
     const buyer = customers.find((c) => c.id === unpaid[0]!.customerId)!;
-    expect(buyer.name).toBe("Tiers of Joy");
+    expect(buyer.name).toBe("Ivory & Vow");
     expect(buyer.contactConsent).toBe(true);
   });
 

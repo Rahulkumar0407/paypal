@@ -28,8 +28,8 @@ describe("the month page", () => {
     ]);
   });
 
-  it("adds up what comes in: about $6,900 with Tiers of Joy's $240, leaving about $2,100 for plans", () => {
-    expect(month.comingIn.owed.map((o) => [o.customerName, o.amountCents, o.dueOn, o.canRemind])).toEqual([["Tiers of Joy", 24_000, "2026-11-18", true]]);
+  it("adds up what comes in: about $6,900 with Ivory & Vow's $240, leaving about $2,100 for plans", () => {
+    expect(month.comingIn.owed.map((o) => [o.customerName, o.amountCents, o.dueOn, o.canRemind])).toEqual([["Ivory & Vow", 24_000, "2026-11-18", true]]);
     expect(Math.round(month.totals.comingInCents / 10_000)).toBe(69);
     expect(month.totals.leftForPlansCents).toBe(month.totals.comingInCents - month.totals.mustPayCents);
   });
@@ -41,22 +41,23 @@ describe("the month page", () => {
     expect(thu12.chips.filter((c) => c.kind === "out").map((c) => c.label)).toEqual(["Rent", "Bean There"]);
     expect(month.wantToDo.map((w) => [w.title, w.fits, w.note])).toEqual([
       ["Second oven", false, "Not yet: buying it on Sat 21 Nov would leave Thu 12 Nov $120 short."],
-      ["Instagram ads", true, "Fits on Fri 20 Nov. Every must-pay stays covered."],
+      ["Stall at the Winter Makers' Market", true, "Fits on Sun 6 Dec. Every must-pay stays covered."],
+      ["Launch Christmas cookie boxes", false, "Pick a date in the next month and tmrw will check it fits."],
     ]);
     expect(month.days[20]!.chips).toContainEqual({ kind: "goal", label: "Second oven", amountCents: 120_000, fits: false });
   });
 
-  it("gives the Today panel: $0 safe to spend, $1,780 of $1,900 ready on the 12th, Tiers of Joy owes $240, oven $320 of $1,200", () => {
+  it("gives the Today panel: $0 safe to spend, $1,780 of $1,900 ready on the 12th, Ivory & Vow owes $240, oven $320 of $1,200", () => {
     expect(month.todayPanel).toMatchObject({
       safeToSpendCents: 0,
       safeNote: "The 12th is $120 short.",
       biggestDay: { date: "2026-11-12", dueCents: 190_000, readyCents: 178_000, names: ["Rent", "Bean There"] },
       goal: { title: "Second oven", savedCents: 32_000, amountCents: 120_000, note: "Not on track for the 21st yet" },
     });
-    expect(month.todayPanel.owed[0]).toMatchObject({ customerName: "Tiers of Joy", amountCents: 24_000 });
+    expect(month.todayPanel.owed[0]).toMatchObject({ customerName: "Ivory & Vow", amountCents: 24_000 });
   });
 
-  it("after Tiers of Joy pays: every day covered, $111 safe to spend, and the oven on track for the 21st", () => {
+  it("after Ivory & Vow pays: every day covered, $111 safe to spend, and the oven on track for the 21st", () => {
     const paid = previewDemoMonth({ recovered: true });
     expect(paid.verdict).toBe("The month adds up, and every day is covered.");
     expect(paid.todayPanel).toMatchObject({ safeToSpendCents: 11_100, owed: [], goal: { note: "On track for the 21st" } });

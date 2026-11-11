@@ -241,9 +241,9 @@ export function buildDemoSeed(storeId: StoreId, today: IsoDate, demoRunId: strin
   });
 
   // --- The story's open orders (after the history) ---------------------------
-  const tiers = DEMO_CUSTOMER_NAMES.indexOf("Tiers of Joy");
+  const tiers = DEMO_CUSTOMER_NAMES.indexOf("Ivory & Vow");
   const hana = DEMO_CUSTOMER_NAMES.indexOf("Hana Sato");
-  // Tiers of Joy's $240 tiered cake: delivered, not paid yet (due 18 Nov). Consent given, so tmrw may remind them.
+  // Ivory & Vow's $240 tiered cake: delivered, not paid yet (due 18 Nov). Consent given, so tmrw may remind them.
   addOrder({ customerIndex: tiers, date: addDays(today, -2), time: "16:20", lines: [{ key: "tiered", quantity: 1 }], status: "ABANDONED", dueOn: addDays(today, 13) });
   // An unpaid order from a customer who did not allow contact (Guard rule 2 blocks a reminder).
   customers[hana]!.contactConsent = false;
@@ -353,7 +353,8 @@ export function buildDemoSeed(storeId: StoreId, today: IsoDate, demoRunId: strin
   // The oven fund already has $320 put aside (inside the PayPal balance). Penny would like it on Sat 21 Nov.
   const goals: Prisma.GoalCreateManyInput[] = [
     { id: id("goal", "oven"), storeId, title: "Second oven", amountCents: 120_000, savedCents: 32_000, wantedOn: addDays(today, 16) },
-    { id: id("goal", "ads"), storeId, title: "Instagram ads", amountCents: 15_000, savedCents: 0, wantedOn: addDays(today, 15) },
+    { id: id("goal", "market"), storeId, title: "Stall at the Winter Makers' Market", amountCents: 30_000, savedCents: 0, wantedOn: addDays(today, 31) },
+    { id: id("goal", "cookies"), storeId, title: "Launch Christmas cookie boxes", amountCents: 45_000, savedCents: 0, wantedOn: addDays(today, 37) },
   ];
   // Requests that would otherwise be WhatsApp messages. Three are about the mixer.
   const requests: Prisma.TeamRequestCreateManyInput[] = [
@@ -361,7 +362,7 @@ export function buildDemoSeed(storeId: StoreId, today: IsoDate, demoRunId: strin
     { id: id("req", 2), storeId, fromName: "Bean There", fromRole: "Coffee supplier", text: "Beans roasted, send $400 by Thursday.", topic: null, receivedOn: addDays(today, -2) },
     { id: id("req", 3), storeId, fromName: "Flo", fromRole: "Baker", text: "Mixer stopped halfway through the dough again this morning.", topic: "mixer", receivedOn: addDays(today, -3) },
     { id: id("req", 4), storeId, fromName: "Flo", fromRole: "Baker", text: "Can I get my pay on the 28th?", topic: null, receivedOn: addDays(today, -1) },
-    { id: id("req", 5), storeId, fromName: "Rafi", fromRole: "Weekend barista", text: "Can we get a stand mixer before the holiday orders? The old one is too slow.", topic: "mixer", receivedOn: addDays(today, -1) },
+    { id: id("req", 5), storeId, fromName: "Marco", fromRole: "Barista", text: "Can we get a stand mixer before the holiday orders? The old one is too slow.", topic: "mixer", receivedOn: addDays(today, -1) },
   ];
 
   return { store, products, customers, payees, orders, orderItems, ledgerEntries, dues, goals, requests };

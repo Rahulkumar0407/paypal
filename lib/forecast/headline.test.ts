@@ -14,7 +14,7 @@ describe("buildHeadline", () => {
     });
   });
 
-  it("says clear once Tiers of Joy pays, and names the big day", () => {
+  it("says clear once Ivory & Vow pays, and names the big day", () => {
     const h = buildHeadline(forecast({ recovered: true }));
     expect(h.tone).toBe("covered");
     expect(h.text).toBe("Clear for the next 30 days. Thu 12 Nov is covered too, when rent and the bean order go out.");

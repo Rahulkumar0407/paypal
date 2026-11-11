@@ -111,7 +111,7 @@ export function rowsFromSeed(seed: DemoSeed): SeedRows {
 }
 
 export interface DemoScenario {
-  /** Story step 3: Tiers of Joy pays its $240 cake today; what arrives after PayPal's fee goes in the ledger. */
+  /** Story step 3: Ivory & Vow pays its $240 cake today; what arrives after PayPal's fee goes in the ledger. */
   recovered?: boolean;
   /** Story step 5: keep this much a day back from the owner's transfers, from today until the day before the gap. */
   setAsideDailyCents?: Cents;

@@ -54,7 +54,7 @@ describe("fix the gap on the demo store", () => {
     expect(loan).toMatchObject({ amountCents: 12_000, loanFeeCents: 240, resultingClosingCents: 20_000, simulated: true });
   });
 
-  it("offers nothing when nothing is short (Tiers of Joy has paid)", () => {
+  it("offers nothing when nothing is short (Ivory & Vow has paid)", () => {
     expect(fixOptionsFrom(input({ recovered: true }))).toEqual([]);
   });
 

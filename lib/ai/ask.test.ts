@@ -4,7 +4,7 @@ import { previewDemoStore, type DemoScenario } from "@/lib/forecast";
 import { formatDollars } from "@/lib/shared/money";
 import { amountFrom, answerWith, dateFrom, plainAnswer, type AskData } from "./ask";
 
-/** Ask chat against the demo store's real forecast. FIXED is the story after Tiers of Joy pays. */
+/** Ask chat against the demo store's real forecast. FIXED is the story after Ivory & Vow pays. */
 const START: DemoScenario = {};
 const FIXED: DemoScenario = { recovered: true };
 

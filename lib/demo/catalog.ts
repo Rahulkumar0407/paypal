@@ -24,7 +24,7 @@ export const DEMO_CATALOG: readonly CatalogItem[] = [
 ];
 
 export const DEMO_CUSTOMER_NAMES: readonly string[] = [
-  "Tiers of Joy", "Liam Chen", "Sofia Martins", "Noah Adeyemi", "Ava Lindqvist", "Ethan Brooks",
+  "Ivory & Vow", "Liam Chen", "Sofia Martins", "Noah Adeyemi", "Ava Lindqvist", "Ethan Brooks",
   "Isla Moreno", "Lucas Weber", "Mia Tanaka", "Oliver Grant", "Zara Haddad", "Mateo Rossi",
   "Chloe Dubois", "Arjun Mehta", "Grace Kim", "Henry Walsh", "Leila Farouk", "Jack Morrison",
   "Nora Petrov", "Samuel Osei", "Ruby Clarke", "Daniel Novak", "Hana Sato", "Felix Wagner",
