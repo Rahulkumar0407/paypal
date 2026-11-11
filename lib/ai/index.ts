@@ -1,5 +1,5 @@
 /**
- * lib/ai: Ask chat, explanations and reminder drafts. Owner: Person 1.
+ * lib/ai: Ask chat, explanations and reminder drafts.
  * AI never calculates money and never calls PayPal (AGENTS.md sections 3 and 5): it answers through read-only tools
  * that return numbers calculated by lib/forecast, and code checks every word it writes. Every function falls back to
  * calculated numbers or a template when the model is off, slow, wrong or failing.

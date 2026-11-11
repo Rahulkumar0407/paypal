@@ -23,7 +23,7 @@ async function load(): Promise<{ settings: StoreSettings; forecast: Forecast | n
   }
 }
 
-/** The short setup form, with a card that shows what the safety line means for the next two weeks. */
+/** The short setup form, with a card that shows what the safety line means for the next 30 days. */
 export default async function SettingsPage() {
   const data = await load();
   if (!data) {
@@ -69,7 +69,7 @@ function SafetyLine({ settings, forecast }: { settings: StoreSettings; forecast:
       </ul>
       {forecast ? (
         <p className="mt-4 border-t border-line pt-4 text-[15px] leading-6 text-ink-muted">
-          Over the next 14 days that gives {counts.map(([s, n]) => `${n} ${s}`).join(", ")}.
+          Over the next 30 days that gives {counts.map(([s, n]) => `${n} ${s}`).join(", ")}.
           {gap ? ` The first short day is ${formatDay(gap.date)}, ${formatShortfall(gap.amountCents)} under your minimum.` : ""}
         </p>
       ) : null}

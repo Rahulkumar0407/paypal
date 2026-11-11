@@ -8,7 +8,7 @@ import type { DueRow } from "./rows";
 import { useLaptop } from "./useLaptop";
 
 /**
- * Money out over the next 14 days. Laptop: the AG Grid table with ready meters (AgDuesGrid), downloaded only on a wide
+ * Money out over the next 30 days. Laptop: the AG Grid table with ready meters (AgDuesGrid), downloaded only on a wide
  * screen. Phone: a plain list.
  */
 
@@ -18,7 +18,7 @@ const AgDuesGrid = dynamic(() => import("./AgDuesGrid").then((m) => m.AgDuesGrid
 });
 
 export function DuesList({ rows }: { rows: DueRow[] }) {
-  if (rows.length === 0) return <p className="py-4 text-[15px] text-ink-muted">Nothing to pay in the next 14 days.</p>;
+  if (rows.length === 0) return <p className="py-4 text-[15px] text-ink-muted">Nothing to pay in the next 30 days.</p>;
   return (
     <ul className="divide-y divide-line">
       {rows.map((d) => {

@@ -25,7 +25,7 @@ export function UnifiedForecastChart({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 className="text-base font-semibold text-slate-900 tracking-tight">
-            14-Day Projected Cash Flow
+            30-Day Projected Cash Flow
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
             Tap any day to inspect anticipated revenue and scheduled payments.
@@ -43,7 +43,7 @@ export function UnifiedForecastChart({
         </div>
       </div>
 
-      {/* ── Interactive 14-Day Trajectory Bars ── */}
+      {/* ── Interactive 30-Day Trajectory Bars ── */}
       <div className="relative pt-6 pb-2 overflow-x-auto [scrollbar-width:none]">
         {/* Minimum reserve threshold line */}
         <div

@@ -14,7 +14,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import type { OwnerMood } from "./Owner";
+export type OwnerMood = "calm" | "worried" | "relieved";
 
 function subscribeReducedMotion(callback: () => void) {
   if (typeof window === "undefined") return () => {};

@@ -36,7 +36,7 @@ export async function decideEscalation(receiptId: string, choice: "approve" | "d
       case "EXECUTED":
         return { ok: true, receiptId, choice, decision: "APPROVE", message: `You approved it, and it's done. ${last.detail}` };
       case "RECHECK_BLOCKED":
-        return { ok: true, receiptId, choice, decision: "BLOCK", message: `NeverShort checked once more and stopped it: ${last.detail} Nothing moved.` };
+        return { ok: true, receiptId, choice, decision: "BLOCK", message: `tmrw checked once more and stopped it: ${last.detail} Nothing moved.` };
       case "EXECUTION_FAILED":
         return { ok: true, receiptId, choice, decision: null, message: `Approved, but it didn't go through: ${last.detail} Nothing moved.` };
       case "OWNER_REJECTED":
@@ -45,7 +45,7 @@ export async function decideEscalation(receiptId: string, choice: "approve" | "d
           : { ok: true, receiptId, choice, decision: null, message: "Declined. Nothing will happen, and the receipt notes your choice." };
       default:
         return parsed.data.choice === "approve"
-          ? { ok: true, receiptId, choice, decision: null, message: "You approved it. NeverShort runs its safety checks once more, then does it." }
+          ? { ok: true, receiptId, choice, decision: null, message: "You approved it. tmrw runs its safety checks once more, then does it." }
           : { ok: true, receiptId, choice, decision: null, message: "Declined. Nothing will happen, and the receipt notes your choice." };
     }
   } catch (error) {

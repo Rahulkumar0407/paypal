@@ -6,8 +6,8 @@ import { fixOptionsFrom } from "./fixes";
 import { buildHeadline } from "./headline";
 
 /**
- * "Try it with your numbers" (/try): a visitor types a few numbers and gets the same 14-day forecast, headline and fix
- * ideas the app gives Loop Audio, from the same engine. Pure: nothing is stored, no database, no AI.
+ * "Try it with your numbers" (/try): a visitor types a few numbers and gets the same 30-day forecast, headline and fix
+ * ideas the app gives Dunder Mifflin & Co., from the same engine. Pure: nothing is stored, no database, no AI.
  *
  * The real app learns sales from PayPal history (an average per weekday). Here the visitor gives one normal day's sales,
  * used for every day, so confidence is "medium" and says why.
@@ -19,7 +19,7 @@ export interface YourPayment {
   amountCents: Cents;
   /** Days from today, 0 to 13. */
   inDays: number;
-  /** Also goes out every 7 days after that, within the two weeks. */
+  /** Also goes out every 7 days after that, within the 30 days. */
   weekly: boolean;
 }
 
@@ -36,7 +36,7 @@ export interface YourForecast {
   fixes: FixOption[];
 }
 
-/** Tight = within this share of the minimum above it (Loop Audio: $50 on a $100 minimum), at least $25. */
+/** Tight = within this share of the minimum above it (Dunder Mifflin & Co.: $50 on a $100 minimum), at least $25. */
 export function warningZoneFor(minimumBalanceCents: Cents): Cents {
   return Math.max(2_500, Math.round(minimumBalanceCents / 2));
 }
@@ -106,7 +106,7 @@ export interface YourFix {
 }
 
 /**
- * The visitor tried one of the fix ideas: its Guard proposal and the two weeks as they'd be with it, rebuilt from the
+ * The visitor tried one of the fix ideas: its Guard proposal and the 30 days as they'd be with it, rebuilt from the
  * numbers on the server. Null when that fix isn't on offer for these numbers.
  */
 export function yourFix(numbers: YourNumbers, fixId: string, today: IsoDate): YourFix | null {

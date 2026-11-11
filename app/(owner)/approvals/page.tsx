@@ -8,7 +8,7 @@ import { agentsHaveRun, runAgents } from "../agents";
 import { decideEscalation, sendFollowUp } from "./actions";
 import { DecisionsViews } from "@/components/app/DecisionsViews";
 
-export const metadata: Metadata = { title: "Decisions • NeverShort" };
+export const metadata: Metadata = { title: "Decisions • tmrw" };
 
 export default async function ApprovalsPage() {
   const storeId = await getVisitorStoreId();

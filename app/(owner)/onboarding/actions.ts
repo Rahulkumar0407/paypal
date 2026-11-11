@@ -112,7 +112,7 @@ export async function resetToDemoSimulation(): Promise<{ ok: boolean; message: s
     await resetStoreWith(getDb(), storeId);
     const paths = ["/today", "/dashboard", "/dues", "/approvals", "/settings", "/onboarding", "/demo"];
     for (const p of paths) revalidatePath(p);
-    return { ok: true, message: "Restored Loop Audio demonstration store." };
+    return { ok: true, message: "Restored Dunder Mifflin & Co. demonstration store." };
   } catch (err) {
     console.error("[onboarding] failed to restore demo:", err);
     return { ok: false, message: "Could not reset to demo store." };

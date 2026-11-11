@@ -39,7 +39,7 @@ export default async function FixPage() {
         <PageSentence>Ways to cover the gap.</PageSentence>
         <ErrorState
           title="Couldn't work out the fixes."
-          body="Your money hasn't moved: nothing is paid or sent without passing NeverShort's safety check. Try again in a minute."
+          body="Your money hasn't moved: nothing is paid or sent without passing tmrw's safety check. Try again in a minute."
           retryHref="/fix"
         />
       </div>
@@ -52,7 +52,7 @@ export default async function FixPage() {
   if (!gap) {
     return (
       <div className="space-y-8">
-        <PageSentence>Nothing to fix. The next two weeks are covered.</PageSentence>
+        <PageSentence>Nothing to fix. The next 30 days are covered.</PageSentence>
         <EmptyState
           title="No short days ahead."
           body={`Every day stays above your ${formatDollars(forecast.minimumBalanceCents)} minimum. If that changes, the ways to fix it show up here.`}
@@ -75,7 +75,7 @@ export default async function FixPage() {
           {forDay} is {formatShortfall(gap.amountCents)} short. {COUNT_WORD[fixes.length] ?? fixes.length} way{fixes.length === 1 ? "" : "s"} to cover it.
         </PageSentence>
         <p className="max-w-[60ch] text-[16px] leading-7 text-ink-muted">
-          {capitalise(gap.reason)}. Pick one. Before anything happens, NeverShort&apos;s safety check (the Margin Guard) looks at it. Loans, moved payments and anything over $100 wait for your OK.
+          {capitalise(gap.reason)}. Pick one. Before anything happens, tmrw&apos;s safety check (the Margin Guard) looks at it. Loans, moved payments and anything over $100 wait for your OK.
         </p>
       </div>
 

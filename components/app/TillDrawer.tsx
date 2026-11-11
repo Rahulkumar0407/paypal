@@ -19,7 +19,7 @@ function readyLayers(readyCents: number, amountCents: number): number {
  * The till drawer: the owner's money already split up for what's coming. One slot per payment in the next two
  * weeks, in date order; the stack under the clip is how much of it is ready, and dashed outlines show the notes
  * still missing. When a gap is fixed or a customer pays, the new notes slide into the slot. Every number in the
- * captions comes from the forecast; the stack is only its picture. Owner: Person 1.
+ * captions comes from the forecast; the stack is only its picture.
  */
 export function TillDrawer({ items }: { items: DueWithState[] }) {
   if (items.length === 0) return null;
@@ -52,7 +52,7 @@ export function TillDrawer({ items }: { items: DueWithState[] }) {
                       {isTop ? (
                         <>
                           <span className="cash-medallion" />
-                          <span className="cash-maker">NeverShort</span>
+                          <span className="cash-maker">tmrw</span>
                           <span className="cash-figure">{formatDollars(due.readyCents)}</span>
                         </>
                       ) : null}

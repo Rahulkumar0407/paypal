@@ -14,7 +14,7 @@ import { listRecentOrders } from "@/lib/store";
 import { formatDay } from "@/lib/shared/dates";
 import { formatCents, formatDollars, formatShortfall } from "@/lib/shared/money";
 
-export const metadata: Metadata = { title: "Forecast • NeverShort" };
+export const metadata: Metadata = { title: "Forecast • tmrw" };
 
 async function load() {
   const storeId = await getVisitorStoreId();
@@ -73,7 +73,7 @@ export default async function DashboardPage() {
       {/* ── Page Header ── */}
       <div className="space-y-1.5">
         <h1 className="text-2xl sm:text-3xl font-serif font-black text-slate-900 tracking-tight">
-          14-Day Cash Forecast
+          30-Day Cash Forecast
         </h1>
         <p className="text-sm text-slate-500">
           A forward-looking estimate of your bank balance based on average sales and scheduled bills.
@@ -118,7 +118,7 @@ export default async function DashboardPage() {
             Forecast Clear
           </span>
           <h2 className="text-lg font-bold text-slate-900">
-            No projected shortfalls over the next two weeks.
+            No projected shortfalls over the next 30 days.
           </h2>
           <p className="text-sm text-slate-600">
             Lowest estimated balance is {formatDollars(lowest.closingCents)} on {formatDay(lowest.date)}, safely above your {formatDollars(forecast.minimumBalanceCents)} cash reserve.
@@ -136,7 +136,7 @@ export default async function DashboardPage() {
       {/* ── Progressive Disclosure: Scheduled Payments Table ── */}
       <CollapsibleSection
         title="Upcoming Bills & Payments in this Forecast"
-        subtitle={`${duesRows.length} obligations due over the next 14 days`}
+        subtitle={`${duesRows.length} obligations due over the next 30 days`}
       >
         <div className="hidden md:block">
           <DuesTable rows={duesRows} />

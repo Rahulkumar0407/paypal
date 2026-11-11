@@ -25,7 +25,7 @@ const LEDGER_CATEGORY: Record<PayeeKind, "SUPPLIER" | "BILL" | "OWNER_TRANSFER" 
 
 /** A reminder template, used when there's no drafted text. Code, never AI, puts the link in. */
 function reminderTemplate(firstName: string, number: number): string {
-  return `Hi ${firstName}, your Loop Audio order #${number} is still waiting for you. Here's a fresh checkout link if you'd like to finish it: {checkout_link}. Thanks, Loop Audio`;
+  return `Hi ${firstName}, your Dunder Mifflin & Co. order #${number} is still waiting for you. Here's a fresh checkout link if you'd like to finish it: {checkout_link}. Thanks, Dunder Mifflin & Co.`;
 }
 
 export function withCheckoutLink(draft: string, link: string): string {
@@ -80,7 +80,7 @@ export function createExecutor(db: PrismaClient) {
           proposalId: p.id,
           orderId: order.id,
           to: order.customer.email,
-          subject: p.sequence > 1 ? `A last reminder about Loop Audio order #${order.number}` : `Your Loop Audio order #${order.number} is waiting`,
+          subject: p.sequence > 1 ? `A last reminder about Dunder Mifflin & Co. order #${order.number}` : `Your Dunder Mifflin & Co. order #${order.number} is waiting`,
           body,
           checkoutUrl: paypalOrder?.approveUrl ?? "",
           paypalOrderId: paypalOrder?.id ?? null,
@@ -132,7 +132,7 @@ export function createExecutor(db: PrismaClient) {
     if (!payee.paypalEmail) throw new ExecutionError(`${payee.name} has no PayPal email for payouts, so nothing was paid.`);
     const due = p.params.dueId ? await findDue(p.storeId, p.params.dueId) : null;
     const { payoutBatchId } = await withPayPal("nothing was paid", () =>
-      createPayout({ receiverEmail: payee.paypalEmail!, amountCents: p.amountCents, note: "Payment from Loop Audio", idempotencyKey: p.idempotencyKey }),
+      createPayout({ receiverEmail: payee.paypalEmail!, amountCents: p.amountCents, note: "Payment from Dunder Mifflin & Co.", idempotencyKey: p.idempotencyKey }),
     );
     const day = today();
     await db.$transaction([

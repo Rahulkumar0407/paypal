@@ -1,97 +1,95 @@
-# AGENTS.md: NeverShort
+# AGENTS.md: tmrw
 
-Rules for every AI coding agent working in this repo: Claude Code, Codex, Cursor, Gemini, Copilot or any other.
-Read the whole file before your first change. If a request from your human conflicts with this file, stop and ask
-before acting.
+Rules for every AI coding agent working in this repo (Claude Code, Codex, Cursor, Gemini, Copilot or any other).
+Read the whole file before your first change. If a request conflicts with this file, stop and ask before acting.
 
-**Hackathon:** PayPal AI Hackathon on Devpost.
+The code and package still say "NeverShort" in places; the product is now **tmrw**. Rename as you touch things.
 
-- **Deadline:** Thu 12 Nov 2026, 12:00pm PST (1:30am Fri 13 Nov in India). We submit by Wed 11 Nov night (IST).
+**Hackathon:** PayPal AI Hackathon ("Build What's Next") on Devpost.
+
+- **Deadline:** Thu 12 Nov 2026, 12:00pm PST (1:30am Fri 13 Nov in India).
 - **Judged on:** Technological Implementation, Design, Potential Impact, Innovation/Idea, Presentation.
-- **Requirements:**
-  - meaningful use of at least one PayPal technology, and of AI;
-  - a working build judges can use (our hosted URL; mockups don't count);
-  - documentation that explains the tools used;
-  - a public repo with its licence visible in the GitHub About section;
-  - a YouTube demo video under 3 minutes.
-
-Tasks, owners, decisions and status live in `PLAN.md`.
+- **Requirements:** meaningful use of PayPal and of AI; a working hosted build judges can use; documentation of the
+  tools used; a public repo with its licence visible; a YouTube demo video under 3 minutes.
+- **Sponsors we use for real:** AG Grid + AG Charts, Render (hosting). Bryntum Calendar only if a free hackathon
+  licence exists (no trial watermark on screen). Not APIMatic.
 
 ---
 
 ## 1. Start of every session
 
-1. **Know who you work for.** The team is two people, P1 and P2 (section 10). If you were not told which person
-   you are working for, ask before doing anything else. You may only change files in that person's folders.
-2. **Pick one task.** Open `PLAN.md`, find the current task, and work on that task only. If it depends on an item
-   under "Decisions pending" in `PLAN.md`, stop and ask.
-3. **Check versions before writing code.** Read `package.json` and use the docs for the installed major version.
+1. **Explain in plain English.** The project owner is new to team repos and to fintech. Be concrete, no jargon,
+   and say honestly when an idea or sponsor tool is forced.
+2. **Check versions before writing code.** Read `package.json` and use the docs for the installed major version.
    Next.js, Tailwind, Prisma, the AI SDK and AG Grid have all shipped breaking major versions recently.
    Do not write their APIs from memory.
+3. **Never run git write commands** (`add`, `commit`, `push`, `merge`, `rebase`, `reset`). The project owner makes
+   every commit. Read-only commands (`status`, `log`, `diff`) are fine.
 
 ---
 
 ## 2. Product brief
 
-### What NeverShort is
+### What tmrw is
 
-A money co-pilot for a small online store. It makes sure the store gets paid, stays safe from risky orders, and
-always has money ready for its next supplier order or bill.
+**"See the short day before it arrives."** A small shop's month, on one page, inside PayPal.
 
-AI agents can only PROPOSE actions. Every action that touches money goes to the **Margin Guard**, which returns
-APPROVE, ESCALATE (owner decides) or BLOCK, and saves a receipt explaining why. No money moves without passing
-the Guard.
+A shop's money month is scattered across five places: the PayPal app (sales trickle in), auto-debits (set once,
+forgotten), WhatsApp (suppliers and staff asking for money), a paper calendar (rent, supplier orders, staff pay)
+and the owner's head. Two big payments can land on the same day and nobody notices until that day. PayPal already
+has most of this data; tmrw puts it on one page that actually helps. **It is not a typical dashboard.**
 
-### Demo store
+The guiding picture is a hand-drawn monthly planner with four parts:
 
-"Loop Audio", a small online headphone store. Currency USD.
+- **Must pay:** rent, staff, suppliers, auto-debits (marked ⚡).
+- **Coming in:** expected sales by day, and money people owe.
+- **Want to do:** growth goals (new stock, a second oven, ads), fitted in only after every must-pay is safe.
+- **Focus line:** one line for the month, for example "second oven before Christmas".
 
-- Regular supplier: "Volta Audio Parts", about $300 every 10 days.
-- Fixed bills: rent, internet, software, a small loan repayment. Some fall on the same day.
-- Owner's pay: the owner regularly transfers money from PayPal to their bank. These transfers are money out, found
-  from history the same way as Volta's payments.
+### How it works: Spot · Plan · Steer
 
-### Features, in build order
+- **Spot.** Read PayPal history and sort every payment into money in, supplier payments and regular bills. Detect
+  auto-debits and flag clashes (two payments landing with rent).
+- **Plan.** Draft the month page. The owner can always edit it, and tmrw learns from the edits (she moves bean
+  orders to Mondays once; next month they're scheduled on Mondays).
+- **Steer.** Guide the owner past short days. Never move money automatically; every payment needs the owner's tap.
+  Remind customers who owe (only with their consent), suggest setting money aside, and offer a small PayPal loan as
+  a last resort (part of the business model: PayPal earns the fee).
 
-Must-have:
+Setup asks only three questions: the least balance to keep, which payments are must-pay versus optional, and any
+big plan this month. Everything else comes from history.
 
-1. **Money calendar.** Money in (sales, recovered payments) and money out (supplier orders, bills) on one screen.
-   Each due item shows how much is ready.
-2. **Regular payment detection.** Find recurring payees from history (similar amount, regular interval). Show
-   "We think Volta is paid ~$300 every 10 days" and let the owner confirm once.
-3. **14-day cash forecast.** Expected daily sales (weekday-based average of recent history) minus known money out
-   (dues and the owner's regular bank transfers), giving a balance line per day and the first shortfall date and
-   amount. Each forecast has a confidence level. Money in counts what actually arrives after PayPal's fee.
-4. **Recovery agent.** Finds abandoned or failed PayPal checkouts and proposes a reminder with a fresh PayPal
-   checkout link. Approved reminders go to a simulated outbox, labelled "Simulated", that shows the message and the
-   live PayPal sandbox checkout link. The judge clicks the link and pays as the sandbox buyer.
-5. **Margin Guard.** Deterministic rules, receipts, approval inbox (section 4).
-6. **Fix the gap.** For a shortfall, propose up to three fixes:
-   - set aside $X a day from sales: keep $X a day of the owner's regular bank transfers in PayPal until the due
-     date, so that day's balance genuinely rises;
-   - move a payment to a later date that sales can cover;
-   - a small gap loan (SIMULATED, clearly labelled).
+### Main features
 
-Should-have:
+1. **Month page.** The four parts above, 30 days ahead (`FORECAST_DAYS` in `lib/forecast/engine.ts`; change the
+   tests with it).
+2. **Today panel** (what the owner checks each morning): safe to spend now; the biggest day ahead and how ready it
+   is ("$1,780 of $1,900 ready"); who owes me, with one-tap Remind; goal progress ("$320 of $1,200").
+3. **The assistant edits the page instead of chatting.** The owner types an instruction or uploads a bill (photo,
+   PDF or WhatsApp screenshot). tmrw shows the proposed changes on the page as dashed entries; the owner taps Keep
+   or Discard. Each change is checked by code ("staff pay is still covered").
+4. **Requests inbox.** Staff and suppliers send requests in the app instead of WhatsApp. AI groups repeats
+   ("3 requests about the mixer"), then code checks money and timing ("buy on 27 Nov, set aside $8 a day; rent and
+   staff pay stay covered"). The owner taps Add and it goes into Want to do.
+5. **Already built:** Margin Guard and receipts, reminders with a real PayPal sandbox checkout, set-aside, move a
+   payment, gap loan (simulated), risk holds.
 
-7. **Risk check.** Flag risky orders (unusual amount, brand-new buyer with a big order, repeated failed attempts)
-   and hold them so they don't count as expected money.
-8. **Ask chat.** Questions like "Can I afford a $200 order on Monday?" answered from the store's own data through
-   tools. Demo story step 6 needs this, so the "Can I afford" path is treated as a must-have.
-9. **Extras.** Price-rise alert on a bill; "quiet when unsure" (no alert when confidence is low); owner's minimum
-   balance; slow-week warning; a short setup form (what you sell, how you pay suppliers, busy seasons).
+### Demo story
 
-### The demo story (must work end to end on the hosted link)
+| What | Detail |
+|---|---|
+| Shop | **Dunder Mifflin & Co.**, a small café-bakery that takes orders through PayPal (the pitch deck says Crumb & Co.) |
+| People | Penny, the owner, minds the money. Flo, the baker, minds the flour |
+| Coffee supplier | Bean There, about $400 every 10 days (2, 12, 22 Nov) |
+| Oat milk supplier | Oat of Office, $180 auto-debit |
+| Customer who owes | Tiers of Joy, a wedding planner; owes $240 for a tiered cake, due 18 Nov |
+| Bills | Rent $1,500 on the 12th · card machine $49 ⚡ on the 13th · internet $60 ⚡ on the 3rd · oven loan $250 ⚡ on the 25th · staff pay $1,600 on the 28th |
+| Short day | Thu 12 Nov: rent + beans = $1,900 due; $1,780 free above the $200 minimum, so $120 short |
+| Fixes | Remind Tiers of Joy (fully covers it), set money aside, move the bean order, or a $120 loan at a 2% fee ($122.40 back on 13 Nov) |
+| November | Must pay $4,839; about $6,900 coming in; about $2,060 left for plans. Sales about $180 a day on weekdays, $320 on weekends |
 
-1. Today (Thu 5 Nov 2026) the forecast shows about $90 short on Thu 12 Nov: the supplier order and rent land the
-   same day.
-2. The Recovery agent finds an abandoned $72 order and proposes a reminder. Guard: APPROVE.
-3. The buyer pays through the new PayPal sandbox checkout. The webhook confirms it and the forecast improves by what
-   actually arrived after PayPal's fee.
-4. The Recovery agent proposes another reminder for the same order. Guard: BLOCK (already paid).
-5. The owner picks "set aside a little each day" for the remaining gap. Guard: APPROVE. The 12th now shows as
-   covered.
-6. The owner asks "Can I afford a $200 order on Monday?" (Mon 9 Nov) and gets a correct, calculated answer.
+Today in the demo is Thu 5 Nov 2026. The code's seed still uses the older "Loop Audio" headphone shop; it is being
+moved to this story. Names carry meaning (suppliers say what they sell); no real brands for suppliers or customers.
 
 ### Demo clock, per-visitor copies and reset
 
@@ -104,7 +102,7 @@ Should-have:
   updates the right copy.
 - **Demo page.** The demo guide (`/demo`) walks judges through the six story steps (each marked Simulated or PayPal
   sandbox), shows the sandbox buyer login and the demo date, and has the reset button.
-- **Routes.** The public landing page is `/` (P1-13): what NeverShort does in one sentence, how it works in three
+- **Routes.** The public landing page is `/`: what tmrw does in one sentence, how it works in three
   steps, a "Can you save Thursday?" slider judged by the real Guard rules, Maya's reminder paid on screen, and real
   receipts, all from `lib/landing` with no database. The owner's Today screen is `/today`.
 
@@ -129,7 +127,7 @@ Should-have:
 
 ## 4. Margin Guard
 
-Lives in `lib/guard/` (P1). Plain TypeScript. No AI. Fully unit-tested.
+Lives in `lib/guard/`. Plain TypeScript. No AI. Fully unit-tested.
 
 ### Action types
 
@@ -220,13 +218,13 @@ never edited in. A receipt holds:
 - **Runs without keys.** With no sandbox keys the app still works: pages show "PayPal isn't set up yet"
   (`components/app/PayPalStatus.tsx`), checkout is switched off, and nothing calls PayPal. `PAYPAL_FAKE=1` keeps
   the fake PayPal mode for tests and offline demos; it is refused in production.
-- **Switches on by itself.** P1 builds checkout and webhooks against fake mode first. Once `PAYPAL_CLIENT_ID` and
+- **Switches on by itself.** Checkout and webhooks were built against fake mode first. Once `PAYPAL_CLIENT_ID` and
   `PAYPAL_CLIENT_SECRET` are set, the same code uses the real sandbox, with no code change. `SWITCH-ON.md` has the
-  exact steps P2 follows (keys, webhook registration, one real test payment).
+  exact steps (keys, webhook registration, one real test payment).
 - **APIs:** Orders v2 (create, get, capture), Webhooks with signature verification, Payments (refund),
   Payouts (paying the supplier).
 - **One file.** All PayPal HTTP calls live in `lib/paypal/client.ts`: the official SDK or a small typed REST
-  wrapper (P1 decides in task P1-9).
+  wrapper.
 - **Agent Toolkit: optional.** If it fits cleanly, it may be used only as a plain library behind
   `lib/paypal/client.ts`, called by the Guard's executor. Never hand its tools to an LLM. If it doesn't fit, skip
   it.
@@ -252,111 +250,22 @@ never edited in. A receipt holds:
 
 ## 7. Design
 
-Judges score design. We want a distinctive product, not a template.
+The visual design is being redone (the old "banknote / money desk" look is going away). Until the new design is in
+the repo, follow these rules, which stay:
 
-### Concept: "money weather"
-
-A calm, honest forecast for a small shop that the owner checks every morning, the way they check the weather.
-The metaphor lives in the words and the colours, never in sun or cloud icons. Not a generic SaaS dashboard.
-
-### Signature elements (build these into the design system first; they define the product)
-
-1. **Headline sentence.** Every home screen opens with ONE plain sentence in a large serif, like a forecast read
-   aloud: "Clear until Wednesday. On Thu 12 Nov you'll be $90 short: the supplier order and rent land the same day."
-2. **14-day money strip.** One tile per day, coloured by how the day looks (green = covered, amber = tight,
-   red = short), showing the date and the day's balance. It is the visual heart of the app and changes colour live
-   when a gap is fixed.
-3. **Referee cards.** Every Margin Guard decision shows a small tilted card chip (green Approved, amber Needs your OK,
-   red Blocked), like a football referee's card.
-4. **Receipts.** Each Guard decision prints as a thermal shop receipt: monospace text, dashed dividers, zig-zag top
-   and bottom edges, PASS/FAIL per rule, a BLOCKED stamp when blocked.
-5. **The banknote** (chosen 1 Nov, option A2 at `/design/backgrounds`). The home screen's headline and strip sit
-   inside a deep green note engraved like real currency: a fine lathe tint, a rope border with a 14 in each corner,
-   NEVERSHORT at the top, "This forecast is good for fourteen days" at the bottom, a rosette medallion, the Margin
-   Guard seal, red serials and signatures. Use `BanknotePanel` from `components/ui/Banknote.tsx`; never redraw it.
-   The full note is for the home screen (Today) only. Precise, symmetric engraving only: no
-   organic swirls.
-6. **The money desk** (every owner page; chosen 4 Nov). Three physical objects, set in `components/app/AppShell.tsx`:
-   - the **till** on the left: a screwed-down dark panel with a display window (shop and date) and square ivory
-     **register keycaps** (`.key` in `app/globals.css`), the current page's key pressed down in brand green, numbers
-     1 to 7 as keyboard shortcuts; on a phone the keys run along the bottom;
-   - the **counting mat**: green felt with a fine twill weave and a stitched edge (`MatBackdrop`,
-     `components/ui/Paper.tsx`). Text on the felt uses the light ink tokens that `.mat` sets;
-   - **banknote paper** cards on the mat (`--color-paper` is a soft green-grey there, not white), with soft shadows.
-   Day tiles are tear-off **ticket stubs** with a SHORT ink stamp; To pay opens with the **till drawer**
-   (`components/app/TillDrawer.tsx`): one slot per payment, the stack of notes is how much is ready.
-   The desk colours (desk, till, felt, paper) are surfaces, not accents; they live as hex values in `globals.css`.
-
-### Colours
-
-| Token | Hex | Use |
-|-------|-----|-----|
-| background | `#FFFFFF` | page |
-| ink | `#14201B` | text |
-| brand | `#0E3B2C` | brand deep green |
-| surface | `#F3F5F2` | the one soft neutral surface |
-| green | `#1E9E5E` | covered, approved, ready |
-| amber | `#F2A93B` | tight, escalated |
-| red | `#E5484D` | short, blocked |
-
-- Meaning colours carry meaning only. "Short" is red everywhere (strip, calendar, text).
-- No colour gradients. No other accent colours. Light and shadow on a physical surface (a lamp's pool of light, a
-  book's spine shadow, ruled lines) are allowed, in neutral black or white only.
-- **Contrast (WCAG AA, measured).** Meaning colours are fills and marks, never text on white: green is 3.4:1,
-  amber 2.0:1, red 3.9:1 against white. Text on a green or amber fill is ink (4.9:1 and 8.4:1). Ink on red is
-  only 4.3:1, so text on a red fill must be large (24px+, or 19px+ bold). Small text goes on white or surface with
-  a coloured mark beside it.
-- **Colour is never the only signal.** Every coloured tile, chip and card also carries a word: Covered, Tight,
-  Short, Approved, Needs your OK, Blocked.
-
-### Type
-
-- **Fraunces** (chosen; variable, softened with `"SOFT" 50`) for headline sentences, page sentences and big single amounts. Instrument Serif was tried first and read as too condensed.
-- **Landing page only:** big headlines use Fraunces at its heaviest, fully soft and "wonky" (the `display` class:
-  weight 900, `"SOFT" 100, "WONK" 1`), for a friendlier, chunkier first impression. App screens keep the calm serif.
-- Inter for interface text. JetBrains Mono for receipts only.
-- Tabular numbers for money in columns: the `tabular` utility (Inter). Big single amounts use the serif.
-- Fonts load through `next/font` in `app/layout.tsx`; tokens and the palette live in `app/globals.css`.
-- **The palette is locked.** Tailwind's default colours are switched off, so only `ink`, `ink-muted`, `line`,
-  `brand`, `surface`, `paper`, `white`, `green`, `amber` and `red` exist. `bg-blue-500` produces nothing.
-- Build screens from `components/ui` (see the `/design` page) before writing new styles.
-
-### Layout
-
-- Generous spacing, one idea per card, big numbers, few borders.
-- Phone-first for the owner's daily view: design every screen at 390px first.
-- The laptop view is not secondary. Most judges will open the link on a laptop, so every screen must look finished
-  at 1280px, in the same design style.
-
-### Voice
-
-- A calm, sharp shop manager: short sentences, real amounts, real dates.
-  "Rent's covered. Volta's order is $90 short. Here are three ways to fix it."
-- No exclamation marks, no emoji. Never "unlock", "seamless", "supercharge", or "AI-powered" badges.
-- Dates read "Thu 12 Nov". Money in sentences and tiles is whole dollars, with shortfalls rounded up so a gap is
-  never understated. Receipts and tables show cents.
-
-### Motion (only when it shows something happening)
-
-- Motion always shows something happening: a fixed day's tile turns green and a COVERED stamp lands, a BLOCKED
-  stamp lands on a blocked receipt, notes slide into the till drawer, a key presses down, tickets are dealt, the
-  landing page's owner looks worried on the short day and relieved when it's saved. Nothing moves just to decorate.
-- Always respect `prefers-reduced-motion`: show the final state instead.
-
-### Never
-
-Purple or blue gradients, glassy cards, sparkle icons, icon-in-a-circle card grids, stock illustrations,
-lorem ipsum, unlabelled charts, a marketing-style hero inside the app screens. The landing page (`/`) may open with a
-hero built from the live product (the real forecast's tickets), never a mockup.
-
-**Exception, landing page only:** hand-drawn people from **Open Peeps** by Pablo Stanley (CC0, openpeeps.com), drawn
-in our ink: the shop's owner (`components/landing/Owner.tsx`) and Maya, the customer (`components/landing/Maya.tsx`).
-They are generated from the Open Peeps drawing data, never hand-edited, and credited in the page footer. Each one acts
-out the story (worried, relieved, paying). No other illustration sets.
-
-### States
-
-Every screen and every module component has a real empty state, loading state and error state, in the same voice.
+- **Planner, not dashboard.** Inspired by Notion and calendar apps. No KPI tiles, no acronyms (GMV, AOV, WoW), no
+  past-only charts. Show one clear next action, not a list of metrics. Presenting information well is the product.
+- **Colour carries meaning, and never alone.** Short is red, tight is amber, covered is green, everywhere. Every
+  coloured mark also has a word (Covered, Tight, Short, Approved, Needs your OK, Blocked). Text meets WCAG AA. Blue gradients in PayPal's colours are fine.
+- **Voice.** A calm, sharp shop manager: short sentences, real amounts, real dates ("Thu 12 Nov"). No exclamation
+  marks. Never "unlock", "seamless", "supercharge" or "AI-powered". Money in sentences is whole dollars, shortfalls
+  rounded up; receipts and tables show cents.
+- **Simulated means labelled.** Anything simulated says "Simulated".
+- **Layout.** Phone-first at 390px, and finished at 1280px (most judges use a laptop).
+- **Motion** only when it shows something happening; respect `prefers-reduced-motion`.
+- **States.** Every screen has a real empty, loading and error state.
+- **Never:** glassy cards, sparkle icons, icon-in-a-circle card grids, stock
+  illustrations, lorem ipsum, unlabelled charts.
 
 ---
 
@@ -403,9 +312,7 @@ Every screen and every module component has a real empty state, loading state an
   `@/lib/<module>`, never deeper files. Data passed between modules uses the types in `types/`. ESLint enforces
   this. The one exception is `lib/shared`: it has no index, so import its files directly
   (`@/lib/shared/money`). That keeps the database client out of browser bundles.
-- **Stubs and mocks.** Until a module is real, its `index.ts` returns fake data from `mocks/`, marked
-  `TODO(Person N)`. Replace the stub body, keep the signature. If a signature must change, that is a `types/`
-  change: tell the other person first (section 10).
+- **No database?** Modules fall back to the demo seed (`lib/demo`), never to separate fake data.
 - **Store-scoped data.** Every table that holds store data has a `storeId` column.
 - **Environment.** Read env only through `lib/shared/env.ts` (zod-validated). Secrets only in `.env` (gitignored).
   `.env.example` lists every key with no real values.
@@ -436,49 +343,19 @@ OPENROUTER_API_KEY=             # only if we switch provider
 
 ---
 
-## 10. Team and folder ownership
+## 10. Workflow
 
-| Owner | Folders and files |
-|-------|-------------------|
-| **P1 (Diwakar)** | Everything not listed for P2 or as shared below: `app/` (including `app/store/` and every API route), `components/` (except `dashboard/` and `charts/`), `public/`, `proxy.ts`, every `lib/` module (`forecast`, `guard`, `recovery`, `demo`, `paypal`, `store`, `ai`, `risk`, `shared`), `mocks/`, `DEMO.md`, `SWITCH-ON.md`, `.github/` (CI), `package.json`, `package-lock.json`, `.env.example`, the root config files, `playwright.config.ts`, `CONTRIBUTING.md`, `LICENSE`, `.gitignore`, `.nvmrc`. |
-| **P2 (name to add, any AI agent)** | `components/dashboard/` (AG Grid), `components/charts/` (AG Charts), `tests/e2e/`, `README.md`, and all deployment settings: the Render service and its environment variables, the uptime pinger, and the PayPal sandbox app and accounts. |
-| **Shared** | `types/` and `prisma/`. Whoever changes one tells the other person first. |
-| **Mocks** | `mocks/` belongs to P1. `mocks/mocks.test.ts` keeps the fake story numbers honest; update it with your mock. |
-| **Never edit** | `generated/` (Prisma client output), `node_modules/`, `.next/`. |
-| **Team** | `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `PLAN.md`. Change only when both agree. Ticking your own task's status in `PLAN.md` is fine. `CLAUDE.md` and `GEMINI.md` only import this file; put no rules there. |
-
-- **Only change files in the current person's folders.** If anything outside them is needed, stop and say exactly
-  which file, what change, and why.
-- **Foundation exception.** During P1's foundation task only, P1 creates the skeleton in every folder, including
-  stub `index.ts` files that return fake typed data. Once the foundation is merged, each folder belongs to its
-  owner.
-- **Shared files** (`types/`, `prisma/`). Whoever changes one tells the other person first, in chat, with the exact
-  change and why.
-- **Dependencies.** The foundation installs every library in the stack. Need another one? Stop and say which and
-  why (`package.json` belongs to P1; tell P2 when one is added).
-
----
-
-## 11. Workflow
-
-- **One task at a time,** from `PLAN.md`. Before starting, say the task ID and the files you expect to touch.
-- **After each task:**
+- **Never edit** `generated/` (Prisma client output), `node_modules/`, `.next/`.
+- **Changes to `types/` or `prisma/`** affect the whole app; say what you changed and why.
+- **New dependency?** Say which and why before installing it.
+- **After each change:**
   1. run `npm run check` (lint, typecheck and unit tests), and `npm run e2e` if you touched the demo flow;
-  2. report the real result;
-  3. give exact steps to test it by hand: URL, what to click, what to expect, with amounts;
-  4. stop and wait.
-- **Never claim something works without running it.** If you could not run something, say so plainly.
-- **Git.** We work one after the other, never at the same time, and both push straight to `main`. No branches or
-  pull requests are needed.
-  - Before starting any work: `git pull` on `main`.
-  - Before pushing: run `npm run check`, and push only if it passes. GitHub runs the same check on every push to
-    `main`, so `main` always passes `npm run check` and deploys.
-  - Never force-push, and never rewrite `main`'s history (no amending or squashing commits that are already pushed).
-  - If a push is rejected because the other person pushed first: pull, fix any conflict, run `npm run check`
-    again, then push.
-  - Tell the other person in chat when you start and when you've pushed, so you never work at the same time.
-- **No co-authors, ever.** Never add `Co-authored-by` trailers, "Generated with" lines or any other AI or tool
-  attribution to commit messages or PR descriptions in this project.
+  2. report the real result; never claim something works without running it;
+  3. give exact steps to test it by hand: URL, what to click, what to expect, with amounts.
+- **Windows note:** run `npm run check` from `C:\Users\...` with a capital drive letter. Opened as `c:\...`,
+  Vitest loads itself twice and every test file fails with "Cannot read properties of undefined (reading 'config')".
+- **Git:** the project owner commits and pushes. `main` must always pass `npm run check` (GitHub runs it on every
+  push and the host deploys from `main`). No `Co-authored-by` trailers or AI/tool attribution in commits or PRs.
 
 ### Commands
 

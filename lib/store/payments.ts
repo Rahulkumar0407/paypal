@@ -129,7 +129,7 @@ export async function startStoreCheckout(storeId: StoreId, sku: string): Promise
         const orderId = `${storeId}_ord_${number}`;
         await tx.order.create({ data: { id: orderId, storeId, number, customerId: customer.id, status: "ABANDONED", placedOn: day, placedAt: realNow(), totalCents: product.priceCents } });
         await tx.orderItem.create({ data: { id: `${orderId}_item_1`, storeId, orderId, productId: product.id, quantity: 1, unitPriceCents: product.priceCents } });
-        return { orderId, orderNumber: number, amountCents: product.priceCents, description: `Loop Audio order #${number}: ${product.name}`, idempotencyKey: `${store.demoRunId}:CHECKOUT:${orderId}:1` };
+        return { orderId, orderNumber: number, amountCents: product.priceCents, description: `Dunder Mifflin & Co. order #${number}: ${product.name}`, idempotencyKey: `${store.demoRunId}:CHECKOUT:${orderId}:1` };
       }, TX);
     } catch (error) {
       if (!isUnique(error)) throw error; // two checkouts took the same order number: try the next

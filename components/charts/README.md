@@ -1,6 +1,5 @@
 # components/charts/
 
-**Owner:** Person 2. Task P2-5 (built Thu 5 Nov).
 
 `ForecastChart({ forecast })`: the 14-day forecast in **AG Charts Community** only (never `ag-charts-enterprise`;
 animation, for one, is Enterprise, so it's off). One column per day coloured like the day tickets, labelled axes, the

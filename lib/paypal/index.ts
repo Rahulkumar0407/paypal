@@ -1,5 +1,5 @@
 /**
- * lib/paypal: the PayPal sandbox client. Owner: Person 1.
+ * lib/paypal: the PayPal sandbox client.
  * Only lib/guard, app/api/paypal and app/store may import this (ESLint enforces it). Never lib/ai.
  */
 export {

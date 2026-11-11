@@ -14,7 +14,7 @@ export function ChartSlot({ forecast }: { forecast: Forecast }) {
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 id="chart-title" className="text-lg font-semibold text-slate-900 tracking-tight">
-            14-Day Closing Balance Curve
+            30-Day Closing Balance Curve
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
             Projected daily balance against your target minimum threshold.

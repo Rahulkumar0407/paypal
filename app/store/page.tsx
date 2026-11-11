@@ -6,7 +6,7 @@ import { listProducts } from "@/lib/store";
 import { formatDollars } from "@/lib/shared/money";
 import { storeMode } from "./store-mode";
 
-export const metadata: Metadata = { title: "Loop Audio store" };
+export const metadata: Metadata = { title: "Dunder Mifflin & Co. store" };
 
 const NOTICE: Record<string, string> = {
   cancelled: "You cancelled at PayPal, so no payment was made.",
@@ -15,7 +15,7 @@ const NOTICE: Record<string, string> = {
   "paypal-off": "PayPal isn't set up yet, so checkout is switched off.",
 };
 
-/** The buyer's side: Loop Audio's shop, with PayPal checkout (sandbox, or fake mode for tests and offline demos). */
+/** The buyer's side: Dunder Mifflin & Co.'s shop, with PayPal checkout (sandbox, or fake mode for tests and offline demos). */
 export default async function StorePage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const params = await searchParams;
   const notice = Object.keys(NOTICE).find((k) => params[k] !== undefined);
@@ -35,15 +35,15 @@ export default async function StorePage({ searchParams }: { searchParams: Promis
         <p className="mx-auto flex max-w-[1160px] flex-wrap justify-between gap-x-4">
           <span>{banner}</span>
           <Link href="/today" className="font-medium underline decoration-white/40 underline-offset-4 hover:decoration-white">
-            Back to NeverShort
+            Back to tmrw
           </Link>
         </p>
       </div>
 
       <header className="mx-auto max-w-[1160px] px-5 pt-10 lg:px-12 lg:pt-16">
-        <h1 className="font-serif text-[3rem] leading-none text-ink lg:text-[4rem]">Loop Audio</h1>
+        <h1 className="font-serif text-[3rem] leading-none text-ink lg:text-[4rem]">Dunder Mifflin & Co.</h1>
         <p className="mt-3 max-w-[46ch] text-[17px] leading-7 text-ink-muted">
-          Headphones, earbuds and the spare parts that keep them going. Shipped from Portland, Oregon.
+          Bread, pastries, cakes and coffee, baked every morning. Order ahead and pay with PayPal.
         </p>
       </header>
 

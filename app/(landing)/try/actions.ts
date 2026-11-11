@@ -87,6 +87,6 @@ export async function runTry(previous: TryResult, form: FormData): Promise<TryRe
   // "Try this fix" submits the same answers plus the fix's id; it's worked out again here from the numbers, never trusted from the browser.
   const fixId = text("fix");
   const verdict = fixId ? judgeYourFix(numbers, fixId, today()) : null;
-  const message = fixId && !verdict ? "That fix doesn't fit these numbers any more. Here are your two weeks as typed." : "";
+  const message = fixId && !verdict ? "That fix doesn't fit these numbers any more. Here are your 30 days as typed." : "";
   return { status: "ok", message, errors: {}, values, attempt, view: toTryView(yourForecast(numbers, today()), verdict) };
 }

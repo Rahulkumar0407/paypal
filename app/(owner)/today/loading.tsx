@@ -3,7 +3,7 @@
  * Aligns 1:1 with the simplified 10-Second Rule layout:
  * 1. Financial status header skeleton
  * 2. 3 KPI summary metrics skeleton
- * 3. Unified 14-day cash-flow trajectory chart skeleton
+ * 3. Unified 30-day cash-flow trajectory chart skeleton
  * 4. Prioritized recommendation & upcoming dues skeleton
  */
 export default function HomeLoading() {
@@ -35,7 +35,7 @@ export default function HomeLoading() {
         ))}
       </div>
 
-      {/* 3. 14-Day Trajectory Chart Skeleton */}
+      {/* 3. 30-Day Trajectory Chart Skeleton */}
       <div className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-xs space-y-4">
         <div className="flex items-center justify-between">
           <div className="space-y-1">

@@ -1,6 +1,6 @@
 /**
- * lib/demo: the demo store, one private copy per visitor, and reset. Owner: Person 1.
- * Copies and reset work since the foundation; the seed numbers were tuned for the real forecast in P1-6 (DEMO.md).
+ * lib/demo: the demo store, one private copy per visitor, and reset.
+ * Copies and reset work since the foundation; the seed numbers were tuned for the real forecast (DEMO.md).
  */
 import { cookies } from "next/headers";
 import type { DemoStoreStatus, StoreId } from "@/types";
@@ -36,7 +36,7 @@ export async function createRealMerchantStore(
 }
 
 /**
- * The storeId of the visitor making this request (set by proxy.ts), once their copy of Loop Audio exists. Server
+ * The storeId of the visitor making this request (set by proxy.ts), once their copy of Dunder Mifflin & Co. exists. Server
  * components and route handlers only.
  *
  * Next renders the owner layout (which creates the copy) and the page at the same time, so on a visitor's very first

@@ -1,6 +1,5 @@
 # lib/store/
 
-**Owner:** Person 1.
 
 **What goes here:** the visitor's store data: the catalogue, recent orders, the settings, and payment records.
 lib/store never calls PayPal: the store routes, the webhook route and the Guard's executor call PayPal, then record

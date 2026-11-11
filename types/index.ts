@@ -1,6 +1,6 @@
 /**
  * Shared data shapes between modules. Modules talk to each other only through these types.
- * Shared folder: created by Person 1 in the foundation; after that, changes go through Person 2.
+ * Shared types used across modules.
  *
  * Conventions (AGENTS.md section 9):
  * - Money is always integer cents (`Cents`). Never floats.
@@ -194,7 +194,7 @@ export interface AffordabilityCheck {
 }
 
 // ---------------------------------------------------------------------------
-// Proposals and the Margin Guard (lib/guard, Person 2)
+// Proposals and the Margin Guard (lib/guard)
 // ---------------------------------------------------------------------------
 
 export type ActionType =
@@ -401,7 +401,7 @@ export interface ChatAnswer {
 }
 
 // ---------------------------------------------------------------------------
-// PayPal (lib/paypal, Person 2)
+// PayPal (lib/paypal)
 // ---------------------------------------------------------------------------
 
 export interface PayPalOrderRef {

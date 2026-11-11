@@ -1,6 +1,5 @@
 # lib/ai/
 
-**Owner:** Person 1. Task P1-10 (done). Person 2 copies the AI section into the main README (P2-7).
 
 **What goes here:** everything that calls a language model. AI never calculates money and never calls PayPal
 (AGENTS.md sections 3 and 5). Every function falls back to calculated numbers or a template when the model is off,

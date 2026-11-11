@@ -85,11 +85,11 @@ const forecast = (r: StoreRows) => forecastFrom(inputFromRows(r, STORE, TODAY));
 const closings = (r: StoreRows) => forecast(r).days.map((d) => d.closingCents);
 const day = (r: StoreRows, date: string) => forecast(r).days.find((d) => d.date === date)!;
 
-describe("the 14-day forecast", () => {
+describe("the 30-day forecast", () => {
   it("adds expected sales and takes off known payments, day by day", () => {
-    expect(closings(rows())).toEqual([60_000, 80_000, 100_000, 120_000, 40_000, 60_000, 80_000, 0, 20_000, 40_000, 60_000, 80_000, 100_000, 120_000]);
+    expect(closings(rows()).slice(0, 14)).toEqual([60_000, 80_000, 100_000, 120_000, 40_000, 60_000, 80_000, 0, 20_000, 40_000, 60_000, 80_000, 100_000, 120_000]);
     const f = forecast(rows());
-    expect(f.days).toHaveLength(14);
+    expect(f.days).toHaveLength(30);
     expect(f.days[0]).toMatchObject({ date: TODAY, isToday: true, openingCents: 40_000, expectedInCents: 20_000 });
     for (const d of f.days) expect(d.closingCents).toBe(d.openingCents + d.expectedInCents - d.knownOutCents);
   });
@@ -165,7 +165,8 @@ describe("what counts as money out", () => {
   it("uses a confirmed payee's own dues, without counting them twice", () => {
     const r = rows({ supplierStatus: "CONFIRMED" });
     r.dues.push({ id: projectedDueId("supplier", "2026-11-12"), payeeId: "supplier", dueOn: "2026-11-12", amountCents: 30_000, status: "SCHEDULED" });
-    expect(closings(r)).toEqual(closings(rows()));
+    // Only the 12 Nov due was written, so compare up to the next projected order (Sun 22 Nov).
+    expect(closings(r).slice(0, 17)).toEqual(closings(rows()).slice(0, 17));
     expect(day(r, "2026-11-12").dues).toHaveLength(2);
   });
 

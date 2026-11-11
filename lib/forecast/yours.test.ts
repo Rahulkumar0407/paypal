@@ -14,7 +14,7 @@ const base: YourNumbers = {
 describe("yourForecast (/try)", () => {
   it("adds a day's sales and takes the payments, day by day", () => {
     const { forecast } = yourForecast({ ...base, payments: [{ name: "Rent", kind: "BILL", amountCents: 120_000, inDays: 3, weekly: false }] }, TODAY);
-    expect(forecast.days).toHaveLength(14);
+    expect(forecast.days).toHaveLength(30);
     expect(forecast.days[0]!.closingCents).toBe(60_000);
     // $500 + 4 days of $100 − $1,200 rent on the 4th day.
     expect(forecast.days[3]!.closingCents).toBe(-30_000);
@@ -30,10 +30,10 @@ describe("yourForecast (/try)", () => {
     expect(headline.text).not.toMatch(/!/);
   });
 
-  it("repeats a weekly payment inside the two weeks", () => {
+  it("repeats a weekly payment inside the 30 days", () => {
     const { forecast } = yourForecast({ ...base, payments: [{ name: "Acme", kind: "SUPPLIER", amountCents: 30_000, inDays: 2, weekly: true }] }, TODAY);
     const dueDays = forecast.days.filter((d) => d.dues.length > 0).map((d) => d.date);
-    expect(dueDays).toEqual([addDays(TODAY, 2), addDays(TODAY, 9)]);
+    expect(dueDays).toEqual([2, 9, 16, 23].map((n) => addDays(TODAY, n)));
     expect(forecast.days[2]!.dues[0]!.label).toBe("the Acme order");
   });
 

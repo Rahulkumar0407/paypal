@@ -14,7 +14,7 @@ import { addDays, formatDay, formatDayWithYear, weekdayIndex } from "@/lib/share
 import { formatDollars, formatShortfall } from "@/lib/shared/money";
 import { resetMyCopy } from "./actions";
 
-export const metadata: Metadata = { title: "Demo Guide • NeverShort" };
+export const metadata: Metadata = { title: "Demo Guide • tmrw" };
 
 interface StoryData {
   forecast: Forecast | null;
@@ -59,8 +59,8 @@ function buildSteps({ forecast, candidate, afford, monday }: StoryData): GuidedS
 
   return [
     {
-      title: "Read the 14-day cash forecast",
-      todo: "Open Overview and review your 14-day balance trajectory.",
+      title: "Read the 30-day cash forecast",
+      todo: "Open Overview and review your 30-day balance trajectory.",
       see: forecast
         ? `"${buildHeadline(forecast).text}" — ${gapDay} shows as a critical shortfall in the daily strip.`
         : `A clear forecast indicating a projected shortfall on ${gapDay}.`,
@@ -153,13 +153,13 @@ export default async function DemoPage() {
           </span>
         </div>
         <h1 className="text-3xl sm:text-4xl font-serif font-black text-slate-900 tracking-tight">
-          See how NeverShort works.
+          See how tmrw works.
         </h1>
         <p className="max-w-[75ch] text-sm sm:text-base text-slate-600 leading-relaxed">
-          NeverShort acts as a money co-pilot for small businesses: it forecasts a 14-day cashflow runway, prevents risky overdrafts, and automates checkout recovery. AI agents only propose actions; every financial movement must pass deterministic <strong>Margin Guard</strong> safety rules.
+          tmrw acts as a money co-pilot for small businesses: it forecasts a 30-day cashflow runway, prevents risky overdrafts, and automates checkout recovery. AI agents only propose actions; every financial movement must pass deterministic <strong>Margin Guard</strong> safety rules.
         </p>
         <div className="pt-2 flex flex-wrap items-center gap-4 text-xs font-mono text-slate-500">
-          <span>Demo store: <strong className="text-slate-900">Loop Audio</strong></span>
+          <span>Demo store: <strong className="text-slate-900">Dunder Mifflin & Co.</strong></span>
           <span>•</span>
           <span>Demo baseline: <strong className="text-slate-900">{startDay}</strong></span>
           <span>•</span>
@@ -183,7 +183,7 @@ export default async function DemoPage() {
                 Reset Demo Instance
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Restores your private Loop Audio copy to {startDay}. Other visitors&apos; sandboxes remain completely unaffected.
+                Restores your private Dunder Mifflin & Co. copy to {startDay}. Other visitors&apos; sandboxes remain completely unaffected.
               </p>
             </div>
 
@@ -240,7 +240,7 @@ export default async function DemoPage() {
               href="/store"
               className="text-blue-600 font-semibold hover:underline"
             >
-              Loop Audio Store →
+              Dunder Mifflin & Co. Store →
             </Link>
           </div>
         </aside>

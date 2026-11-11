@@ -1,6 +1,5 @@
 # lib/guard/
 
-**Owner:** Person 1. Task P1-7 (done). Rules and semantics: AGENTS.md section 4.
 
 **What goes here:** the Margin Guard (9 deterministic rules, no AI), receipts (append-only), the approval inbox, and
 the executor: the only code that carries out actions, and one of the few allowed to import `@/lib/paypal`.
@@ -46,7 +45,7 @@ Tests: `rules.test.ts` (each rule passing and failing, N/A, precedence, the demo
 
 | Action | Does |
 |--------|------|
-| SEND_REMINDER | Creates a PayPal order (fake mode until P1-9), puts the message in the simulated outbox with its checkout link, notes the PayPal order on our order. |
+| SEND_REMINDER | Creates a PayPal order (fake mode), puts the message in the simulated outbox with its checkout link, notes the PayPal order on our order. |
 | SET_ASIDE | Saves a `SetAside` row; the forecast keeps its total back from the owner's transfers. |
 | MOVE_PAYMENT | Moves the `Due` row (creates it for a payee that's found but not confirmed), marked simulated. |
 | GAP_LOAN | Saves a simulated `GapLoan` row: in today, repaid with the fee on the repay date. |

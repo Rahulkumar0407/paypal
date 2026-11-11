@@ -25,7 +25,7 @@ export const SUGGESTED_QUESTIONS = [
   "Can I afford a $200 order on Monday?",
   "When is my next short day?",
   "What do I have to pay this week?",
-  "How much do I usually pay Volta?",
+  "How much do I usually pay Bean There?",
 ] as const;
 
 type ToolName = "getForecast" | "listDues" | "canAfford" | "listRecentPayments";
@@ -184,7 +184,7 @@ export async function plainAnswer(question: string, data: AskData): Promise<{ an
     return {
       answer: gap
         ? `${formatDay(gap.date)}: you'll be ${formatShortfall(gap.amountCents)} short, because ${gap.reason}.`
-        : `No short days in the next two weeks. The lowest is ${formatDay(lowest.date)}, ending at ${formatDollars(lowest.closingCents)}.`,
+        : `No short days in the next 30 days. The lowest is ${formatDay(lowest.date)}, ending at ${formatDollars(lowest.closingCents)}.`,
       used: [used],
     };
   }
@@ -201,12 +201,12 @@ export async function plainAnswer(question: string, data: AskData): Promise<{ an
 
   if (/due|bill|have to pay|owe|coming up|payments?\b.*(week|next)/.test(q)) {
     // "This week": today and the 7 days after it.
-    const days = /week/.test(q) ? 8 : 14;
+    const days = /week/.test(q) ? 8 : 30;
     const used = duesTool(dues, data.today, days);
     const shown = dues.filter((d) => d.dueOn <= addDays(data.today, days - 1));
     const words = shown.map((d) => `${d.payeeName} ${formatDollars(d.amountCents)} on ${formatDay(d.dueOn)}${d.readyCents < d.amountCents ? ` (${formatDollars(d.readyCents)} ready)` : ""}`);
     return {
-      answer: shown.length ? `In the next ${days === 8 ? "week" : "two weeks"}: ${words.join("; ")}.` : `Nothing is due in the next ${days === 8 ? "week" : "two weeks"}.`,
+      answer: shown.length ? `In the next ${days === 8 ? "week" : "30 days"}: ${words.join("; ")}.` : `Nothing is due in the next ${days === 8 ? "week" : "30 days"}.`,
       used: [used],
     };
   }
@@ -233,15 +233,15 @@ export async function plainAnswer(question: string, data: AskData): Promise<{ an
 // ---------------------------------------------------------------------------
 
 function calendar(today: IsoDate): string {
-  return eachDay(today, 14)
+  return eachDay(today, 30)
     .map((d) => `${formatDay(d)} is ${d}${d === today ? " (today)" : ""}`)
     .join("; ");
 }
 
 function system(today: IsoDate): string {
   return [
-    "You answer the owner of Loop Audio, a small online shop, about their money.",
-    `Today is ${formatDayWithYear(today)}. The next 14 days: ${calendar(today)}.`,
+    "You answer the owner of Dunder Mifflin & Co., a small café-bakery, about their money.",
+    `Today is ${formatDayWithYear(today)}. The next 30 days: ${calendar(today)}.`,
     "Always call a tool before answering, and answer only from tool results.",
     "Every amount and date you write must appear in a tool result, written exactly as there. Never add, subtract or estimate amounts yourself.",
     "For 'can I afford' questions, call canAfford with the amount in dollars and the date (YYYY-MM-DD).",
@@ -268,7 +268,7 @@ export async function answerWith(question: string, data: AskData, model: Languag
   const record = (u: Used) => (used.push(u), u.output);
   const tools = {
     getForecast: tool({
-      description: "The 14-day forecast: each day's ending balance, the first short day and why, the minimum balance.",
+      description: "The 30-day forecast: each day's ending balance, the first short day and why, the minimum balance.",
       inputSchema: z.object({}),
       execute: async () => record(forecastTool(await data.forecast())),
     }),

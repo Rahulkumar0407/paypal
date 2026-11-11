@@ -155,7 +155,7 @@ describe("rule 6: minimum balance", () => {
   it("passes when no day ends lower and below the minimum", () => {
     expect(rule(setAsideProposal(1_100), ctx({ forecast: ready() }), "MINIMUM_BALANCE")).toMatchObject({
       outcome: "PASS",
-      reason: "Every day stays at or above your $100.00 minimum.",
+      reason: "Every day stays at or above your $200.00 minimum.",
     });
   });
   it("passes when a day is already short but the action doesn't make it worse", () => {
@@ -168,7 +168,7 @@ describe("rule 6: minimum balance", () => {
     expect(rule(gapLoan(1_000), ctx({ forecast: ready(recovered, start) }), "MINIMUM_BALANCE")).toMatchObject({
       outcome: "FAIL",
       onFail: "BLOCK",
-      reason: "It would leave Thu 12 Nov at $10.00, below your $100.00 minimum.",
+      reason: "It would leave Thu 12 Nov at $80.00, below your $200.00 minimum.",
     });
   });
   it("blocks when the forecast can't be worked out (fails closed)", () => {
@@ -180,23 +180,23 @@ describe("rule 7: set-aside cap", () => {
   it("passes within 30% of every day's expected sales, up to the exact cent", () => {
     expect(rule(setAsideProposal(1_100), ctx({ forecast: ready() }), "SET_ASIDE_CAP")).toMatchObject({
       outcome: "PASS",
-      reason: "$11.00 a day is within 30% of each day's expected sales (lowest: Tue 10 Nov, $186.55).",
+      reason: "$11.00 a day is within 30% of each day's expected sales (lowest: Fri 6 Nov, $178.25).",
     });
-    // 30% of $186.55 is $55.965.
-    expect(rule(setAsideProposal(5_596), ctx({ forecast: ready() }), "SET_ASIDE_CAP").outcome).toBe("PASS");
+    // 30% of $178.25 is $53.475.
+    expect(rule(setAsideProposal(5_347), ctx({ forecast: ready() }), "SET_ASIDE_CAP").outcome).toBe("PASS");
   });
   it("blocks a day over 30%, and days outside the forecast", () => {
-    expect(rule(setAsideProposal(5_597), ctx({ forecast: ready() }), "SET_ASIDE_CAP")).toMatchObject({
+    expect(rule(setAsideProposal(5_348), ctx({ forecast: ready() }), "SET_ASIDE_CAP")).toMatchObject({
       outcome: "FAIL",
-      reason: "$55.97 a day is more than 30% of Tue 10 Nov's expected sales ($186.55).",
+      reason: "$53.48 a day is more than 30% of Fri 6 Nov's expected sales ($178.25).",
     });
-    expect(rule(setAsideProposal(1_100, "2026-11-30"), ctx({ forecast: ready() }), "SET_ASIDE_CAP").outcome).toBe("FAIL");
+    expect(rule(setAsideProposal(1_100, "2026-12-10"), ctx({ forecast: ready() }), "SET_ASIDE_CAP").outcome).toBe("FAIL");
   });
 });
 
 describe("rule 8: owner approval", () => {
   it("passes up to and including $100.00", () => {
-    expect(rule(reminder({ amountCents: 10_000 }), ctx(), "OWNER_APPROVAL")).toMatchObject({ outcome: "PASS", reason: "$100.00 is within the $100.00 NeverShort may do without asking you." });
+    expect(rule(reminder({ amountCents: 10_000 }), ctx(), "OWNER_APPROVAL")).toMatchObject({ outcome: "PASS", reason: "$100.00 is within the $100.00 tmrw may do without asking you." });
   });
   it("asks the owner above $100.00, and always for loans, moved payments and refunds", () => {
     expect(rule(reminder({ amountCents: 10_001 }), ctx(), "OWNER_APPROVAL")).toMatchObject({ outcome: "FAIL", onFail: "ESCALATE" });

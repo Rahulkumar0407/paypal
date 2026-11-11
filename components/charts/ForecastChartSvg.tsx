@@ -23,7 +23,7 @@ export function ForecastChartSvg({ forecast }: { forecast: Forecast }) {
   return (
     <figure>
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-labelledby="fc-title fc-desc" className="h-auto w-full">
-        <title id="fc-title">Closing balance for the next 14 days</title>
+        <title id="fc-title">Closing balance for the next 30 days</title>
         <desc id="fc-desc">
           {gap
             ? `The balance dips below your ${formatDollars(forecast.minimumBalanceCents)} minimum on ${formatDay(gap.date)}, ${formatShortfall(gap.amountCents)} short.`

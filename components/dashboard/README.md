@@ -1,6 +1,5 @@
 # components/dashboard/
 
-**Owner:** Person 2. Task P2-5 (built Thu 5 Nov).
 
 The laptop dashboard's tables, in **AG Grid Community** only (never `ag-grid-enterprise`), styled in our design
 (`gridTheme.ts`: banknote-paper sheet, ink text, brand green accent, ledger rules).

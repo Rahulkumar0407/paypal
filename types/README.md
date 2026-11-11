@@ -1,6 +1,5 @@
 # types/
 
-**Owner:** shared by Person 1 and Person 2. Whoever changes a type tells the other person first.
 
 **What goes here:** the data shapes that cross module boundaries. Modules talk to each other only through these
 types (AGENTS.md section 9). One file: `index.ts`.

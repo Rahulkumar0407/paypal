@@ -42,7 +42,7 @@ const AFFECTED = ["/today", "/dues", "/fix", "/approvals", "/ask", "/dashboard",
 
 /**
  * Checks the setup answers and keeps them on this visitor's copy of the store. The reply says what the new safety line
- * does to the next 14 days, worked out by the forecast (never by AI).
+ * does to the next 30 days, worked out by the forecast (never by AI).
  */
 export async function checkSettings(previous: SettingsResult, form: FormData): Promise<SettingsResult> {
   const text = (key: string) => {
@@ -85,14 +85,14 @@ export async function checkSettings(previous: SettingsResult, form: FormData): P
   }
   for (const path of AFFECTED) revalidatePath(path);
 
-  // What the new line means for the next two weeks.
+  // What the new line means for the next 30 days.
   const forecast = await getForecast(storeId).catch(() => null);
   const gap = forecast?.firstShortfall ?? null;
   const effect = !forecast
     ? ""
     : gap
       ? ` With a ${formatDollars(answers.minimum * 100)} minimum, the first short day is ${formatDay(gap.date)}, ${formatShortfall(gap.amountCents)} short.`
-      : ` With a ${formatDollars(answers.minimum * 100)} minimum, no day in the next 14 is short.`;
+      : ` With a ${formatDollars(answers.minimum * 100)} minimum, no day in the next 30 is short.`;
   const story =
     answers.minimum * 100 !== DEMO_STORE_SETTINGS.minimumBalanceCents || answers.margin * 100 !== DEMO_STORE_SETTINGS.tightMarginCents
       ? " The demo story's numbers assume $100 and $50; Reset on the demo guide puts them back."

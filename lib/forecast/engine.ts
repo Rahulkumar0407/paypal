@@ -19,7 +19,7 @@ import { isRisky, scoreOrder } from "@/lib/shared/risk";
 import { type Cadence, datesBetween, detectPattern, type PastPayment, type Pattern, summaryFor } from "./detect";
 
 /**
- * The 14-day cash forecast. Pure and deterministic: rows in, numbers out. No AI, no database, no clock.
+ * The 30-day cash forecast. Pure and deterministic: rows in, numbers out. No AI, no database, no clock.
  *
  *   start of today's balance = opening balance + every ledger entry before today
  *   money in, per day        = average net sales for that weekday over the last 8 weeks
@@ -31,7 +31,7 @@ import { type Cadence, datesBetween, detectPattern, type PastPayment, type Patte
  *   state                    = short below the minimum balance, tight within the margin above it, else covered
  */
 
-export const FORECAST_DAYS = 14;
+export const FORECAST_DAYS = 30;
 /** How far ahead dues, projections and "can I afford" look. The demo seed has 35 days of dues. */
 export const MAX_HORIZON_DAYS = 35;
 export const SALES_WEEKS = 8;

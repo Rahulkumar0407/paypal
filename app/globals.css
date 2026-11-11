@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
- * NeverShort design tokens (AGENTS.md section 7). Owner: Person 1.
+ * NeverShort design tokens (AGENTS.md section 7).
  * Tailwind's default palette is cleared, so only these colours exist: a class like `bg-blue-500`
  * produces nothing. Meaning colours are fills and marks, never small text on white.
  */

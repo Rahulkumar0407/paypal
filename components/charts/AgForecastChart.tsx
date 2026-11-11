@@ -9,7 +9,7 @@ import { dayOfMonth, formatDay, weekdayShort } from "@/lib/shared/dates";
 import { formatDollars, formatShortfall } from "@/lib/shared/money";
 
 /**
- * The 14-day forecast as an AG Charts Community column chart: one column per day, coloured like the day tickets
+ * The 30-day forecast as an AG Charts Community column chart: one column per day, coloured like the day tickets
  * (covered, tight, short), the owner's minimum as a dashed line, the short day banded and labelled. Labelled axes and
  * a tooltip with each day's money in and out. Loaded only on a laptop (ForecastChart).
  */
@@ -83,7 +83,7 @@ export function AgForecastChart({ forecast }: { forecast: Forecast }) {
         x: {
           type: "category",
           position: "bottom",
-          title: { text: "Next 14 days", fontFamily: font, fontSize: 13, color: MUTED },
+          title: { text: "Next 30 days", fontFamily: font, fontSize: 13, color: MUTED },
           label: { fontFamily: font, fontSize: 12, color: MUTED },
           line: { stroke: "rgb(20 32 27 / 0.25)" },
           crossLines: short
@@ -127,8 +127,8 @@ export function AgForecastChart({ forecast }: { forecast: Forecast }) {
       </div>
       <figcaption className="sr-only">
         {forecast.firstShortfall
-          ? `Closing balance for the next 14 days. It drops below your ${formatDollars(forecast.minimumBalanceCents)} minimum on ${formatDay(forecast.firstShortfall.date)}, ${formatShortfall(forecast.firstShortfall.amountCents)} short.`
-          : `Closing balance for the next 14 days. It stays above your ${formatDollars(forecast.minimumBalanceCents)} minimum.`}
+          ? `Closing balance for the next 30 days. It drops below your ${formatDollars(forecast.minimumBalanceCents)} minimum on ${formatDay(forecast.firstShortfall.date)}, ${formatShortfall(forecast.firstShortfall.amountCents)} short.`
+          : `Closing balance for the next 30 days. It stays above your ${formatDollars(forecast.minimumBalanceCents)} minimum.`}
       </figcaption>
     </figure>
   );

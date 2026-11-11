@@ -1,6 +1,5 @@
 # components/ui/
 
-**Owner:** Person 1. The NeverShort design system. See it live at `/design`.
 
 **The four signature elements (use these, don't rebuild them):**
 - `HeadlineSentence`: the forecast read aloud, large Fraunces. Text comes from `buildHeadline()` (lib/forecast). `PageSentence` opens every other page.

@@ -19,7 +19,7 @@ const SANDBOX_BUYER: { email: string; password: string } | null = null;
 
 const TECHNICAL_DETAILS: Record<number, { title: string; points: string[] }> = {
   0: {
-    title: "14-Day Trajectory & First Shortfall Detection",
+    title: "30-Day Trajectory & First Shortfall Detection",
     points: [
       "Calculated deterministically using weekday-weighted moving averages of net sales minus known obligations.",
       "Identifies Thu 12 Nov shortfall: Volta Audio Parts ($300) and Studio Rent ($600) collide on the same day.",

@@ -3,7 +3,7 @@ import { LoginForm } from "@/components/auth/LoginForm";
 import { demoLoginAction } from "@/lib/auth";
 
 export const metadata: Metadata = {
-  title: "Sign In • NeverShort",
+  title: "Sign In • tmrw",
 };
 
 export default function LoginPage() {

@@ -1,5 +1,5 @@
 /**
- * lib/recovery: the Recovery agent. Owner: Person 1.
+ * lib/recovery: the Recovery agent.
  * Finds abandoned or failed checkouts and PROPOSES reminders. It never sends anything itself: every proposal goes to
  * the Margin Guard (lib/guard), whose executor creates the fresh PayPal link and writes the simulated outbox.
  * The search is a deterministic query. The message is drafted by lib/ai (checked by code, with a template fallback).

@@ -19,7 +19,7 @@ export default async function FakePayPalPage({ searchParams }: { searchParams: P
   let order = getFakeOrder(token);
   if (!order) {
     const attempt = await findAttempt(token).catch(() => null);
-    if (attempt) order = restoreFakeOrder({ paypalOrderId: token, storeId: attempt.storeId, orderId: attempt.orderId, amountCents: attempt.amountCents, description: `Loop Audio order #${attempt.orderNumber}` });
+    if (attempt) order = restoreFakeOrder({ paypalOrderId: token, storeId: attempt.storeId, orderId: attempt.orderId, amountCents: attempt.amountCents, description: `Dunder Mifflin & Co. order #${attempt.orderNumber}` });
   }
 
   return (

@@ -1,5 +1,5 @@
 /**
- * lib/guard: the Margin Guard, receipts, the approval inbox and the executor. Owner: Person 1.
+ * lib/guard: the Margin Guard, receipts, the approval inbox and the executor.
  * Plain TypeScript, no AI (AGENTS.md section 4). Nothing happens to money without passing through here.
  *
  *   rules.ts     the 9 rules and the decision (pure)

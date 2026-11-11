@@ -1,6 +1,5 @@
 # lib/paypal/
 
-**Owner:** Person 1. Task P1-9 (done; Person 2 switches it on with `SWITCH-ON.md`). Rules: AGENTS.md section 6.
 
 **What goes here:** the ONE place that talks to PayPal: `client.ts` (a small typed REST wrapper, no SDK) and
 `webhook.ts` (verify, then read the event). ESLint only lets `lib/guard`, `app/api/paypal` and `app/store` import it.
