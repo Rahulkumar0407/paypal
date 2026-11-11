@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>tmrw web app prototype</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&amp;family=Plus+Jakarta+Sans:ital,wght@1,800&amp;family=Inter:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+.ui{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Inter',sans-serif;letter-spacing:-.01em}
+.layer{position:absolute;inset:0;overflow:hidden}
+.btn{border:0;cursor:pointer;font:inherit}
+.pill{display:inline-flex;align-items:center;justify-content:center;height:44px;padding:0 20px;border-radius:99px;font-weight:600;font-size:15px}
+.blue{background:#0071E3;color:#ffffff}
+.ghost{background:rgba(0,0,0,.05);color:#1D1D1F}
+.glass{background:rgba(255,255,255,.82);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.icon{fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.chip{display:inline-flex;align-items:center;height:34px;padding:0 14px;border-radius:99px;font-size:14px;font-weight:500;background:rgba(0,0,0,.05);color:#1D1D1F}
+.chip.on{background:#0071E3;color:#ffffff}
+.seg{display:inline-flex;padding:3px;border-radius:10px;background:rgba(0,0,0,.06)}
+.seg span,.seg .btn{padding:6px 12px;border-radius:8px;font-size:13px;font-weight:500;color:#6E6E73;background:transparent}
+.seg span.on,.seg .btn.on{background:#ffffff;color:#1D1D1F;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(0,0,0,.07)}
+.card{background:#ffffff;border-radius:18px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 4px 18px rgba(0,0,0,.05)}
+.muted{color:#6E6E73}
+
+/* station: wind, light, slow breath */
+.kb{animation:kb 26s ease-in-out infinite alternate}
+@keyframes kb{from{transform:scale(1)}to{transform:scale(1.045) translate(-.6%,-.4%)}}
+.leaf{position:absolute;width:12px;height:7px;border-radius:12px 0 12px 0;background:#5E9E3C;opacity:0;animation:leaf linear infinite}
+@keyframes leaf{0%{opacity:0;transform:translate(0,0) rotate(0)}10%{opacity:.9}50%{transform:translate(-520px,90px) rotate(260deg)}90%{opacity:.8}100%{opacity:0;transform:translate(-1100px,40px) rotate(560deg)}}
+.glow{animation:glow 4s ease-in-out infinite}
+@keyframes glow{50%{opacity:.55}}
+.cloud{animation:cloud 60s linear infinite alternate}
+@keyframes cloud{to{transform:translateX(-40px)}}
+.hint{animation:hint 1.8s ease-in-out infinite}
+@keyframes hint{50%{transform:translateY(6px);opacity:.6}}
+
+/* carriage: rocking, swinging straps, passing light */
+.rock{animation:rock 3.4s ease-in-out infinite}
+@keyframes rock{0%,100%{transform:translateY(0)}30%{transform:translateY(1.4px)}60%{transform:translateY(-.6px)}}
+.skyrun{animation:skyrun 140s linear infinite}
+@keyframes skyrun{to{background-position:-1356px 0}}
+.groundrun{animation:groundrun 9s linear infinite}
+@keyframes groundrun{to{background-position:-1356px 0}}
+
+.panelIn{animation:panelIn .55s cubic-bezier(.2,.8,.2,1) both}
+@keyframes panelIn{from{opacity:0;transform:scale(.96) translateY(14px)}to{opacity:1;transform:none}}
+.toast{animation:toast .6s cubic-bezier(.2,.8,.2,1) 1.4s both}
+@keyframes toast{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.fadeUp{animation:fadeUp .7s cubic-bezier(.2,.8,.2,1) both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.cal-cell{position:relative;padding:7px 8px;border-radius:12px;background:#ffffff;display:flex;flex-direction:column;gap:3px;overflow:hidden;min-height:0}
+.cal-cell.out{background:transparent}
+.cal-cell.short{box-shadow:inset 0 0 0 1.5px #FF3B30}
+.e{font-size:11.5px;line-height:1.35;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:6px}
+.e-in{color:#1E7F3C}
+.e-out{color:#C4161C}
+.e-meet{color:#3A3A3C;background:#F0F0F4;padding:1px 6px}
+.e-nudge{color:#3A3A3C;background:#F0F0F4;padding:1px 6px}
+.e-grow{color:#6E6E73;border:1px dashed #AEAEB2;padding:0 6px}
+.e-fail{color:#C4161C;background:#FFF0EF;padding:1px 6px}
+@media (prefers-reduced-motion: reduce){.kb,.leaf,.glow,.cloud,.hint,.rock,.skyrun,.groundrun,.toast,.panelIn,.fadeUp{animation:none !important}.toast,.fadeUp{opacity:1}}
+</style>
+</helmet>
+
+<div class="ui" onWheel="{{wheel}}" style="position: relative; width: 1440px; height: 900px; overflow: hidden; background: #0E1A2B; color: #1D1D1F">
+
+  <!-- ============ STATION ============ -->
+  <div class="layer" style="opacity: {{L.stOp}}; filter: {{L.stFilter}}; transition: opacity .9s ease, filter 1s ease">
+    <div class="kb" style="position: absolute; left: -80px; top: 0; width: 1600px; height: 900px">
+      <img src="../assets/scenes/station-bench.webp" alt="A quiet country railway platform with a bench and a street lamp under a summer sky" style="position: absolute; inset: 0; width: 100%; height: 100%">
+      <span class="glow" style="position: absolute; left: 25.5%; top: 9%; width: 140px; height: 140px; border-radius: 50%; background: radial-gradient(circle, rgba(255,236,190,.55), rgba(255,236,190,0) 65%)"></span>
+      <sc-for list="{{leaves}}" as="lf" hint-placeholder-count="10">
+        <span class="leaf" style="{{lf}}"></span>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- ============ TRAIN ARRIVES ============ -->
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true"><defs><filter id="mblur" x="-10%" y="0" width="120%" height="100%"><feGaussianBlur stdDeviation="9 0"></feGaussianBlur></filter><filter id="mblur2" x="-10%" y="0" width="120%" height="100%"><feGaussianBlur stdDeviation="3 0"></feGaussianBlur></filter></defs></svg>
+  <div class="layer" style="opacity: {{L.trOp}}; transition: {{L.trTrans}}">
+    <div style="position: absolute; left: -80px; top: 0; width: 1600px; height: 900px; transform-origin: 50.1% 54.7%; transform: {{L.trT}}; transition: {{L.trTrans}}">
+      <img src="../assets/scenes/train-doors-open.webp" alt="A cream and green local train stopped at the platform" style="position: absolute; inset: 0; width: 100%; height: 100%">
+      <div style="position: absolute; left: 39.89%; top: 32.31%; width: 20.27%; height: 43.78%; overflow: hidden">
+        <img src="../assets/layers/door-left.webp" alt="" style="position: absolute; left: 0; top: 0; width: 50%; height: 100%; transform: {{L.doorL}}; transition: transform 1.9s cubic-bezier(.5,0,.2,1)">
+        <img src="../assets/layers/door-right.webp" alt="" style="position: absolute; right: 0; top: 0; width: 50%; height: 100%; transform: {{L.doorR}}; transition: transform 1.9s cubic-bezier(.5,0,.2,1)">
+      </div>
+      <div style="position: absolute; left: 0; top: 21.79%; width: 100%; height: 58.98%; overflow: hidden; opacity: {{L.bandOp}}">
+        <div style="display: flex; width: 4800px; height: 100%; transform: translateX({{L.bandX}}); filter: {{L.bandF}}; transition: {{L.bandTr}}">
+          <img src="../assets/layers/train-band-doors-closed.webp" alt="" style="flex: 0 0 1600px; height: 100%"><img src="../assets/layers/train-band-doors-closed.webp" alt="" style="flex: 0 0 1600px; height: 100%"><img src="../assets/layers/train-band-doors-closed.webp" alt="" style="flex: 0 0 1600px; height: 100%">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ THE SEAT ============ -->
+  <div class="layer" style="opacity: {{L.caOp}}; transition: opacity .8s ease {{L.caDelay}}">
+    <div class="rock" style="position: absolute; inset: 0">
+      <div style="position: absolute; left: -80px; top: 0; width: 1600px; height: 900px">
+        <div class="skyrun" style="position: absolute; left: 0; top: 63px; width: 100%; height: 387px; background: #3E8EE0 url(../assets/layers/scenery-sky-tile.webp) 0 0 / auto 100% repeat-x"></div>
+        <div class="groundrun" style="position: absolute; left: 0; top: 410px; width: 100%; height: 190px; background: url(../assets/layers/scenery-ground-tile.webp) 0 0 / auto 100% repeat-x"></div>
+        <img src="../assets/layers/seat-window-glass-cut.webp" alt="A window seat on a sunlit train: olive walls, orange seats, fields rolling past" style="position: absolute; inset: 0; width: 100%; height: 100%">
+        <sc-for list="{{seats}}" as="st" hint-placeholder-count="3">
+          <button class="btn" onClick="{{st.open}}" aria-label="Open {{st.name}}" style="position: absolute; left: 800px; top: 322px; transform: translate(-50%, -50%) translateX({{st.x}}); opacity: {{st.op}}; transition: transform 1.3s cubic-bezier(.45,.05,.2,1), opacity .9s ease; background: transparent; display: flex; flex-direction: column; align-items: center; gap: 12px">
+            <img src="{{st.img}}" alt="" style="width: 250px; height: 250px; filter: drop-shadow(0 18px 30px rgba(10,30,60,.3))">
+            <span style="height: 40px; padding: 0 18px; border-radius: 99px; background: rgba(22,22,24,.82); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: #ffffff; font-size: 16px; font-weight: 600; display: flex; align-items: center">{{st.name}}</span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <!-- dim behind an open window -->
+  <div class="layer" style="opacity: {{L.wiOp}}; transition: opacity .6s ease; pointer-events: none; background: rgba(8,14,10,.42)"></div>
+
+  <!-- ============ LOGIN ============ -->
+  <sc-if value="{{is.login}}" hint-placeholder-val="{{true}}">
+    <div class="layer" style="display: grid; place-items: center; background: rgba(10,20,35,.25)">
+      <div class="glass fadeUp" style="width: 420px; border-radius: 28px; padding: 40px 40px 32px; text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,.25)">
+        <p style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-style: italic; font-size: 58px; font-weight: 800; letter-spacing: -1.5px; line-height: 1"><span style="color: #003087">tm</span><span style="color: #009CDE">rw</span></p>
+        <p style="margin: 12px 0 30px; font-size: 17px" class="muted">Know tomorrow before it arrives.</p>
+        <button class="btn pill blue" onClick="{{toSetup}}" style="width: 100%; height: 50px; font-size: 16px; background: #0070E0">Continue with PayPal</button>
+        <button class="btn pill ghost" onClick="{{toSetup}}" style="width: 100%; height: 50px; margin-top: 10px; font-size: 16px">Continue with email</button>
+        <p style="margin: 22px 0 0; font-size: 13px" class="muted">New here? Setup takes about two minutes.</p>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ SETUP ============ -->
+  <sc-if value="{{is.setup}}" hint-placeholder-val="{{false}}">
+    <div class="layer" style="display: grid; place-items: center; background: rgba(10,20,35,.3)">
+      <div class="glass" style="width: 660px; border-radius: 28px; padding: 30px 36px 28px; box-shadow: 0 30px 80px rgba(0,0,0,.25)">
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 500" class="muted"><span>Setting up your calendar: {{step}} of 9</span></div>
+        <div style="height: 4px; border-radius: 4px; background: rgba(0,0,0,.08); margin: 10px 0 26px; overflow: hidden"><div style="height: 100%; width: {{stepPct}}; background: #0071E3; border-radius: 4px; transition: width .5s cubic-bezier(.2,.8,.2,1)"></div></div>
+
+        <sc-if value="{{s.s1}}" hint-placeholder-val="{{true}}">
+          <div class="fadeUp">
+            <p style="margin: 0 0 6px; font-size: 26px; font-weight: 700">Your business</p>
+            <p style="margin: 0 0 20px; font-size: 15px" class="muted">This shapes how tmrw expects your sales to move.</p>
+            <label for="bn" style="font-size: 13px; font-weight: 600" class="muted">Name</label>
+            <input id="bn" value="Dunder Mifflin &amp; Co." style="display: block; width: 100%; box-sizing: border-box; height: 46px; margin: 6px 0 18px; padding: 0 14px; border: 0; border-radius: 12px; background: rgba(0,0,0,.05); font: inherit; font-size: 16px; color: #1D1D1F">
+            <p style="margin: 0 0 8px; font-size: 13px; font-weight: 600" class="muted">Type</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px"><span class="chip on">Bakery and café</span><span class="chip">Clothing</span><span class="chip">Grocery</span><span class="chip">Salon</span><span class="chip">Other</span></div>
+            <p style="margin: 0 0 8px; font-size: 13px; font-weight: 600" class="muted">Busiest days</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px"><span class="chip">Mon</span><span class="chip">Tue</span><span class="chip">Wed</span><span class="chip">Thu</span><span class="chip">Fri</span><span class="chip on">Sat</span><span class="chip on">Sun</span></div>
+            <p style="margin: 0 0 8px; font-size: 13px; font-weight: 600" class="muted">Busy seasons</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px"><span class="chip on">Christmas</span><span class="chip on">Weddings</span><span class="chip">Diwali</span><span class="chip">Summer</span><span class="chip">+ Add</span></div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{s.s2}}" hint-placeholder-val="{{false}}">
+          <div class="fadeUp">
+            <p style="margin: 0 0 6px; font-size: 26px; font-weight: 700">Connect PayPal</p>
+            <p style="margin: 0 0 22px; font-size: 15px" class="muted">tmrw reads your history to find what comes in and what goes out. It never moves money on its own.</p>
+            <div class="card" style="padding: 18px 20px; display: flex; align-items: center; gap: 14px">
+              <span style="display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: #0070E0; color: #ffffff; font-weight: 800; font-size: 18px">P</span>
+              <div style="flex: 1"><p style="margin: 0; font-weight: 600">Dunder Mifflin &amp; Co. on PayPal</p><p style="margin: 3px 0 0; font-size: 14.5px; font-weight: 600; color: #1A7F37">Connected - 14 months of history read</p></div>
+              <span style="display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: #1A9E45; color: #ffffff; font-size: 16px; font-weight: 800">✓</span>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{s.s3}}" hint-placeholder-val="{{false}}">
+          <div class="fadeUp">
+            <p style="margin: 0 0 6px; font-size: 26px; font-weight: 700">Your regular payments</p>
+            <p style="margin: 0 0 16px; font-size: 15px; font-weight: 500; color: #3A3A3C">8 found in your PayPal history.</p>
+            <div class="card" style="padding: 4px 18px 0">
+              <div style="display: grid; grid-template-columns: 1.7fr .8fr 1.3fr auto; gap: 12px; align-items: center; padding: 10px 0; font-size: 12px; font-weight: 700; letter-spacing: .04em; color: #6E6E73; border-bottom: 1px solid rgba(0,0,0,.08)"><span>PAYMENT</span><span style="text-align: right">AMOUNT</span><span>WHEN</span><span style="width: 178px">DATE</span></div>
+              <p style="margin: 10px 0 2px; font-size: 12px; font-weight: 700; letter-spacing: .04em; color: #C4161C">GOING OUT</p>
+              <sc-for list="{{outs}}" as="o" hint-placeholder-count="6">
+                <div style="display: grid; grid-template-columns: 1.7fr .8fr 1.3fr auto; gap: 12px; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,.06)">
+                  <span style="font-size: 15px; font-weight: 600">{{o.name}}</span>
+                  <span style="text-align: right; font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums">{{o.amt}}</span>
+                  <span style="font-size: 13.5px; font-weight: 500; color: #3A3A3C">{{o.when}}<span style="display: block; font-size: 12px; color: #6E6E73">{{o.how}}</span></span>
+                  <div class="seg" style="width: 178px; box-sizing: border-box"><span class="{{o.fixed}}">Fixed date</span><span class="{{o.move}}">Can move</span></div>
+                </div>
+              </sc-for>
+              <div style="display: flex; justify-content: space-between; padding: 8px 0 4px; font-size: 14px; font-weight: 700"><span>Going out each month</span><span style="font-variant-numeric: tabular-nums">about $4,839</span></div>
+              <p style="margin: 10px 0 2px; font-size: 12px; font-weight: 700; letter-spacing: .04em; color: #1E7F3C">COMING IN</p>
+              <sc-for list="{{ins}}" as="o" hint-placeholder-count="2">
+                <div style="display: grid; grid-template-columns: 1.7fr .8fr 1.3fr auto; gap: 12px; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,.06)">
+                  <span style="font-size: 15px; font-weight: 600">{{o.name}}</span>
+                  <span style="text-align: right; font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; color: #1E7F3C">{{o.amt}}</span>
+                  <span style="font-size: 13.5px; font-weight: 500; color: #3A3A3C">{{o.when}}<span style="display: block; font-size: 12px; color: #6E6E73">{{o.how}}</span></span>
+                  <span style="width: 178px; font-size: 13px; font-weight: 600; color: #3A3A3C">{{o.note}}</span>
+                </div>
+              </sc-for>
+              <div style="display: flex; justify-content: space-between; padding: 8px 0 12px; font-size: 14px; font-weight: 700"><span>Coming in each month</span><span style="font-variant-numeric: tabular-nums; color: #1E7F3C">about $6,900</span></div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{s.s4}}" hint-placeholder-val="{{false}}">
+          <div class="fadeUp">
+            <p style="margin: 0 0 6px; font-size: 26px; font-weight: 700">Any payments you make or receive outside PayPal?</p>
+            <p style="margin: 0 0 18px; font-size: 15px" class="muted">Add them so your calendar is complete.</p>
+            <div class="card" style="padding: 4px 18px">
+              <div class="row"><div style="flex: 1"><p style="margin: 0; font-weight: 600">Oat of Office - oat milk</p><p style="margin: 1px 0 0; font-size: 13px" class="muted">$180 going out - bank auto-debit on the 15th</p></div><span style="font-size: 13px; color: #C4161C; font-weight: 600">Out</span></div>
+              <div class="row" style="border: 0"><div style="flex: 1"><p style="margin: 0; font-weight: 600">Weekend market - cash sales</p><p style="margin: 1px 0 0; font-size: 13px" class="muted">about $150 coming in - every Saturday</p></div><span style="font-size: 13px; color: #1E7F3C; font-weight: 600">In</span></div>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 14px"><span class="chip">+ Add a payment</span><span class="chip">Upload a statement or bill</span></div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{s.s5}}" hint-placeholder-val="{{false}}">
+          <div class="fadeUp">
+            <p style="margin: 0 0 6px; font-size: 26px; font-weight: 700">Who pays you later?</p>
+            <p style="margin: 0 0 18px; font-size: 15px" class="muted">Clients who buy on credit or invoice. tmrw sends friendly reminders only if the client agrees.</p>
+            <div class="card" style="padding: 18px 20px">
+              <div style="display: flex; justify-content: space-between; align-items: baseline"><p style="margin: 0; font-weight: 600; font-size: 16px">Ivory &amp; Vow - wedding planner</p><p style="margin: 0; font-size: 14px" class="muted">usually pays 5 days late</p></div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; font-size: 14px"><span>Payment reminders</span><span style="width: 46px; height: 28px; border-radius: 14px; background: #34C759; position: relative"><span style="position: absolute; right: 2px; top: 2px; width: 24px; height: 24px; border-radius: 50%; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,.2)"></span></span></div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 14px"><span>Tone</span><div class="seg"><span class="on">Gentle</span><span>Firm</span></div></div>
+            </div>
+            <span class="chip" style="margin-top: 12px">+ Add a client</span>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{s.s6}}" hint-placeholder-val="{{false}}">
+          <div class="fadeUp">
+            <p style="margin: 0 0 6px; font-size: 26px; font-weight: 700">Your safety cushion</p>
+            <p style="margin: 0 0 22px; font-size: 15px" class="muted">The least money that should always stay in the account. Every plan is built above this line.</p>
+            <p style="margin: 0; font-size: 56px; font-weight: 700; letter-spacing: -.03em">$200</p>
+            <div style="position: relative; height: 6px; border-radius: 6px; background: rgba(0,0,0,.08); margin: 18px 0 8px"><div style="width: 20%; height: 100%; border-radius: 6px; background: #0071E3"></div><span style="position: absolute; left: 20%; top: 50%; width: 24px; height: 24px; margin: -12px 0 0 -12px; border-radius: 50%; background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,.25)"></span></div>
+            <div style="display: flex; justify-content: space-between; font-size: 13px" class="muted"><span>$0</span><span>$1,000</span></div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{s.s7}}" hint-placeholder-val="{{false}}">
+          <div class="fadeUp">
+            <p style="margin: 0 0 6px; font-size: 26px; font-weight: 700">Anything you're planning to grow?</p>
+            <p style="margin: 0 0 18px; font-size: 15px" class="muted">Optional. A new product, an event, a bigger kitchen. tmrw finds the money for it after every bill is safe.</p>
+            <div class="card" style="padding: 4px 20px; font-size: 15px">
+              <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 14px; padding: 12px 0 8px; font-size: 12px; font-weight: 600" class="muted"><span>Plan</span><span>Rough cost</span><span>By</span></div>
+              <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 14px; padding: 12px 0; border-top: 1px solid rgba(0,0,0,.07); font-weight: 600"><span>Stall at the Winter Makers' Market</span><span>$300</span><span>Sun 6 Dec</span></div>
+              <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 14px; padding: 12px 0; border-top: 1px solid rgba(0,0,0,.07); font-weight: 600"><span>Launch Christmas cookie boxes</span><span>$450</span><span>Sat 12 Dec</span></div>
+            </div>
+            <span class="chip" style="margin-top: 12px">+ Add a plan</span>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{s.s8}}" hint-placeholder-val="{{false}}">
+          <div class="fadeUp">
+            <p style="margin: 0 0 6px; font-size: 26px; font-weight: 700">Your team</p>
+            <p style="margin: 0 0 14px; font-size: 15px" class="muted">Add the people who work in your shop. You can do this later. Only you approve money.</p>
+            <sc-for list="{{team}}" as="tm" hint-placeholder-count="3">
+              <div class="row">
+                <span style="display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: {{tm.c}}; color: #ffffff; font-weight: 700">{{tm.i}}</span>
+                <p style="flex: 1; margin: 0; font-weight: 600">{{tm.name}}</p>
+                <span class="chip" style="height: 30px">{{tm.role}}</span>
+              </div>
+            </sc-for>
+            <span class="chip" style="margin-top: 12px">+ Add a member</span>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{s.s9}}" hint-placeholder-val="{{false}}">
+          <div class="fadeUp">
+            <p style="margin: 0 0 6px; font-size: 26px; font-weight: 700">Your daily brief</p>
+            <p style="margin: 0 0 22px; font-size: 15px" class="muted">A calm note from Pip each morning. Four lines, at most one decision.</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid rgba(0,0,0,.07)"><span style="font-weight: 600">Time</span><span style="font-size: 17px; font-weight: 600">8:00 AM</span></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0"><span style="font-weight: 600">Where <span style="font-weight: 400; font-size: 13px" class="muted">pick any</span></span><div style="display: flex; gap: 8px"><span class="chip on">✓ In the app</span><span class="chip on">✓ Notification</span><span class="chip">WhatsApp</span><span class="chip">Email</span></div></div>
+          </div>
+        </sc-if>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 28px">
+          <button class="btn pill ghost" onClick="{{back}}">Back</button>
+          <div style="display: flex; gap: 10px">
+            <sc-if value="{{canSkip}}" hint-placeholder-val="{{false}}"><button class="btn pill ghost" onClick="{{next}}">Skip</button></sc-if>
+            <button class="btn pill blue" onClick="{{next}}">{{nextLabel}}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ STATION / TRAIN HINTS ============ -->
+  <sc-if value="{{is.hint}}" hint-placeholder-val="{{false}}">
+    <div style="position: absolute; left: 0; right: 0; bottom: 34px; display: flex; flex-direction: column; align-items: center; gap: 8px; color: #ffffff; text-shadow: 0 1px 10px rgba(0,0,0,.45)">
+      <span style="font-size: 14px; font-weight: 600">{{hintText}}</span>
+      <svg class="icon hint" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+    </div>
+  </sc-if>
+
+  <!-- ============ ALWAYS-THERE CONTROLS (inside) ============ -->
+  <sc-if value="{{is.inside}}" hint-placeholder-val="{{false}}">
+    <div style="position: absolute; z-index: 20; left: 0; right: 0; top: 12px; display: flex; justify-content: center; gap: 10px">
+      <sc-for list="{{dock}}" as="dk" hint-placeholder-count="4">
+        <button class="btn" onClick="{{dk.go}}" style="position: relative; display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 18px 0 10px; border-radius: 99px; background: rgba(22,22,24,.86); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); color: #ffffff; font-size: 15px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,.3)">
+          <img src="{{dk.img}}" alt="" style="width: 30px; height: 30px">
+          {{dk.name}}
+          <sc-if value="{{dk.badge}}" hint-placeholder-val="{{false}}"><span style="position: absolute; top: -5px; left: 28px; min-width: 20px; height: 20px; border-radius: 10px; background: #FF3B30; color: #ffffff; font-size: 11.5px; font-weight: 700; display: grid; place-items: center; box-shadow: 0 0 0 2px rgba(22,22,24,.9)">3</span></sc-if>
+        </button>
+      </sc-for>
+    </div>
+    <sc-if value="{{showNote}}" hint-placeholder-val="{{false}}">
+      <div class="glass fadeUp" style="position: absolute; z-index: 19; top: 20px; left: 50%; margin-left: -260px; width: 520px; border-radius: 20px; padding: 14px 16px; box-shadow: 0 14px 40px rgba(0,0,0,.2); animation-delay: 1.3s; display: flex; gap: 12px; align-items: center">
+        <img src="../assets/icons/brief.png" alt="" style="width: 38px; height: 38px">
+        <div style="flex: 1; font-size: 14.5px; line-height: 1.45">
+          <p style="margin: 0; font-weight: 600">Good morning, Penny. Today is clear.</p>
+          <p style="margin: 2px 0 0" class="muted">Coming up: Thursday the 12th is $120 short.</p>
+        </div>
+        <button class="btn" onClick="{{openMorning}}" style="height: 32px; padding: 0 14px; border-radius: 99px; background: #0071E3; color: #ffffff; font-size: 13px; font-weight: 600">Open</button>
+        <button class="btn" onClick="{{hideNote}}" aria-label="Dismiss" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,.05); color: #6E6E73"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
+      </div>
+    </sc-if>
+  </sc-if>
+
+  <!-- ============ NAV (scroll fallback) ============ -->
+  <sc-if value="{{is.nav}}" hint-placeholder-val="{{false}}">
+    <div style="position: absolute; z-index: 18; right: 22px; bottom: 100px; display: flex; flex-direction: column; align-items: center; gap: 8px">
+      <button class="btn glass" onClick="{{up}}" aria-label="Scroll up" style="width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: #1D1D1F"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 15l-6-6-6 6"></path></svg></button>
+      <sc-for list="{{dots}}" as="d" hint-placeholder-count="5">
+        <span style="width: 6px; height: {{d.h}}; border-radius: 3px; background: {{d.c}}; transition: height .3s"></span>
+      </sc-for>
+      <button class="btn glass" onClick="{{down}}" aria-label="Scroll down" style="width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: #1D1D1F"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+    </div>
+  </sc-if>
+
+  <!-- ============ OPEN WINDOW (focus / unfocus) ============ -->
+  <sc-if value="{{is.panel}}" hint-placeholder-val="{{false}}">
+    <div class="panelIn" style="position: absolute; z-index: 30; left: {{P.l}}; top: {{P.t}}; width: {{P.w}}; height: {{P.h}}; border-radius: {{P.r}}; background: #F5F5F7; box-shadow: 0 40px 100px rgba(0,0,0,.35); overflow: hidden; display: flex; flex-direction: column; transition: left .5s cubic-bezier(.2,.8,.2,1), top .5s cubic-bezier(.2,.8,.2,1), width .5s cubic-bezier(.2,.8,.2,1), height .5s cubic-bezier(.2,.8,.2,1), border-radius .5s">
+      <div style="flex: 0 0 56px; display: flex; align-items: center; gap: 12px; padding: 0 16px 0 20px; background: rgba(255,255,255,.7); border-bottom: 1px solid rgba(0,0,0,.06)">
+        <span style="display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; background: {{P.tint}}; color: #ffffff"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="{{P.icon}}"></path></svg></span>
+        <p style="margin: 0; font-size: 16px; font-weight: 600; flex: 1">{{P.title}}</p>
+        <button class="btn" onClick="{{toggleFocus}}" aria-label="{{P.focusLabel}}" title="{{P.focusLabel}}" style="display: flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px; border-radius: 99px; background: rgba(0,0,0,.05); color: #1D1D1F; font-size: 13px; font-weight: 500"><svg class="icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="{{P.focusIcon}}"></path></svg>{{P.focusLabel}}</button>
+        <button class="btn" onClick="{{closePanel}}" aria-label="Close" style="width: 34px; height: 34px; border-radius: 50%; background: rgba(0,0,0,.05); color: #1D1D1F; display: grid; place-items: center"><svg class="icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
+      </div>
+
+      <!-- PLACEHOLDER: windows are designed on their own board -->
+      <sc-if value="{{p.ph}}" hint-placeholder-val="{{false}}">
+        <div class="fadeUp" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 30px">
+          <img src="{{P.img}}" alt="" style="width: {{P.imgSize}}; height: {{P.imgSize}}; filter: drop-shadow(0 14px 24px rgba(0,0,0,.18))">
+          <p style="margin: 6px 0 0; font-size: 26px; font-weight: 700; letter-spacing: -.02em">{{P.title}}</p>
+          <p style="margin: 0; font-size: 16px; font-weight: 500; color: #3A3A3C">Coming soon.</p>
+        </div>
+      </sc-if>
+
+      <!-- CALENDAR -->
+      <sc-if value="{{p.cal}}" hint-placeholder-val="{{false}}">
+        <div style="position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 18px 22px 0">
+          <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px">
+            <div>
+              <p style="margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -.02em">November</p>
+              <p style="margin: 2px 0 0; font-size: 15px"><span style="color: #1D1D1F; font-weight: 600">The month adds up.</span> <span style="color: #C4161C; font-weight: 600">Thu 12 doesn't: $120 short.</span></p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px; font-size: 13px" class="muted">
+              <span style="display: flex; align-items: center; gap: 6px"><span style="width: 9px; height: 9px; border-radius: 50%; background: #34C759"></span>Money in</span>
+              <span style="display: flex; align-items: center; gap: 6px"><span style="width: 9px; height: 9px; border-radius: 50%; background: #FF3B30"></span>Money out</span>
+              <div class="seg"><span>Week</span><span class="on">Month</span></div>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin: 14px 0 6px; font-size: 12px; font-weight: 600" class="muted"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+          <div style="flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: repeat(6, minmax(0, 1fr)); gap: 6px">
+            <sc-for list="{{cal}}" as="c" hint-placeholder-count="42">
+              <div class="{{c.cls}}">
+                <div style="display: flex; justify-content: space-between; align-items: center">
+                  <span style="font-size: 13px; font-weight: 600; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: {{c.todayBg}}; color: {{c.numC}}">{{c.n}}</span>
+                  <span class="e e-in">{{c.sales}}</span>
+                </div>
+                <sc-for list="{{c.items}}" as="it" hint-placeholder-count="1">
+                  <span class="e e-{{it.k}}">{{it.t}}</span>
+                </sc-for>
+                <sc-if value="{{c.short}}" hint-placeholder-val="{{false}}">
+                  <span class="e" style="margin-top: auto; color: #C4161C; font-weight: 700">Short $120 - Fix</span>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <div style="flex: 0 0 auto; padding: 12px 0 16px">
+            <div style="display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 8px 0 16px; border-radius: 14px; background: #ffffff; box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 4px 16px rgba(0,0,0,.05)">
+              <span style="width: 26px; height: 26px; border-radius: 50%; background: #FFD15C; display: grid; place-items: center; font-size: 12px; font-weight: 700; color: #6B4A00">P</span>
+              <label for="pip" style="position: absolute; left: -9999px">Ask Pip</label>
+              <input id="pip" placeholder="Ask Pip, or drop a bill or WhatsApp screenshot" style="flex: 1; border: 0; outline: none; background: transparent; font: inherit; font-size: 15px; color: #1D1D1F">
+              <button class="btn" aria-label="Attach a bill" style="width: 34px; height: 34px; border-radius: 50%; background: rgba(0,0,0,.05); color: #6E6E73; display: grid; place-items: center"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M21.4 11l-9.2 9.2a6 6 0 0 1-8.5-8.5l9.2-9.2a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 0 1-2.8-2.8l8.5-8.5"></path></svg></button>
+            </div>
+          </div>
+          <div class="toast card" style="position: absolute; right: 22px; bottom: 80px; width: 330px; padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start; box-shadow: 0 16px 40px rgba(0,0,0,.16)">
+            <span style="flex: 0 0 34px; height: 34px; border-radius: 50%; background: #AF52DE; color: #ffffff; display: grid; place-items: center; font-weight: 700">F</span>
+            <div style="flex: 1">
+              <p style="margin: 0; font-size: 14px; font-weight: 600">Flo asked about the mixer 3 times</p>
+              <p style="margin: 2px 0 10px; font-size: 13px" class="muted">Pip: Black Friday, 27 Nov. Set aside $8 a day.</p>
+              <div style="display: flex; gap: 8px"><button class="btn" onClick="{{openRequests}}" style="height: 30px; padding: 0 12px; border-radius: 99px; background: #0071E3; color: #ffffff; font-size: 13px; font-weight: 600">View</button><button class="btn" style="height: 30px; padding: 0 12px; border-radius: 99px; background: rgba(0,0,0,.05); color: #1D1D1F; font-size: 13px; font-weight: 500">Later</button></div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- GROW -->
+      <sc-if value="{{p.grow}}" hint-placeholder-val="{{false}}">
+        <div style="flex: 1; min-height: 0; overflow: auto; padding: 26px 30px">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px"><p style="margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -.02em">{{gTitle}}</p></div>
+          <sc-if value="{{gTabs.isPlans}}" hint-placeholder-val="{{true}}">
+          <p style="margin: 0 0 22px; font-size: 15px" class="muted">Plans that need money. tmrw fits them in only after every must-pay is safe. About $2,060 is free for plans this month.</p>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+            <sc-for list="{{plans}}" as="pl" hint-placeholder-count="3">
+              <div class="card fadeUp" style="padding: 22px; animation-delay: {{pl.d}}">
+                <p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .04em" class="muted">{{pl.kind}}</p>
+                <p style="margin: 6px 0 2px; font-size: 20px; font-weight: 700">{{pl.name}}</p>
+                <p style="margin: 0 0 16px; font-size: 14px" class="muted">{{pl.cost}} - by {{pl.by}}</p>
+                <div style="height: 6px; border-radius: 6px; background: rgba(0,0,0,.07); overflow: hidden"><div style="height: 100%; width: {{pl.pct}}; background: #0071E3; border-radius: 6px"></div></div>
+                <p style="margin: 6px 0 14px; font-size: 13px" class="muted">{{pl.saved}}</p>
+                <p style="margin: 0; padding: 10px 12px; border-radius: 12px; background: {{pl.noteBg}}; font-size: 13.5px; line-height: 1.45; color: {{pl.noteC}}">{{pl.note}}</p>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top: 16px; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 16px; border-radius: 16px; border: 1.5px dashed rgba(0,0,0,.15); color: #6E6E73; font-size: 15px">+ Tell Pip a plan: “a coffee machine, about $900, by March”</div>
+          </sc-if>
+          <sc-if value="{{gTabs.isIns}}" hint-placeholder-val="{{false}}">
+            <div style="max-width: 760px">
+              <p style="margin: 0 0 18px; font-size: 22px; font-weight: 700; letter-spacing: -.01em">Your shop's month, told as a story.</p>
+              <sc-for list="{{story}}" as="sy" hint-placeholder-count="4">
+                <div class="fadeUp" style="display: flex; gap: 18px; padding: 18px 0; border-top: 1px solid rgba(0,0,0,.08); animation-delay: {{sy.d}}">
+                  <span style="flex: 0 0 34px; font-size: 15px; font-weight: 700; color: #0071E3">{{sy.n}}</span>
+                  <div><p style="margin: 0 0 6px; font-size: 19px; font-weight: 700">{{sy.h}}</p><p style="margin: 0; font-size: 15.5px; line-height: 1.6" class="muted">{{sy.p}}</p></div>
+                </div>
+              </sc-for>
+              <p style="margin: 8px 0 0; font-size: 13px" class="muted">Written by Pip from your PayPal history. Demo figures are simulated.</p>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <!-- INSIGHTS -->
+      <sc-if value="{{p.ins}}" hint-placeholder-val="{{false}}">
+        <div style="flex: 1; min-height: 0; overflow: auto; padding: 26px 30px">
+          <div style="max-width: 760px; margin: 0 auto">
+            <p style="margin: 0; font-size: 13px; font-weight: 600; letter-spacing: .04em" class="muted">INSIGHTS - NOVEMBER SO FAR</p>
+            <p style="margin: 6px 0 26px; font-size: 32px; font-weight: 700; letter-spacing: -.02em; line-height: 1.15">Your shop's month, told as a story.</p>
+            <sc-for list="{{story}}" as="sy" hint-placeholder-count="4">
+              <div class="fadeUp" style="display: flex; gap: 18px; padding: 20px 0; border-top: 1px solid rgba(0,0,0,.08); animation-delay: {{sy.d}}">
+                <span style="flex: 0 0 34px; font-size: 15px; font-weight: 700; color: #0071E3">{{sy.n}}</span>
+                <div><p style="margin: 0 0 6px; font-size: 20px; font-weight: 700">{{sy.h}}</p><p style="margin: 0; font-size: 16px; line-height: 1.6" class="muted">{{sy.p}}</p></div>
+              </div>
+            </sc-for>
+            <p style="margin: 10px 0 0; font-size: 13px" class="muted">Written by Pip from your PayPal history. Demo figures are simulated.</p>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- MORNING CHECK -->
+      <sc-if value="{{p.morning}}" hint-placeholder-val="{{false}}">
+        <div style="flex: 1; min-height: 0; overflow: auto; padding: 40px 30px">
+          <div style="max-width: 640px; margin: 0 auto">
+            <p class="fadeUp" style="margin: 0; font-size: 13px; font-weight: 600; letter-spacing: .04em; color: #C77700">THU 5 NOV - 8:00 AM</p>
+            <p class="fadeUp" style="margin: 8px 0 28px; font-size: 40px; font-weight: 700; letter-spacing: -.03em; animation-delay: .1s">Good morning, Penny. Today is clear.</p>
+            <div class="fadeUp" style="display: flex; flex-direction: column; gap: 16px; font-size: 18px; line-height: 1.5; animation-delay: .2s">
+              <p style="margin: 0"><span class="muted">Going out today:</span> nothing.</p>
+              <p style="margin: 0"><span class="muted">Coming in:</span> <span style="color: #1E7F3C; font-weight: 600">about $180 in orders.</span></p>
+              <p style="margin: 0"><span class="muted">Coming up:</span> Thursday the 12th is <span style="color: #C4161C; font-weight: 600">$120 short</span>. Rent and Bean There land together.</p>
+            </div>
+            <div class="card fadeUp" style="margin-top: 28px; padding: 22px 24px; animation-delay: .35s">
+              <p style="margin: 0 0 4px; font-size: 13px; font-weight: 600" class="muted">ONE THING FOR YOU</p>
+              <p style="margin: 0 0 16px; font-size: 19px; font-weight: 600">Ivory &amp; Vow owes $240. Send a reminder?</p>
+              <div style="display: flex; gap: 10px"><button class="btn pill blue">Yes</button><button class="btn pill ghost">Later</button></div>
+            </div>
+            <p class="fadeUp" style="margin: 22px 0 0; font-size: 15px; animation-delay: .5s"><span class="muted">Overnight, Pip read 1 new bill from Oat of Office and added it to your calendar.</span></p>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- SETTINGS -->
+      <sc-if value="{{p.settings}}" hint-placeholder-val="{{false}}">
+        <div style="flex: 1; min-height: 0; display: flex">
+          <div style="flex: 0 0 240px; padding: 18px 12px; border-right: 1px solid rgba(0,0,0,.06); background: rgba(255,255,255,.5)">
+            <sc-for list="{{setNav}}" as="sn" hint-placeholder-count="7">
+              <button class="btn" onClick="{{sn.go}}" style="display: block; width: 100%; text-align: left; padding: 10px 12px; border-radius: 10px; font-size: 14.5px; font-weight: 500; background: {{sn.bg}}; color: {{sn.c}}">{{sn.name}}</button>
+            </sc-for>
+          </div>
+          <div style="flex: 1; min-width: 0; overflow: auto; padding: 26px 32px">
+            <sc-if value="{{set.money}}" hint-placeholder-val="{{true}}">
+              <p style="margin: 0 0 18px; font-size: 26px; font-weight: 700">Money rules and Pip</p>
+              <div class="card" style="padding: 4px 20px">
+                <div class="row"><div style="flex: 1"><p style="margin: 0; font-weight: 600">Safety cushion</p><p style="margin: 1px 0 0; font-size: 13px" class="muted">The least money that stays in the account</p></div><span style="font-size: 17px; font-weight: 600">$200</span></div>
+                <div class="row" style="border: 0"><div style="flex: 1"><p style="margin: 0; font-weight: 600">Every money move needs your approval</p><p style="margin: 1px 0 0; font-size: 13px" class="muted">Always on. This can't be switched off.</p></div><span style="width: 46px; height: 28px; border-radius: 14px; background: #34C759; opacity: .55; position: relative"><span style="position: absolute; right: 2px; top: 2px; width: 24px; height: 24px; border-radius: 50%; background: #ffffff"></span></span></div>
+              </div>
+              <p style="margin: 24px 0 8px; font-size: 13px; font-weight: 600" class="muted">WHAT PIP MAY DO ALONE</p>
+              <div class="card" style="padding: 4px 20px">
+                <sc-for list="{{pipRules}}" as="pr" hint-placeholder-count="3">
+                  <div class="row"><p style="flex: 1; margin: 0; font-weight: 500">{{pr}}</p><span style="width: 46px; height: 28px; border-radius: 14px; background: #34C759; position: relative"><span style="position: absolute; right: 2px; top: 2px; width: 24px; height: 24px; border-radius: 50%; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,.2)"></span></span></div>
+                </sc-for>
+                <div class="row" style="border: 0"><p style="flex: 1; margin: 0; font-size: 14px" class="muted">Pip never sends or pays without your approval.</p></div>
+              </div>
+              <p style="margin: 24px 0 8px; font-size: 13px; font-weight: 600" class="muted">CLIENT REMINDERS</p>
+              <div class="card" style="padding: 4px 20px">
+                <div class="row"><p style="flex: 1; margin: 0; font-weight: 500">Ivory &amp; Vow</p><div class="seg"><span class="on">Gentle</span><span>Firm</span></div></div>
+                <div class="row" style="border: 0"><p style="flex: 1; margin: 0; font-size: 14px" class="muted">Never twice within 48 hours.</p><span style="font-size: 14px; font-weight: 600; color: #0071E3">Receipts log ›</span></div>
+              </div>
+            </sc-if>
+            <sc-if value="{{set.team}}" hint-placeholder-val="{{false}}">
+              <p style="margin: 0 0 18px; font-size: 26px; font-weight: 700">Team and permissions</p>
+              <div class="card" style="padding: 6px 20px; font-size: 14px">
+                <div style="display: grid; grid-template-columns: 1.1fr 1.3fr 1.2fr 1.6fr; gap: 12px; padding: 12px 0; font-weight: 600; border-bottom: 1px solid rgba(0,0,0,.07)" class="muted"><span>Role</span><span>Can see</span><span>Edit calendar</span><span>Approve money</span></div>
+                <sc-for list="{{roles}}" as="rl" hint-placeholder-count="4">
+                  <div style="display: grid; grid-template-columns: 1.1fr 1.3fr 1.2fr 1.6fr; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,.07)"><span style="font-weight: 600">{{rl.r}}</span><span>{{rl.s}}</span><span>{{rl.e}}</span><span>{{rl.a}}</span></div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{set.other}}" hint-placeholder-val="{{false}}">
+              <p style="margin: 0 0 18px; font-size: 26px; font-weight: 700">{{setOther.title}}</p>
+              <div class="card" style="padding: 4px 20px">
+                <sc-for list="{{setOther.rows}}" as="or" hint-placeholder-count="3">
+                  <div class="row"><p style="flex: 1; margin: 0; font-weight: 500">{{or.k}}</p><span class="muted" style="font-size: 15px">{{or.v}}</span></div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- REQUESTS -->
+      <sc-if value="{{p.requests}}" hint-placeholder-val="{{false}}">
+        <div style="flex: 1; min-height: 0; overflow: auto; padding: 26px 30px">
+          <div style="max-width: 780px; margin: 0 auto">
+            <p style="margin: 0 0 4px; font-size: 28px; font-weight: 700; letter-spacing: -.02em">Requests</p>
+            <p style="margin: 0 0 20px; font-size: 15px" class="muted">Staff and suppliers ask here instead of WhatsApp. Pip groups repeats and checks money and timing.</p>
+            <sc-for list="{{reqs}}" as="rq" hint-placeholder-count="3">
+              <div class="card fadeUp" style="padding: 18px 20px; margin-bottom: 12px; display: flex; gap: 14px; animation-delay: {{rq.d}}">
+                <span style="flex: 0 0 38px; height: 38px; border-radius: 50%; background: {{rq.c}}; color: #ffffff; display: grid; place-items: center; font-weight: 700">{{rq.i}}</span>
+                <div style="flex: 1">
+                  <p style="margin: 0; font-weight: 600; font-size: 16px">{{rq.h}}</p>
+                  <p style="margin: 3px 0 10px; font-size: 14.5px" class="muted">{{rq.q}}</p>
+                  <p style="margin: 0 0 12px; padding: 10px 12px; border-radius: 12px; background: #F5F5F7; font-size: 14px; line-height: 1.45"><strong>Pip:</strong> {{rq.pip}}</p>
+                  <div style="display: flex; gap: 8px"><button class="btn" style="height: 32px; padding: 0 14px; border-radius: 99px; background: #0071E3; color: #ffffff; font-size: 13px; font-weight: 600">{{rq.a}}</button><button class="btn" style="height: 32px; padding: 0 14px; border-radius: 99px; background: rgba(0,0,0,.05); color: #1D1D1F; font-size: 13px; font-weight: 500">Reply</button></div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- PLUS -->
+      <sc-if value="{{p.plus}}" hint-placeholder-val="{{false}}">
+        <div style="flex: 1; min-height: 0; overflow: auto; padding: 30px">
+          <p style="margin: 0 0 4px; font-size: 28px; font-weight: 700; letter-spacing: -.02em; text-align: center">Free or Pro</p>
+          <p style="margin: 0 0 26px; font-size: 15px; text-align: center" class="muted">Start free. Upgrade when Pip is doing more of your paperwork.</p>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; max-width: 760px; margin: 0 auto">
+            <div class="card" style="padding: 26px">
+              <p style="margin: 0; font-size: 22px; font-weight: 700">Free</p>
+              <p style="margin: 4px 0 18px; font-size: 14px" class="muted">Your current plan</p>
+              <sc-for list="{{free}}" as="f" hint-placeholder-count="4"><p style="margin: 0 0 10px; font-size: 15px">✓ {{f}}</p></sc-for>
+            </div>
+            <div class="card" style="padding: 26px; box-shadow: 0 0 0 2px #0071E3, 0 10px 30px rgba(0,113,227,.15)">
+              <p style="margin: 0; font-size: 22px; font-weight: 700">Pro</p>
+              <p style="margin: 4px 0 18px; font-size: 14px" class="muted">Everything in Free, and</p>
+              <sc-for list="{{plus}}" as="f" hint-placeholder-count="4"><p style="margin: 0 0 10px; font-size: 15px">✓ {{f}}</p></sc-for>
+              <button class="btn pill blue" style="margin-top: 10px; width: 100%">Try Pro</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    this.state = { stage: 'login', step: 1, seat: 0, panel: null, focus: false, note: true, setSec: 'money', arr: 'open', gTab: 'plans' };
+    this._timers = [];
+    this._t = 0;
+  }
+  componentWillUnmount() { this._timers.forEach(clearTimeout); }
+  renderVals() {
+    const S = this.state, st = S.stage;
+    const set = (o) => this.setState(o);
+    const FLOW = ['station', 'train', 'car0', 'car1', 'car2'];
+    const pos = st === 'car' ? 2 + S.seat : FLOW.indexOf(st);
+    const goPos = (i) => {
+      i = Math.max(0, Math.min(4, i));
+      this._timers.forEach(clearTimeout); this._timers = [];
+      if (i === 1 && st === 'station') {
+        set({ stage: 'train', panel: null, arr: 'start' });
+        this._timers.push(setTimeout(() => this.setState({ arr: 'moving' }), 60));
+        this._timers.push(setTimeout(() => this.setState({ arr: 'slowing' }), 2100));
+        this._timers.push(setTimeout(() => this.setState({ arr: 'settle' }), 3300));
+        this._timers.push(setTimeout(() => this.setState({ arr: 'stopped' }), 4700));
+        this._timers.push(setTimeout(() => this.setState({ arr: 'open' }), 5200));
+      } else if (i < 2) set({ stage: FLOW[i], panel: null, arr: 'open' });
+      else set({ stage: 'car', seat: i - 2, panel: null, arr: 'open' });
+    };
+    const inCar = st === 'car';
+    const pre = st === 'login' || st === 'setup';
+
+    const ICON = {
+      cal: 'M3 5h18v16H3zM16 3v4M8 3v4M3 10h18',
+      grow: 'M23 6l-9.5 9.5-5-5L1 18M17 6h6v6',
+      ins: 'M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z',
+      morning: 'M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zM12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2',
+      settings: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2',
+      requests: 'M22 12h-6l-2 3h-4l-2-3H2M5.5 5.1L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.7 1.1z',
+      plus: 'M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z'
+    };
+    const META = {
+      cal: ['Calendar', '#FF3B30'], grow: ['Ventures', '#C08A2B'], ins: ['Insights', '#D7263D'],
+      morning: ['Daily brief', '#FF9500'], settings: ['Settings', '#8E8E93'], requests: ['Requests', '#AF52DE'], plus: ['tmrw Pro', '#0071E3']
+    };
+    const open = (k) => set({ panel: k, note: false });
+
+    // layers
+    const L = {
+      stOp: inCar ? 0 : 1,
+      stFilter: pre ? 'blur(10px) brightness(.85)' : 'none',
+      trOp: st === 'train' ? 1 : 0,
+      trT: inCar ? 'scale(3.2)' : 'none',
+      trTrans: inCar ? 'transform 1.1s cubic-bezier(.7,0,.3,1), opacity .5s ease .6s' : 'transform 1s ease, opacity .5s ease',
+      bandOp: st === 'train' && ['start', 'moving', 'slowing', 'settle'].indexOf(S.arr) >= 0 ? 1 : 0,
+      bandX: S.arr === 'start' ? '0px' : '-3200px',
+      bandF: S.arr === 'start' || S.arr === 'moving' ? 'url(#mblur)' : (S.arr === 'slowing' ? 'url(#mblur2)' : 'none'),
+      bandTr: S.arr === 'start' ? 'none' : 'transform 4.6s cubic-bezier(.18,.6,.2,1)',
+      doorL: S.arr === 'open' ? 'translateX(-101%)' : 'none',
+      doorR: S.arr === 'open' ? 'translateX(101%)' : 'none',
+      caOp: inCar ? 1 : 0, caDelay: inCar ? '.55s' : '0s',
+      wiOp: S.panel ? 1 : 0, wiT: S.panel ? 'scale(1)' : 'scale(1.12)'
+    };
+    let s = 11;
+    const r = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+    const leaves = [];
+    for (let i = 0; i < 12; i++) leaves.push('left:' + (60 + r() * 45).toFixed(1) + '%;top:' + (5 + r() * 60).toFixed(1) + '%;animation-duration:' + (9 + r() * 8).toFixed(1) + 's;animation-delay:-' + (r() * 14).toFixed(1) + 's;background:' + ['#5E9E3C', '#7DB24A', '#A7C35A', '#4C8A34'][i % 4]);
+    const IMG = { cal: '../assets/icons/calendar.png', ventures: '../assets/icons/ventures.png', almanac: '../assets/icons/insights.png', settings: '../assets/icons/settings.png', brief: '../assets/icons/brief.png', requests: '../assets/icons/requests.png', plus: '../assets/icons/pro.png' };
+    const seats = [
+      { k: 'cal', name: 'Calendar', img: IMG.cal },
+      { k: 'grow', name: 'Ventures', img: IMG.ventures },
+      { k: 'ins', name: 'Insights', img: IMG.almanac }
+    ].map((o, i) => ({ ...o, x: ((i - S.seat) * 820) + 'px', op: i === S.seat ? 1 : 0, open: () => open(o.k) }));
+    const dock = [
+      { name: 'Settings', img: IMG.settings, go: () => open('settings'), badge: false },
+      { name: 'Daily brief', img: IMG.brief, go: () => open('morning'), badge: false },
+      { name: 'Requests', img: IMG.requests, go: () => open('requests'), badge: true },
+      { name: 'Pro', img: IMG.plus, go: () => open('plus'), badge: false }
+    ];
+
+    // setup
+    const step = S.step;
+    const sflags = {}; for (let i = 1; i <= 9; i++) sflags['s' + i] = step === i;
+    const outs = [
+      { name: 'Rent', amt: '$1,500', when: '12th, monthly', how: 'Bank transfer', fixed: 'on', move: '' },
+      { name: 'Bean There - coffee beans', amt: '$400', when: 'Every 10 days', how: 'PayPal', fixed: '', move: 'on' },
+      { name: 'Internet', amt: '$60', when: '3rd, monthly', how: 'Auto-debit', fixed: 'on', move: '' },
+      { name: 'Card machine', amt: '$49', when: '13th, monthly', how: 'Auto-debit', fixed: 'on', move: '' },
+      { name: 'Oven loan', amt: '$250', when: '25th, monthly', how: 'Auto-debit', fixed: 'on', move: '' },
+      { name: 'Staff pay', amt: '$1,600', when: '28th, monthly', how: 'PayPal', fixed: 'on', move: '' }
+    ];
+    const ins = [
+      { name: 'Daily sales', amt: '$180-$320', when: 'Every day', how: 'PayPal', note: 'More on weekends' },
+      { name: 'Ivory & Vow - wedding cake', amt: '$240', when: 'Due 18 Nov', how: 'Invoice', note: 'Usually 5 days late' }
+    ];
+    const team = [{ i: 'F', name: 'Flo', role: 'Head baker', c: '#AF52DE' }, { i: 'M', name: 'Marco', role: 'Barista', c: '#FF9500' }, { i: 'P', name: 'Pam', role: 'Front counter', c: '#34C759' }];
+
+    // calendar
+    const ev = {
+      2: [{ k: 'out', t: 'Bean There $400' }], 3: [{ k: 'out', t: 'Internet $60' }],
+      6: [{ k: 'fail', t: 'Order $65 failed - Retry' }],
+      10: [{ k: 'meet', t: 'Ivory & Vow - 4 pm' }],
+      12: [{ k: 'out', t: 'Rent $1,500' }, { k: 'out', t: 'Bean There $400' }],
+      13: [{ k: 'out', t: 'Card machine $49' }], 15: [{ k: 'out', t: 'Oat of Office $180' }],
+      16: [{ k: 'nudge', t: 'Nudge Ivory & Vow' }], 18: [{ k: 'in', t: 'Ivory & Vow $240' }],
+      21: [{ k: 'grow', t: 'Second oven $1,200' }], 22: [{ k: 'out', t: 'Bean There $400' }],
+      25: [{ k: 'out', t: 'Oven loan $250' }], 28: [{ k: 'out', t: 'Staff pay $1,600' }]
+    };
+    const cal = [];
+    for (let i = 0; i < 42; i++) {
+      const d = i - 5, isOut = d < 1 || d > 30;
+      const n = d < 1 ? 26 + i : (d > 30 ? d - 30 : d);
+      cal.push({
+        n, cls: 'cal-cell' + (isOut ? ' out' : '') + (d === 12 ? ' short' : ''),
+        sales: isOut ? '' : (i % 7 >= 5 ? '+$320' : '+$180'),
+        items: isOut ? [] : (ev[d] || []), short: d === 12,
+        todayBg: d === 5 ? '#FF3B30' : 'transparent', numC: d === 5 ? '#ffffff' : (isOut ? '#C7C7CC' : '#1D1D1F')
+      });
+    }
+
+    const plans = [
+      { kind: 'NEW EQUIPMENT', name: 'Second oven', cost: '$1,200', by: 'Sat 21 Nov', pct: '27%', saved: '$320 saved', note: 'On track. About $45 a day after must-pays gets you there.', noteBg: '#EAF8EE', noteC: '#1E6B35', d: '0s' },
+      { kind: 'NEW PRODUCT', name: 'Christmas cookie boxes', cost: 'about $450 stock', by: 'Sat 12 Dec', pct: '0%', saved: 'Not started', note: 'Fits after staff pay on the 28th. Start setting aside on 1 Dec.', noteBg: '#F5F5F7', noteC: '#3A3A3C', d: '.08s' },
+      { kind: 'EXHIBITION', name: 'Winter market stall', cost: '$300 fee', by: 'Sun 6 Dec', pct: '0%', saved: 'Not started', note: 'Tight: the fee is due the week of a Bean There order. Book after 22 Nov.', noteBg: '#FFF4E5', noteC: '#8A4B00', d: '.16s' }
+    ];
+    const story = [
+      { n: '01', h: 'Weekends carry the shop.', p: 'Saturdays and Sundays bring about $320 each, nearly twice a weekday. Bean orders on Mondays land right after your two best days.', d: '0s' },
+      { n: '02', h: 'The 12th is the only tight day.', p: 'Rent and Bean There arrive together on Thursday. Every other day this month has room above your $200 cushion.', d: '.08s' },
+      { n: '03', h: 'Ivory & Vow pays late, but always pays.', p: 'Their recent payments came a few days after the due date. A gentle reminder two days before usually does it.', d: '.16s' },
+      { n: '04', h: 'Coffee got dearer.', p: 'Bean There’s latest bill is $460, up from $400. If that holds, each order costs $60 more.', d: '.24s' }
+    ];
+    const reqs = [
+      { i: 'F', c: '#AF52DE', h: 'Flo - 3 requests about the mixer', q: '“The mixer keeps breaking, we need a new one.”', pip: 'Mixers are cheaper around Black Friday. Buy on 27 Nov and set aside $8 a day. Rent and staff pay stay covered.', a: 'Add to Grow', d: '0s' },
+      { i: 'B', c: '#A2845E', h: 'Bean There - sent a new bill', q: 'beanthere-invoice.jpg - $460, due Sun 22 Nov', pip: 'Read from the photo. Replaces the $400 order on the 22nd. Staff pay on the 28th is still covered.', a: 'Add to calendar', d: '.08s' },
+      { i: 'I', c: '#FF2D55', h: 'Ivory & Vow - message', q: '“Can we pay the cake on the 20th instead?”', pip: 'Paying on the 18th covers Thu 12 only if it comes early. The 20th is fine for the rest of the month.', a: 'Agree to the 20th', d: '.16s' }
+    ];
+    const setNames = [['business', 'Business'], ['team', 'Team and permissions'], ['accounts', 'Connected accounts'], ['money', 'Money rules and Pip'], ['morning', 'Daily brief'], ['plan', 'Plan'], ['account', 'Account']];
+    const setNav = setNames.map(([k, name]) => ({ name, bg: S.setSec === k ? '#0071E3' : 'transparent', c: S.setSec === k ? '#ffffff' : '#1D1D1F', go: () => set({ setSec: k }) }));
+    const OTHER = {
+      business: { title: 'Business', rows: [{ k: 'Name', v: 'Dunder Mifflin & Co.' }, { k: 'Type', v: 'Bakery and café' }, { k: 'Currency', v: 'USD' }, { k: 'Busy days', v: 'Sat, Sun' }, { k: 'Busy seasons', v: 'Christmas, weddings' }] },
+      accounts: { title: 'Connected accounts', rows: [{ k: 'PayPal', v: 'Connected' }, { k: 'Bank auto-debits', v: 'Oat of Office, added by hand' }, { k: 'Add a source', v: 'Upload a statement ›' }] },
+      morning: { title: 'Daily brief', rows: [{ k: 'Time', v: '8:00 AM' }, { k: 'Channel', v: 'In the app' }, { k: 'Language', v: 'English' }] },
+      plan: { title: 'Plan', rows: [{ k: 'Current plan', v: 'Free' }, { k: 'Uploads this month', v: '4 of about 10' }, { k: 'Billing', v: 'None' }] },
+      account: { title: 'Account', rows: [{ k: 'Profile', v: 'Penny' }, { k: 'Export your data', v: 'Download ›' }, { k: 'Delete the business', v: '›' }, { k: 'Log out', v: '›' }] }
+    };
+    const roles = [
+      { r: 'Owner', s: 'Everything', e: 'Yes', a: 'Yes, the only one' },
+      { r: 'Partner', s: 'Everything', e: 'Yes', a: 'Only if the owner allows' },
+      { r: 'Staff', s: 'Calendar and requests', e: 'Only their own items', a: 'No' },
+      { r: 'Supplier or client', s: 'Only their own items', e: 'No', a: 'No; can send requests or bills' }
+    ];
+
+    const pk = S.panel;
+    const big = pk === 'cal' || pk === 'grow' || pk === 'ins';
+    const P = pk ? {
+      title: META[pk][0], tint: META[pk][1], icon: ICON[pk],
+      l: S.focus ? '0px' : (big ? '70px' : '310px'), t: S.focus ? '0px' : (big ? '40px' : '170px'), w: S.focus ? '1440px' : (big ? '1300px' : '820px'), h: S.focus ? '900px' : (big ? '820px' : '560px'), r: S.focus ? '0px' : '22px',
+      img: { cal: IMG.cal, grow: IMG.ventures, ins: IMG.almanac, settings: IMG.settings, morning: IMG.brief, requests: IMG.requests, plus: IMG.plus }[pk], imgSize: big ? '200px' : '140px',
+      focusLabel: S.focus ? 'Unfocus' : 'Focus',
+      focusIcon: S.focus ? 'M8 3v3a2 2 0 0 1-2 2H3M21 8h-3a2 2 0 0 1-2-2V3M3 16h3a2 2 0 0 1 2 2v3M16 21v-3a2 2 0 0 1 2-2h3' : 'M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3'
+    } : { title: '', tint: '#000', icon: '', l: '0', t: '0', w: '0', h: '0', r: '0', focusLabel: '', focusIcon: '', img: '', imgSize: '0' };
+    const p = { ph: !!pk }; Object.keys(META).forEach((k) => { p[k] = false; });
+
+    return {
+      L, leaves, seats, dock,
+      gTitle: 'Ventures',
+      gTabs: { plans: S.gTab === 'plans' ? 'on' : '', ins: S.gTab === 'ins' ? 'on' : '', isPlans: true, isIns: false, toPlans: () => set({ gTab: 'plans' }), toIns: () => set({ gTab: 'ins' }) },
+      is: { login: st === 'login', setup: st === 'setup', hint: (st === 'station' || st === 'train') && !pk, inside: inCar, nav: !pre, panel: !!pk },
+      hintText: 'Scroll to continue',
+      toSetup: () => set({ stage: 'setup', step: 1 }),
+      step, stepPct: (step / 9 * 100) + '%', s: sflags, canSkip: step === 7 || step === 8,
+      nextLabel: step === 9 ? 'Start my day' : (step === 2 ? 'Continue' : 'Looks right'),
+      next: () => step < 9 ? set({ step: step + 1 }) : set({ stage: 'station', arr: 'open' }),
+      back: () => step > 1 ? set({ step: step - 1 }) : set({ stage: 'login' }),
+      outs, ins, team, cal, plans, story, reqs, setNav, roles, setOther: OTHER[S.setSec] || OTHER.business,
+      set: { money: S.setSec === 'money', team: S.setSec === 'team', other: S.setSec !== 'money' && S.setSec !== 'team' },
+      pipRules: ['Read bills and screenshots', 'Suggest changes to the calendar', 'Draft client reminders'],
+      free: ['Full calendar', 'Morning check', 'Requests inbox', 'About 10 uploads a month', 'Up to 3 team members'],
+      plus: ['Unlimited bill and message uploads to Pip', 'Season planning', 'Weekly email report', 'More team members'],
+      showNote: false, hideNote: () => set({ note: false }),
+      openSettings: () => open('settings'), openRequests: () => open('requests'), openMorning: () => open('morning'), openPlus: () => open('plus'),
+      P, p, toggleFocus: () => set({ focus: !S.focus }), closePanel: () => set({ panel: null }),
+      dots: [0, 1, 2, 3, 4].map((i) => ({ h: i === pos ? '18px' : '6px', c: i === pos ? '#ffffff' : 'rgba(255,255,255,.5)' })),
+      up: () => goPos(pos - 1), down: () => goPos(pos + 1),
+      wheel: (e) => {
+        if (pre || S.panel) return;
+        const now = Date.now();
+        if (now - this._t < 1100) return;
+        const d = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+        if (Math.abs(d) < 6) return;
+        this._t = now;
+        goPos(pos + (d > 0 ? 1 : -1));
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

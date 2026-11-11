@@ -258,7 +258,7 @@ never edited in. A receipt holds:
 
 The new laptop flow lives at `/` (`components/tmrw/`): login → 9-step setup → station → train arrival → window seats
 (Calendar, Ventures, Insights) with a top dock (Settings, Daily brief, Requests, Pro). It follows the design handoff
-in `design/tmrw-handoff/` (kept local, gitignored; the artwork is copied to `public/tmrw/`). The windows are
+in `design/tmrw-handoff/` (in the repo; the artwork the app uses is cut from it into `public/tmrw/`). The windows are
 "Coming soon" placeholders until they're designed. The assistant is called Pip. Writing rules from the handoff: use a
 hyphen, never a middle dot; no lightning-bolt icons. The old "banknote / money desk" screens under `/today` are going
 away. These rules stay:
