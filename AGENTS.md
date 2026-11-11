@@ -71,7 +71,13 @@ big plan this month. Everything else comes from history.
 4. **Requests inbox.** Staff and suppliers send requests in the app instead of WhatsApp. AI groups repeats
    ("3 requests about the mixer"), then code checks money and timing ("buy on 27 Nov, set aside $8 a day; rent and
    staff pay stay covered"). The owner taps Add and it goes into Want to do.
-5. **Already built:** Margin Guard and receipts, reminders with a real PayPal sandbox checkout, set-aside, move a
+5. **Bring lost payments back** (part of Steer). tmrw finds money the shop is owed but never received: unpaid
+   invoices (Tiers of Joy's $240 cake), abandoned checkouts and failed payments (card declined, PayPal attempt
+   dropped). It drafts a reminder with a fresh PayPal checkout link, only if the customer agreed to be contacted,
+   and never twice in 48 hours. If PayPal shows the order already paid, the reminder is blocked. When the customer
+   pays, the webhook confirms it and the month page updates with what actually arrived after PayPal's fee. Risky
+   orders (brand-new buyer with a big order, repeated failed attempts) are held and not counted as money coming in.
+6. **Already built:** Margin Guard and receipts, reminders with a real PayPal sandbox checkout, set-aside, move a
    payment, gap loan (simulated), risk holds.
 
 ### Demo story
