@@ -23,8 +23,9 @@ The code and package still say "NeverShort" in places; the product is now **tmrw
 2. **Check versions before writing code.** Read `package.json` and use the docs for the installed major version.
    Next.js, Tailwind, Prisma, the AI SDK and AG Grid have all shipped breaking major versions recently.
    Do not write their APIs from memory.
-3. **Never run git write commands** (`add`, `commit`, `push`, `merge`, `rebase`, `reset`). The project owner makes
-   every commit. Read-only commands (`status`, `log`, `diff`) are fine.
+3. **Anyone can commit.** Any team member, or their agent when its human asks, may `git add` and `git commit`. Run
+   `npm run check` first and commit only if it passes. Push only when your human asks: pushing to `main` deploys.
+   Never force-push, rebase or reset history that is already pushed.
 
 ---
 
@@ -364,7 +365,7 @@ OPENROUTER_API_KEY=             # only if we switch provider
   3. give exact steps to test it by hand: URL, what to click, what to expect, with amounts.
 - **Windows note:** run `npm run check` from `C:\Users\...` with a capital drive letter. Opened as `c:\...`,
   Vitest loads itself twice and every test file fails with "Cannot read properties of undefined (reading 'config')".
-- **Git:** the project owner commits and pushes. `main` must always pass `npm run check` (GitHub runs it on every
+- **Git:** anyone on the team can commit and push (section 1). `main` must always pass `npm run check` (GitHub runs it on every
   push and the host deploys from `main`). No `Co-authored-by` trailers or AI/tool attribution in commits or PRs.
 
 ### Commands
