@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ButtonLink } from "@/components/ui";
-import { UnifiedForecastChart } from "@/components/app/UnifiedForecastChart";
+import { ChartSlot } from "@/components/app/ChartSlot";
 import { CollapsibleSection } from "@/components/app/CollapsibleSection";
 import { DuesList, DuesTable } from "@/components/dashboard/DuesTable";
 import { OrdersList, OrdersTable } from "@/components/dashboard/OrdersTable";
@@ -63,7 +63,6 @@ export default async function DashboardPage() {
   const duesRows = dueRows(dues.filter((d) => d.dueOn <= lastDay));
   const gap = forecast.firstShortfall;
   const lowest = forecast.days.reduce((a, d) => (d.closingCents < a.closingCents ? d : a), forecast.days[0]!);
-  const startOn = gap?.date ?? forecast.days[0]?.date ?? forecast.asOf;
 
   const arrived = orders.reduce((s, o) => s + (o.netCents ?? 0), 0);
   const fees = orders.reduce((s, o) => s + (o.feeCents ?? 0), 0);
@@ -126,12 +125,8 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* ── ONE Readable Chart + Day Inspection ── */}
-      <UnifiedForecastChart
-        days={forecast.days}
-        minimumBalanceCents={forecast.minimumBalanceCents}
-        initialDate={startOn}
-      />
+      {/* ── ONE readable chart: AG Charts on a laptop (loaded only there), the light SVG version on a phone. Hover a day for its money in and out. ── */}
+      <ChartSlot forecast={forecast} />
 
       {/* ── Progressive Disclosure: Scheduled Payments Table ── */}
       <CollapsibleSection
