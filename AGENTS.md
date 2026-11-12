@@ -92,16 +92,16 @@ big plan this month. Everything else comes from history.
 | Customer who owes | Ivory & Vow, a wedding planner; owes $240 for a tiered cake, due 18 Nov |
 | Bills | Rent $1,500 on the 12th - card machine $49 (auto-debit) on the 13th - internet $60 (auto-debit) on the 3rd - oven loan $250 (auto-debit) on the 25th - staff pay $1,600 on the 28th |
 | Short day | Thu 12 Nov: rent + beans = $1,900 due; $1,780 free above the $200 minimum, so $120 short |
-| Fixes | Remind Ivory & Vow (fully covers it), set money aside, move the bean order, or a $120 loan at a 2% fee ($122.40 back on 13 Nov) |
-| November | Must pay $4,839; about $6,900 coming in; about $2,060 left for plans. Sales about $180 a day on weekdays, $320 on weekends |
+| Fixes | Remind Ivory & Vow (fully covers it), move the bean order to Sat 14 Nov, or a $120 loan at a 2% fee ($122.40 back on Sat 14 Nov) |
+| November | Must pay $4,839; about $6,939 coming in; about $2,100 left for plans. Sales about $180 a day on weekdays, $320 on weekends |
 
-Today in the demo is Thu 5 Nov 2026. The code's seed still uses the older "Loop Audio" headphone shop; it is being
-moved to this story. Names carry meaning (suppliers say what they sell); no real brands for suppliers or customers.
+Today in the demo is Thu 5 Nov 2026. The seed (`lib/demo/seed.ts`) tells this story; `DEMO.md` has every number.
+Names carry meaning (suppliers say what they sell); no real brands for suppliers or customers.
 
 ### Demo clock, per-visitor copies and reset
 
 - `DEMO_TODAY=2026-11-05` (Thu 5 Nov 2026) fixes "today" for the whole app.
-- **One copy per visitor.** Each visitor gets their own copy of Loop Audio. A cookie maps the browser to its own
+- **One copy per visitor.** Each visitor gets their own copy of Dunder Mifflin & Co. A cookie maps the browser to its own
   `storeId`, created from the seed on the first visit. Judges never see each other's actions.
 - **Reset.** It restores that visitor's copy exactly and starts a new **demo run id**, so the story replays
   identically every time. It never touches other visitors' copies.

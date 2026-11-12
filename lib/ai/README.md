@@ -14,7 +14,7 @@ slow, wrong or failing, so AI failure is never app failure.
 | `reminder.ts` | The reminder draft (structured output, zod-checked, one `{checkout_link}`, no amounts) and its template. |
 | `explain.ts` | One line under the headline on why the short day is short, and one under each found payment on what it was found from. Templates as fallback; remembered for an hour. |
 | `limit.ts` | Per-visitor limit: 8 AI answers in 10 minutes, 40 a day. Over it, answers come from code with a note. |
-| `run.ts` | The model calls, with an 8-second limit and one retry. AI texts are remembered for a day by the facts they were written from: every visitor's copy has the same facts at the same story step, so after the first visitor the rest cost no requests. A fallback is never remembered. |
+| `run.ts` | The model calls, with a 20-second limit and one retry. AI texts are remembered for a day by the facts they were written from: every visitor's copy has the same facts at the same story step, so after the first visitor the rest cost no requests. A fallback is never remembered. |
 
 Labels follow AGENTS.md: "Written for you from your forecast, and checked", never "AI-powered".
 

@@ -2,12 +2,13 @@
 
 Every number in the demo story, worked out by hand from the seed, so anyone can check what the app shows.
 Everything here is **simulated** (the seed in `lib/demo/seed.ts`). The real forecast (`lib/forecast`) produces exactly
-these numbers; `lib/forecast/demo-story.test.ts` checks every one.
+these numbers; `lib/forecast/demo-story.test.ts` checks them.
 
 - **Today:** Thu 5 Nov 2026 (`DEMO_TODAY=2026-11-05`). "Monday" in the story is Mon 9 Nov.
-- **Store:** Loop Audio, USD. Minimum balance **$100**. A day is **tight** below $150 (within $50 of the minimum).
-- **PayPal's fee:** 3.49% + $0.49 per capture, PayPal's published US rate. **Confirmed** by a real sandbox capture of
-  the $72 order on 3 Nov 2026: gross $72.00, fee $3.00, net $69.00.
+- **Shop:** Dunder Mifflin & Co., a small café-bakery that takes orders through PayPal. USD. Penny is the owner.
+- **Minimum balance:** **$200**. A day is **tight** below $300 (within $100 of the minimum), **short** below $200.
+- **PayPal's fee:** 3.49% + $0.49 per capture. **Confirmed** by a real sandbox capture of Ivory & Vow's $240 order
+  on 12 Nov 2026: gross $240.00, fee $8.87, net $231.13.
 
 The step-by-step judge script is on the demo guide page (`/demo`) and in section 9 below.
 
@@ -18,152 +19,157 @@ The step-by-step judge script is on the demo guide page (`/demo`) and in section
 | What | Numbers |
 |------|---------|
 | History | 90 days, Fri 7 Aug to Wed 4 Nov |
-| Opening balance | $3,133.50 on Fri 7 Aug |
-| Sales | 257 orders, $21,831.06 after PayPal's fee. Busier at weekends. |
-| Volta Audio Parts | every 10 days, last Mon 2 Nov: $304, $294, $312, $300, $291, $307, $300, $297, $305 ($2,710) |
-| Transfers to the owner's bank | every other Monday, last Mon 26 Oct: $2,530, $2,480, $2,500, $2,545, $2,500, $2,465 ($15,020) |
-| Bills (confirmed) | rent $1,200 on the 12th, store software $99 on the 13th, internet $60 on the 3rd, shipping supplies $240 on the 30th ($4,797 in the history) |
-| Loan (confirmed) | equipment loan $150 on the 25th ($450 in the history) |
-| Lowest balance in the history | $433.40 on Tue 13 Oct (the day after rent and a transfer) |
-| **Balance at the start of today** | **$1,987.56** = 3,133.50 + 21,831.06 − 2,710 − 15,020 − 4,797 − 450 |
+| Opening balance | $2,057.91 on Fri 7 Aug |
+| Sales | 759 orders, $19,881.17 after PayPal's fee. Busier at weekends. |
+| Bean There (coffee beans) | 9 payments, about $400 every 10 days, last Mon 2 Nov ($3,601 in all) |
+| Oat of Office (oat milk) | 3 payments, monthly on the 15th ($495 in all) |
+| Bills | rent $1,500 on the 12th, staff pay $1,600 on the 28th, internet $60 on the 3rd, card machine $49 on the 13th (3 months each: $9,627) |
+| Loan | oven loan $250 on the 25th ($750 in the history) |
+| Transfers to the owner's bank | 4 in the history ($7,200). None is due in the next 30 days. |
+| **Balance at the start of today** | **$266.08** = 2,057.91 + 19,881.17 − 9,627 − 4,096 − 7,200 − 750 |
 
 Open orders:
 
 | Order | Customer | Status | Total | Why it's there |
 |-------|----------|--------|-------|----------------|
-| #1258 | Maya Okafor | Abandoned on Tue 3 Nov | $72.00 | The Recovery agent's reminder (story steps 2 to 4). She allowed contact. |
-| #1259 | Hana Sato | Abandoned on Wed 4 Nov | $45.00 | She did not allow contact: Guard rule 2 blocks a reminder. |
-| #1260 | Jordan Reyes | Pending | $567.00 | Risky: a brand-new buyer, three Studio headphones. Not counted until PayPal captures it. |
-| #1261 | Sam Whitfield | Failed, 3 attempts | $119.00 | Risky: repeated failed attempts. |
+| #1760 | Ivory & Vow | Unpaid since Tue 3 Nov, due Wed 18 Nov | $240.00 | A tiered wedding cake. The reminder story (steps 2 to 4). They allowed contact. |
+| #1761 | Hana Sato | Abandoned on Wed 4 Nov | $24.00 | She did not allow contact: Guard rule 2 blocks a reminder. |
+| #1762 | Jordan Reyes | Pending | $432.00 | Risky: a brand-new buyer with a big order. Not counted until it's cleared. |
+| #1763 | Sam Whitfield | Failed, 3 attempts | $64.00 | Risky: repeated failed attempts. |
+| #1764 | Isla Moreno | Pending | $320.00 | Risky: an unusual amount for a regular customer. Not counted until it's cleared. |
+
+Goals (the month page's *Want to do*): a second oven, $1,200 ($320 saved), by Sat 21 Nov; a stall at the Winter
+Makers' Market, $300, Sun 6 Dec; Christmas cookie boxes, $450, Sat 12 Dec. Focus line: *"Second oven before
+Christmas"*.
 
 ## 2. Regular payments found from the history
 
 | Found | Status at the start |
 |-------|--------------------|
-| "We think Volta Audio Parts is paid about $300 every 10 days, next on Thu 12 Nov." | Found, not confirmed |
-| "We think you move about $2,500 to your bank every other Monday, next on Mon 9 Nov." | Found, not confirmed |
-| Rent $1,200 on the 12th; store software $99 on the 13th; equipment loan $150 on the 25th; shipping supplies $240 on the 30th; internet $60 on the 3rd | Confirmed |
+| "Bean There, about $400 every 10 days, next on Thu 12 Nov." | Found, not confirmed |
+| "Card machine, $49 on the 13th, next on Fri 13 Nov." (an auto-debit nobody wrote down) | Found, not confirmed |
+| Rent $1,500 on the 12th; Oat of Office $180 on the 15th; oven loan $250 on the 25th; staff pay $1,600 on the 28th; internet $60 on the 3rd | Confirmed |
 
-The typical amount is the median of the past payments: exactly $300.00 and $2,500.00. A found payment counts in the
-forecast straight away (ignoring it would hide the gap); confirming saves its next payments as dues at the same dates
-and amounts, so the numbers don't change. "Not regular" takes it out.
+A found payment counts in the forecast straight away (ignoring it would hide the gap); confirming saves its next
+payments at the same dates and amounts, so the numbers don't change. **November's must-pays come to $4,839.**
 
 ## 3. Expected sales
 
-Average net sales for each weekday over the last 8 weeks (Thu 10 Sep to Wed 4 Nov):
+Average net sales for each weekday over the last 8 weeks:
 
 | Sun | Mon | Tue | Wed | Thu | Fri | Sat |
 |-----|-----|-----|-----|-----|-----|-----|
-| $270.69 | $205.85 | $186.55 | $189.02 | $272.50 | $291.13 | $334.20 |
+| $292.87 | $206.18 | $188.92 | $184.16 | $173.60 | $178.25 | $316.34 |
 
-**Confidence: high.** A usual week lands within about 12% of the 8-week average.
+**Confidence: high.** A usual week lands within about 8% of the 8-week average.
 
-## 4. Story step 1: about $90 short on Thu 12 Nov
+## 4. Story step 1: $120 short on Thu 12 Nov
 
 By hand, from the start of today to the end of Thu 12 Nov:
 
 ```
-  Balance at the start of Thu 5 Nov                         1,987.56
+  Balance at the start of Thu 5 Nov                           266.08
 + Sales Thu 5 to Thu 12 (Thu, Fri, Sat, Sun, Mon, Tue, Wed, Thu)
-    272.50 + 291.13 + 334.20 + 270.69 + 205.85 + 186.55 + 189.02 + 272.50
-                                                          + 2,022.44
-− Transfer to your bank, Mon 9 Nov                        − 2,500.00
-− Rent, Thu 12 Nov                                        − 1,200.00
-− Volta Audio Parts, Thu 12 Nov                             − 300.00
-= Thu 12 Nov closes at                                         10.00
-  Minimum balance                                             100.00
-= Short by                                                     90.00
+    173.60 + 178.25 + 316.34 + 292.87 + 206.18 + 188.92 + 184.16 + 173.60
+                                                          + 1,713.92
+− Rent, Thu 12 Nov                                        − 1,500.00
+− Bean There, Thu 12 Nov                                    − 400.00
+= Thu 12 Nov closes at                                         80.00
+  Minimum balance                                             200.00
+= Short by                                                    120.00
 ```
 
-On the 12th, $1,410.00 is above the minimum ($1,237.50 opening + $272.50 sales − $100). Rent is paid first and is
-fully ready; Volta gets the remaining $210.00 of its $300.00. "Rent's covered. Volta's order is $90 short."
+On the 12th, $1,780.00 is above the minimum ($1,806.40 opening + $173.60 sales − $200). Rent is paid first and is
+fully ready; Bean There gets the remaining $280.00 of its $400.00: **"$1,780 of $1,900 ready."**
 
-The 14-day strip:
+The first 14 days:
 
 | Day | Starts | In | Out | Ends | State |
 |-----|-------:|---:|----:|-----:|-------|
-| Thu 5 Nov | 1,987.56 | 272.50 | | 2,260.06 | Covered |
-| Fri 6 Nov | 2,260.06 | 291.13 | | 2,551.19 | Covered |
-| Sat 7 Nov | 2,551.19 | 334.20 | | 2,885.39 | Covered |
-| Sun 8 Nov | 2,885.39 | 270.69 | | 3,156.08 | Covered |
-| Mon 9 Nov | 3,156.08 | 205.85 | 2,500.00 transfer | 861.93 | Covered |
-| Tue 10 Nov | 861.93 | 186.55 | | 1,048.48 | Covered |
-| Wed 11 Nov | 1,048.48 | 189.02 | | 1,237.50 | Covered |
-| **Thu 12 Nov** | 1,237.50 | 272.50 | 1,200.00 rent, 300.00 Volta | **10.00** | **$90 short** |
-| Fri 13 Nov | 10.00 | 291.13 | 99.00 software | 202.13 | Covered |
-| Sat 14 Nov | 202.13 | 334.20 | | 536.33 | Covered |
-| Sun 15 Nov | 536.33 | 270.69 | | 807.02 | Covered |
-| Mon 16 Nov | 807.02 | 205.85 | | 1,012.87 | Covered |
-| Tue 17 Nov | 1,012.87 | 186.55 | | 1,199.42 | Covered |
-| Wed 18 Nov | 1,199.42 | 189.02 | | 1,388.44 | Covered |
+| Thu 5 Nov | 266.08 | 173.60 | | 439.68 | Covered |
+| Fri 6 Nov | 439.68 | 178.25 | | 617.93 | Covered |
+| Sat 7 Nov | 617.93 | 316.34 | | 934.27 | Covered |
+| Sun 8 Nov | 934.27 | 292.87 | | 1,227.14 | Covered |
+| Mon 9 Nov | 1,227.14 | 206.18 | | 1,433.32 | Covered |
+| Tue 10 Nov | 1,433.32 | 188.92 | | 1,622.24 | Covered |
+| Wed 11 Nov | 1,622.24 | 184.16 | | 1,806.40 | Covered |
+| **Thu 12 Nov** | 1,806.40 | 173.60 | 1,500.00 rent, 400.00 Bean There | **80.00** | **$120 short** |
+| Fri 13 Nov | 80.00 | 178.25 | 49.00 card machine | 209.25 | Tight |
+| Sat 14 Nov | 209.25 | 316.34 | | 525.59 | Covered |
+| Sun 15 Nov | 525.59 | 292.87 | 180.00 Oat of Office | 638.46 | Covered |
+| Mon 16 Nov | 638.46 | 206.18 | | 844.64 | Covered |
+| Tue 17 Nov | 844.64 | 188.92 | | 1,033.56 | Covered |
+| Wed 18 Nov | 1,033.56 | 184.16 | | 1,217.72 | Covered |
 
-Headline: "Clear until Wednesday. On Thu 12 Nov you'll be $90 short: the supplier order and rent land the same day."
+Headline: "Clear until Wednesday. On Thu 12 Nov you'll be $120 short: the bean order and rent land the same day."
 
-## 5. Story step 3: the $72 order is paid
-
-```
-  Order #1258                                                 72.00
-− PayPal's fee (estimate): 3.49% of 72.00 = 2.51, + 0.49     − 3.00
-= Arrives in PayPal today                                     69.00
-
-  Thu 12 Nov closes at 10.00 + 69.00 =                        79.00
-  Short by 100.00 − 79.00 =                                   21.00
-```
-
-Headline: "Clear until Wednesday. On Thu 12 Nov you'll be $21 short: the supplier order and rent land the same day."
-
-## 6. Story step 5: set aside $11 a day
+## 5. Story step 3: Ivory & Vow pays the $240
 
 ```
-  To be covered, Thu 12 Nov must close at 150.00 or more: 150.00 − 79.00 = 71.00 more
-  Days from today to the day before: Thu 5 to Wed 11 Nov = 7 days
-  71.00 / 7 = 10.14 a day, so the smallest whole-dollar amount is 11.00 a day
-  11.00 × 7 = 77.00, kept back from Monday's transfer: 2,500.00 − 77.00 = 2,423.00
-  Thu 12 Nov closes at 79.00 + 77.00 =                        156.00   Covered
+  Order #1760                                                240.00
+− PayPal's fee: 3.49% of 240.00 = 8.38, + 0.49               − 8.87
+= Arrives in PayPal today                                    231.13
+
+  Thu 12 Nov closes at 80.00 + 231.13 =                      311.13   Covered
 ```
 
-- Within the 30% cap (Guard rule 7): the lowest expected day in the window is Tue 10 Nov, $186.55, so the cap is
-  $55.96 a day. $11 is well inside it.
-- The total, $77, is under $100.
-- Every one of the 14 days is now covered. Headline: "Clear for the next two weeks. Thu 12 Nov is covered too, when
-  rent and the supplier order go out."
+Every one of the 30 days is now covered. Headline: "Clear for the next 30 days. Thu 12 Nov is covered too, when rent
+and the bean order go out."
+
+## 6. Fix the gap: the other ways
+
+Worked out by `lib/forecast/fixes.ts` from the forecast, each one checked by running the forecast with it. Asked before
+anyone pays (straight after a reset):
+
+| Fix | Thu 12 Nov after | Guard |
+|---|---|---|
+| Move Bean There's $400 to Sat 14 Nov (simulated) | closes at $480: covered | Always needs your OK (rule 8) |
+| A $120 short-term loan, 2% fee, $122.40 back on Sat 14 Nov (simulated) | closes at $200: tight | Always needs your OK (rule 8) |
+
+There's no "set aside a little each day" fix in this story: it keeps money back from the owner's transfers to their
+bank, and none is due before Thu 12 Nov.
 
 ## 7. Story step 6: "Can I afford a $200 order on Monday?"
 
-Asked after steps 1 to 5, as in the story:
+Asked straight after a reset:
 
 ```
-  Mon 9 Nov closes at 1,007.93; with the order:     1,007.93 − 200.00 =  807.93
-  Thu 12 Nov closes at 156.00; with the order:        156.00 − 200.00 = −44.00
-  Short by 100.00 − (−44.00) =                                          144.00
+  Mon 9 Nov closes at 1,433.32; with the order:   1,433.32 − 200.00 = 1,233.32
+  Thu 12 Nov closes at 80.00; with the order:          80.00 − 200.00 = −120.00
+  Short by 200.00 − (−120.00) =                                         320.00
 ```
 
-**Answer: no.** Monday itself is fine ($807.93 after the order), but Thu 12 Nov would be $144 short.
+**Answer: no.** Monday itself is fine ($1,233.32 after the order), but Thu 12 Nov would be $320 short.
 
-Asked before any fix (straight after a reset): Monday closes at $661.93 after the order, and Thu 12 Nov would be
-$290 short (10.00 − 200.00 = −190.00, which is 290.00 below the minimum).
+Asked after Ivory & Vow has paid: Mon 9 Nov closes at $1,464.45 after the order, and Thu 12 Nov at
+311.13 − 200.00 = 111.13, so it would still be **$89 short** (exactly $88.87).
 
-## 8. Fix the gap: the three options
+## 8. The month page (November)
 
-Worked out by `lib/forecast/fixes.ts` from the forecast, each one checked by running the forecast with it.
-
-| | At step 1 ($90 short) | At step 5 ($21 short) | Guard |
-|---|---|---|---|
-| Set aside a little each day (from the owner's transfer on Mon 9 Nov) | $20 a day for 7 days, $140: Thu 12 Nov closes at $150, covered | $11 a day for 7 days, $77: closes at $156, covered | $140: needs your OK (over $100). $77: approved |
-| Move a payment to the first later day the forecast covers (simulated) | Volta's $300 to Fri 13 Nov: Thu 12 Nov closes at $310 | Volta's $300 to Fri 13 Nov: closes at $379 | Always needs your OK |
-| Short-term loan for the exact gap (simulated, 2% fee) | $90 today, $91.80 back on Fri 13 Nov: closes at $100, tight | $21 today, $21.42 back on Fri 13 Nov | Always needs your OK |
+| | |
+|---|---|
+| Must pay | $4,839 |
+| Coming in | about $6,939 |
+| Left for plans | about $2,100 |
+| Verdict | "The month adds up. The 12th doesn't." |
 
 ## 9. Judge script
 
-The judges' sandbox buyer login: _P2 adds it here and on `/demo` (task P2-1)._
+The judges' PayPal **sandbox buyer** login (a test account with play money; it's also on `/demo`):
+
+| Email | Password |
+|-------|----------|
+| `sb-awbkq53701713@personal.example.com` | `Rahul1234` |
 
 | Step | Where | Do | Expect |
 |------|-------|----|--------|
-| 1 | Today (`/today`) | Read the sentence on the green note. | "Clear until Wednesday. On Thu 12 Nov you'll be $90 short: the supplier order and rent land the same day." Thu 12 is the red $10 tile. |
-| 2 | Approvals | Open it. The reminder helper checks unfinished checkouts and the risk check checks pending orders; the Guard decides each. | Maya's $72 reminder: **Approved**, and it appears under Sent reminders (Simulated) with a payment link. Hana's: **Blocked** (she didn't agree to contact). Waiting for your OK: Sam's $119 reminder, and holds on Jordan's $567, Isla's $894 and Sam's $119 orders (the risky ones, not counted in the forecast until you decide). |
-| 3 | Sent reminders | Open the payment link and pay as the test buyer. | The order is paid. $72.00 minus PayPal's $3.00 fee: $69.00 arrives. Today's sentence says Thu 12 Nov is $21 short. |
-| 4 | Sent reminders | Press **Send a follow-up** on Maya's reminder. | **Blocked**: "PayPal shows order #1258 already paid". Only rule 1 fails on its receipt. |
-| 5 | Fix the gap (`/fix`) | Pick **Set aside $11 a day**. | **Approved**. Thu 12 Nov closes at $156 and turns green; the sentence says clear for two weeks. |
-| 6 | Ask | Press "Can I afford a $200 order on Monday?" | No: Mon 9 Nov ends at $808 (exactly $807.93), but Thu 12 Nov would be $144 short. The facts under it list both. |
+| 1 | Overview (`/today`) | Read the top card. | "Short by $120 on Thu 12 Nov": $1,780 free above the $200 minimum, but rent ($1,500) and the bean order ($400) come to $1,900. |
+| 2 | Decisions (`/approvals`) | Open it. The reminder helper checks unpaid and abandoned orders and the risk check checks pending ones; the Guard decides each. | Ivory & Vow's $240 reminder: **Needs your OK** (over $100). Sam Whitfield's $64 reminder: **Approved**, in Sent reminders (Simulated). Hana Sato's: **Blocked** (no consent). Holds on Jordan Reyes's $432 and Isla Moreno's $320 orders wait for your OK. |
+| 3 | Decisions | Press **Approve** on Ivory & Vow's reminder, then open **Sent reminders**. | The reminder, with a **Pay in PayPal Sandbox** link to a fresh sandbox order. |
+| 4 | PayPal sandbox | Open the link, log in as the sandbox buyer above, and press **Complete Purchase**. | The shop's paid page: you paid $240.00, PayPal's fee $8.87, $231.13 arrives. Overview: "Your cash is covered for the next 30 days." |
+| 5 | Decisions → Sent reminders | Press **Send a follow-up** on Ivory & Vow's reminder. | **Blocked**: "PayPal shows order #1760 already paid". |
+| 6 | Ask (`/ask`) | Press "Can I afford a $200 order on Monday?" | No. After the payment, Thu 12 Nov would be $89 short. (Straight after a reset: $320 short.) |
 
-Reset (on `/demo`) puts the copy back at step 1 with a new demo run id. Other visitors' copies are never touched.
+To try the other fixes, **Reset** on `/demo`, then open Fix the gap (`/fix`) before paying.
+
+Reset (on `/demo`) puts your copy back at step 1 with a new demo run id. Other visitors' copies are never touched.

@@ -23,7 +23,8 @@ Open **Testing Tools > Sandbox Accounts**:
 1. **Business account (the shop):** use the one linked to the app. Never publish its login.
 2. **Judges' buyer account:** **Create account** > **Personal (buyer)**, country United States, with a PayPal balance
    of at least $1,000. Note its email and password. This is the only login we publish.
-3. Send P1 the judges' buyer email and password, for `SANDBOX_BUYER` in `app/(owner)/demo/page.tsx` and `DEMO.md`.
+3. Put the judges' buyer email and password in `SANDBOX_BUYER` (`components/app/GuidedDemoWizard.tsx`), `DEMO.md`
+   and `README.md`. (Done: `sb-awbkq53701713@personal.example.com`.)
 
 ## 3. Set the environment on Render
 
@@ -60,13 +61,13 @@ stores each event id once (repeats are ignored), and finds the visitor's copy fr
 Use a private browser window so you get a fresh copy of the demo store.
 
 1. Open `<APP_URL>/demo` and press **Reset the demo**.
-2. Open **Approvals**. Maya Okafor's $72 reminder shows **Approved**, and under **Sent reminders** there's an
-   **Open the PayPal checkout** button.
-3. Press it. PayPal's sandbox checkout opens. Log in as the **judges' buyer** and pay.
-4. You land on Loop Audio's "Paid" page: you paid $72.00, PayPal's fee, and what arrives. Note the real fee: P1 puts
-   it in `DEMO.md` (it may differ from the $3.00 estimate).
-5. Open Today (`/today`). Thu 12 Nov should now be about $21 short (the exact number depends on the real fee).
-6. In Approvals, press **Send a follow-up** on Maya's reminder: **Blocked**, "PayPal shows order #1258 already paid".
+2. Open **Decisions** (`/approvals`). Ivory & Vow's $240 reminder shows **Needs your OK**. Press **Approve**, then
+   open **Sent reminders**: there's a **Pay in PayPal Sandbox** button.
+3. Press it. PayPal's sandbox checkout opens. Log in as the **judges' buyer** and press **Complete Purchase**.
+4. You land on Dunder Mifflin & Co.'s "Paid" page: you paid $240.00, PayPal's fee $8.87, $231.13 arrives.
+5. Open Overview (`/today`): "Your cash is covered for the next 30 days." Thu 12 Nov's lowest balance is $311.
+6. In Sent reminders, press **Send a follow-up** on Ivory & Vow's reminder: **Blocked**, "PayPal shows order #1760
+   already paid".
 7. Check the webhook arrived: developer.paypal.com > **Testing Tools > Webhooks events** (or Render's logs) shows a
    `PAYMENT.CAPTURE.COMPLETED` delivered with status 200.
 8. With a second private window, repeat steps 1 and 2: its copy is separate, and the payment above didn't touch it.

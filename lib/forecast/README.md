@@ -1,8 +1,8 @@
 # lib/forecast/
 
 
-**What goes here:** regular payment detection, the 14-day cash forecast, "can I afford" checks, what-ifs for the
-Guard, fix-the-gap options. Deterministic code only: no AI. All money in cents, "today" from `lib/shared/clock`.
+**What goes here:** regular payment detection, the 30-day cash forecast (`FORECAST_DAYS` in `engine.ts`), "can I
+afford" checks, what-ifs for the Guard, fix-the-gap options, and the month page. Deterministic code only: no AI. All money in cents, "today" from `lib/shared/clock`.
 
 ## Files
 
@@ -12,6 +12,10 @@ Guard, fix-the-gap options. Deterministic code only: no AI. All money in cents, 
 | `engine.ts` | Pure. Rows in, forecast out: balance, weekday averages, confidence, the day-by-day run, what-ifs. |
 | `load.ts` | Reads one store's rows (7 queries, once per request). No database: uses the demo seed in memory. |
 | `headline.ts` | The home screen's sentence (code templates). |
+| `fixes.ts` | Pure. Up to three ways to cover the first short day (set aside, move a payment, a short-term loan), each checked by re-running the forecast. |
+| `month.ts` | Pure. The month page: Must pay, Coming in, Want to do, the focus line, and the Today panel. |
+| `history.ts` | Recent payments and what each found pattern rests on. |
+| `yours.ts` | `/try`: the forecast and fixes on a visitor's own typed-in numbers. |
 | `index.ts` | The public API below. |
 
 Tests: `detect.test.ts`, `engine.test.ts` (fixed round numbers), `demo-story.test.ts` (the seed gives the exact
@@ -19,7 +23,7 @@ Tests: `detect.test.ts`, `engine.test.ts` (fixed round numbers), `demo-story.tes
 
 ## Public API (`@/lib/forecast`)
 
-- `getForecast(storeId)`: 14 days from today, first shortfall, confidence.
+- `getForecast(storeId)`: 30 days from today, first shortfall, confidence.
 - `getDues(storeId)`: every payment in the next 35 days, each with `readyCents`.
 - `getRecurringPayees(storeId)`: regular payees found from history (`DETECTED`) and confirmed ones.
 - `confirmRecurringPayee(storeId, payeeId)`: saves the payee's next payments (35 days) as dues.
@@ -28,7 +32,11 @@ Tests: `detect.test.ts`, `engine.test.ts` (fixed round numbers), `demo-story.tes
   that isn't there, so the Guard fails closed.
 - `canAfford(storeId, amountCents, date)`: affordable when no day from `date` on ends below the minimum. Throws
   `RangeError` for a past date, more than 35 days out, or an amount of $0 or less.
-- `getFixOptions(storeId)`: **still the stub** (`mocks/fixes.ts`).
+- `getFixOptions(storeId)`: up to three fixes for the first short day (`fixes.ts`); `proposeFix(storeId, fixId)` turns
+  one into a Guard proposal.
+- `getMonthPlan(storeId)`, `previewDemoMonth()`: the month page.
+- `previewDemoStore(scenario)`: the demo store in memory (forecast, dues, found payees, fixes, what-ifs), for tests
+  and the landing page.
 - `previewDemoForecast(scenario)`: the demo store's real forecast in memory, for tests.
 - `buildHeadline(forecast)`.
 
