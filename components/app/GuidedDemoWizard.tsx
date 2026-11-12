@@ -15,55 +15,57 @@ export interface GuidedStep {
   technicalNote?: string;
 }
 
-const SANDBOX_BUYER: { email: string; password: string } | null = null;
+/** The judges' PayPal sandbox BUYER account: a test account with play money, the only login we publish (AGENTS.md section 6). */
+const SANDBOX_BUYER: { email: string; password: string } | null = { email: "sb-awbkq53701713@personal.example.com", password: "Rahul1234" };
 
+/** What happens under the hood at each step, with the demo story's numbers (DEMO.md; checked by lib/forecast/demo-story.test.ts). */
 const TECHNICAL_DETAILS: Record<number, { title: string; points: string[] }> = {
   0: {
-    title: "30-Day Trajectory & First Shortfall Detection",
+    title: "30-day forecast and the first short day",
     points: [
-      "Calculated deterministically using weekday-weighted moving averages of net sales minus known obligations.",
-      "Identifies Thu 12 Nov shortfall: Volta Audio Parts ($300) and Studio Rent ($600) collide on the same day.",
-      "Pure TypeScript rules in lib/forecast/engine.ts. AI is never permitted to calculate money.",
+      "Money in: the average net sales for each weekday over the last 8 weeks. Money out: bills and the regular payments found in the history.",
+      "Finds Thu 12 Nov: rent ($1,500) and the bean order ($400) land together. $1,900 is due, $1,780 is free above the $200 minimum: $120 short.",
+      "Pure TypeScript in lib/forecast. AI never calculates money.",
     ],
   },
   1: {
-    title: "Recovery Agent & Margin Guard Evaluation",
+    title: "Reminder helper and the Margin Guard",
     points: [
-      "Recovery agent identifies abandoned cart checkout (Order #1042, $72.00) with customer contact consent.",
-      "Passes to Margin Guard: checks Rule 1 (Already paid? No), Rule 2 (Consent? Yes), Rule 3 (Frequency? 0 in 48h).",
-      "Decision: APPROVE. Generates an immutable thermal receipt and creates a simulated outbox draft.",
+      "The reminder helper finds Ivory & Vow's unpaid $240 order (#1760). They agreed to be contacted.",
+      "Rules 1 to 3 pass (not paid, consent, no reminder in 48 hours). Rule 8 fails: $240 is over the $100 the Guard approves on its own.",
+      "Decision: Needs your OK. After Approve, the blocking rules run again, then the executor creates a fresh PayPal sandbox order and puts the reminder in the simulated outbox.",
     ],
   },
   2: {
-    title: "PayPal Sandbox Orders v2 & Webhook Reconciliation",
+    title: "PayPal sandbox Orders v2 and webhooks",
     points: [
-      "Generates a fresh PayPal Sandbox Orders v2 checkout link on demand.",
-      "Buyer captures payment via PayPal Sandbox; webhook verifies transmission signature.",
-      "App records gross ($72.00), fee ($2.39), and actual net ($69.61) to immediately improve cash balance.",
+      "The reminder carries a fresh PayPal sandbox checkout link, made when the reminder was approved.",
+      "The buyer pays. The shop captures on the buyer's return and the signed webhook confirms it; whichever arrives second changes nothing.",
+      "Records gross $240.00, PayPal's fee $8.87 and net $231.13. Only the net reaches the forecast: Thu 12 Nov now closes at $311, covered.",
     ],
   },
   3: {
-    title: "Deterministic Safety Enforcement (Rule 1: Already Paid)",
+    title: "Rule 1: already paid",
     points: [
-      "Agent attempts to submit a follow-up reminder for the same target order.",
-      "Margin Guard checks PayPal order capture state in real-time.",
-      "Decision: BLOCK. Rule 1 triggers. BLOCKED stamp rendered on thermal receipt. Customer is protected.",
+      "A follow-up reminder for the same order is proposed.",
+      "The Margin Guard asks PayPal for the order's status: captured.",
+      "Decision: Blocked. The receipt is stamped BLOCKED and the customer isn't bothered again.",
     ],
   },
   4: {
-    title: "Cashflow Gap Resolution (Set-Aside Allocation)",
+    title: "Other ways to fix the short day",
     points: [
-      "Owner selects 'Set aside a little each day' from upcoming sales before Thu 12 Nov.",
-      "Evaluated against Rule 7 (Set-aside cap <= 30% of daily sales) and Rule 6 (Minimum balance preservation).",
-      "Decision: APPROVE. Thu 12 Nov balance shifts from short to covered. Strip tile stamps COVERED.",
+      "Move Bean There's $400 to Sat 14 Nov: Thu 12 Nov closes at $480, covered.",
+      "Or a $120 short-term loan, $122.40 back on Sat 14 Nov: Thu 12 Nov closes at $200, tight.",
+      "Rule 8: moves and loans always need your OK. Rule 6 checks no day drops below the minimum. Both are simulated.",
     ],
   },
   5: {
-    title: "Tool-Calling AI Co-pilot (Read-Only Financial Queries)",
+    title: "Ask: read-only tools, calculated answers",
     points: [
-      "User queries 'Can I afford a $200 order on Monday?' in natural language.",
-      "AI SDK invokes canAfford() deterministic tool with simulated $200 expenditure on Mon 9 Nov.",
-      "Returns exact closing balance and impact on subsequent buffer without hallucinating numbers.",
+      "The question goes to the AI SDK with four read-only tools; it answers through canAfford(200, Mon 9 Nov).",
+      "Before Ivory & Vow pays: no. Mon 9 Nov ends at $1,233, but Thu 12 Nov would be $320 short.",
+      "After they pay: still no, $89 short on Thu 12 Nov. Every number comes from the tool, never from the model.",
     ],
   },
 };

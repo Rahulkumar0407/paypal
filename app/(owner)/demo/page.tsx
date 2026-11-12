@@ -51,7 +51,7 @@ async function loadStory(storeId: string): Promise<StoryData> {
 function buildSteps({ forecast, candidate, afford, monday }: StoryData): GuidedStep[] {
   const gap = forecast?.firstShortfall ?? null;
   const gapDay = gap ? formatDay(gap.date) : "Thu 12 Nov";
-  const amount = candidate ? formatDollars(candidate.amountCents) : "$72";
+  const amount = candidate ? formatDollars(candidate.amountCents) : "$240";
   const net = candidate
     ? formatDollars(candidate.amountCents - paypalFeeCents(candidate.amountCents))
     : null;
@@ -69,8 +69,11 @@ function buildSteps({ forecast, candidate, afford, monday }: StoryData): GuidedS
     },
     {
       title: "Send a payment recovery reminder",
-      todo: `Open Decisions. The Recovery Co-pilot finds ${who} unfinished ${amount} checkout and drafts a personalized reminder.`,
-      see: "Margin Guard evaluates consent and frequency: APPROVE. A simulated outbox entry is created with a live PayPal checkout link.",
+      todo: `Open Decisions. The reminder helper finds ${who} unpaid ${amount} order and drafts a reminder. Press Approve.`,
+      see:
+        candidate && candidate.amountCents > 10_000
+          ? `Margin Guard: Needs your OK (rule 8, over $100). After you approve, it re-checks, and Sent reminders shows the message with a fresh PayPal sandbox checkout link.`
+          : "Margin Guard checks consent and how often the customer was contacted: Approved. Sent reminders shows the message with a fresh PayPal sandbox checkout link.",
       uses: ["simulated", "sandbox"],
       link: { label: "Open Decisions", href: "/approvals" },
     },
@@ -92,9 +95,9 @@ function buildSteps({ forecast, candidate, afford, monday }: StoryData): GuidedS
       link: { label: "Open Decisions Inbox", href: "/approvals#outbox-title" },
     },
     {
-      title: "Fix the remaining gap with daily set-aside",
-      todo: `Open Recommended Fixes for ${gapDay} and choose 'Set aside a little each day'.`,
-      see: `Margin Guard confirms daily set-aside cap <= 30%: APPROVE. ${gapDay} turns green (Covered) across the dashboard.`,
+      title: "Or fix the short day another way",
+      todo: `Open Fix the gap (after Reset, before anyone pays) and compare the ways to cover ${gapDay}.`,
+      see: `Move the bean order to a later day, or take a small short-term loan. Both are simulated, and the Margin Guard says Needs your OK (rule 8). Once the customer has paid, ${gapDay} is already covered and there's nothing left to fix.`,
       uses: ["simulated"],
       link: { label: "Compare Fix Options", href: "/fix" },
     },
