@@ -204,6 +204,10 @@ export function previewDemoStore(scenario: DemoScenario = {}) {
     evidence: patternEvidenceFromRows(rows, day),
     recentPayments: recentPaymentsFromRows(rows, day),
     canAfford: (amountCents: Cents, date: IsoDate) => affordability(input, amountCents, date),
+    /** Up to three ways to cover the first short day, as the app offers them. */
+    fixes: fixOptionsFrom(input),
+    /** The forecast as it would be if this action ran (the Guard's rule 6 uses it). */
+    simulate: (proposal: ActionProposal) => forecastFrom(withAdjustments(input, adjustmentsFor(proposal, day))),
   };
 }
 
