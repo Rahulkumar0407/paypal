@@ -1,11 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import type { Cents, DayState, Decision } from "@/types";
 import type { LandingFix } from "@/lib/landing";
 import { formatDollars, formatShortfall } from "@/lib/shared/money";
 import { MiniTicket } from "../MiniTicket";
-import { Owner, type OwnerMood } from "../Owner";
 
 export interface PickerDay {
   date: string;
@@ -36,9 +36,10 @@ export function DayWord({ state, shortByCents }: { state: DayState; shortByCents
 }
 
 /**
- * "Can you save Thursday?" on the green felt: pick one of the ways tmrw offers to cover the short day. Every choice was
- * worked out on the server by the real 30-day forecast and judged by the real Margin Guard (lib/landing). The tickets it
- * changes flip over, the money drops into Thursday's ticket, and Penny reacts: worried, relieved, or grinning.
+ * "Can you save Thursday?": pick one of the ways tmrw offers to cover the short day. Every choice was worked out on the
+ * server by the real 30-day forecast and judged by the real Margin Guard (lib/landing). The tickets it changes flip
+ * over, the money drops into Thursday's ticket, and the shopkeeper reacts: v2's worried scene while the day is short,
+ * the relaxed one (with a COVERED stamp) once it's saved.
  */
 export function FixPicker({
   days,
@@ -98,106 +99,102 @@ export function FixPicker({
   };
   const short = days[shortIndex]!;
   const sState = run.states[shortIndex]!;
-
-  const mood: OwnerMood = sState === "short" ? "worried" : sState === "tight" ? "calm" : "happy";
+  const saved = sState !== "short";
   const says =
     sState === "short"
       ? `${short.label} is ${formatShortfall(run.shortBy[shortIndex]!)} short. Help?`
       : sState === "tight"
         ? `Covered, just. Everyone still gets paid on ${short.label}.`
         : `${shortWeekday}'s covered. I can pay everyone.`;
-  const saved = changed > 0 && sState !== "short";
 
   return (
-    <div ref={box} className="h-felt px-5 pt-8 pb-7 sm:px-8 lg:px-12 lg:pt-12 lg:pb-11">
-      <p className="h-eyebrow">Your turn</p>
-      <h3 className="h-display mt-3 text-[2.3rem] text-white lg:text-[3.4rem]">Can you save {shortWeekday}?</h3>
-      <p className="mt-3 max-w-[56ch] text-[17px] leading-7 text-white/85">
-        {short.label} is {formatShortfall(base.shortBy[shortIndex]!)} short. Pick a fix and watch the next two weeks. Each one runs through the
-        real forecast and the 9 safety rules, and Penny reacts.
-      </p>
-
-      <div className="mt-8 grid gap-x-12 gap-y-6 lg:grid-cols-[minmax(0,0.62fr)_minmax(0,1.38fr)]">
-        {/* Penny: beside her words on a phone, behind her counter on a laptop. */}
-        <div className="h-penny grid grid-cols-[44%_minmax(0,1fr)] items-end gap-3 lg:order-none lg:block lg:self-end">
-          <p key={mood + says} className="bubble bubble-in order-2 lg:mb-4" aria-live="polite">
+    <div ref={box} className="grid items-start gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-12">
+      {/* The shopkeeper: worried while the day is short, relaxed once it's saved. */}
+      <div className="lg:sticky lg:top-24">
+        <div className="h-art relative">
+          <Image src="/landing/scene_bills_custom.jpg" alt="" width={1376} height={768} unoptimized className="h-mood h-auto w-full" data-hidden={saved ? "" : undefined} />
+          <Image
+            src="/landing/scene_relaxed_custom.jpg"
+            alt=""
+            width={1376}
+            height={768}
+            unoptimized
+            className="h-mood absolute inset-0 h-full w-full object-cover"
+            data-hidden={saved ? undefined : ""}
+          />
+          <p key={says} className="h-say" aria-live="polite">
             {says}
           </p>
-          <div className="order-1">
-            <div className="scene-window">
-              <Owner mood={mood} className="relative z-[1] mx-auto w-[92%]" />
-            </div>
-            <div aria-hidden className="counter counter-dark" />
-          </div>
+          {saved && changed > 0 ? (
+            <span key={`stamp-${changed}`} aria-hidden className="h-covered-stamp animate-stamp-slam">
+              {sState === "tight" ? `${shortWeekday} tight` : `${shortWeekday} covered`}
+            </span>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="min-w-0">
+        <div role="group" aria-label={`Ways to save ${shortWeekday}`} className="h-seg">
+          <button type="button" aria-pressed={choice === null} onClick={() => pick(null)}>
+            Do nothing
+          </button>
+          {fixes.map((f) => (
+            <button key={f.id} type="button" aria-pressed={choice === f.id} onClick={() => pick(f.id)}>
+              {f.label}
+            </button>
+          ))}
         </div>
 
-        <div className="min-w-0">
-          <div role="group" aria-label={`Ways to save ${shortWeekday}`} className="h-seg h-seg-dark">
-            <button type="button" aria-pressed={choice === null} onClick={() => pick(null)}>
-              Do nothing
-            </button>
-            {fixes.map((f) => (
-              <button key={f.id} type="button" aria-pressed={choice === f.id} onClick={() => pick(f.id)}>
-                {f.label}
-              </button>
-            ))}
-          </div>
+        <ol aria-label="Each day's balance at the end of the day" className="till-board mt-5 grid grid-cols-4 gap-x-2 gap-y-3 sm:grid-cols-7 lg:gap-x-2">
+          {days.map((d, i) => {
+            const state = run.states[i]!;
+            const moved = changed > 0 && from.closings[i] !== run.closings[i];
+            const isShortDay = i === shortIndex;
+            return (
+              <li key={moved ? `${d.date}-${changed}` : d.date} className={`relative min-w-0 ${moved ? "fix-flip" : ""} ${i > shortIndex ? "hidden sm:block" : ""}`}>
+                <MiniTicket
+                  label={i === 0 ? "Today" : `${d.weekday} ${d.day}`}
+                  strong={i === 0}
+                  closingCents={run.closings[i]!}
+                  state={state}
+                  shortByCents={run.shortBy[i]!}
+                  stamp={isShortDay ? (state === "short" ? "short" : state === "tight" ? "tight" : "covered") : null}
+                  narrow
+                />
+                {/* Thursday saved: the money drops into its ticket. */}
+                {isShortDay && saved && changed > 0
+                  ? [0, 1, 2].map((n) => <span key={`${changed}-${n}`} aria-hidden className="note-drop" style={{ animationDelay: `${n * 130}ms`, left: `${18 + n * 16}%` }} />)
+                  : null}
+              </li>
+            );
+          })}
+        </ol>
 
-          <ol aria-label="Each day's balance at the end of the day" className="till-board mt-5 grid grid-cols-4 gap-x-2 gap-y-3 sm:grid-cols-7 lg:gap-x-2.5">
-            {days.map((d, i) => {
-              const state = run.states[i]!;
-              const moved = changed > 0 && from.closings[i] !== run.closings[i];
-              const isShortDay = i === shortIndex;
-              return (
-                <li key={moved ? `${d.date}-${changed}` : d.date} className={`relative min-w-0 ${moved ? "fix-flip" : ""} ${i > shortIndex ? "hidden sm:block" : ""}`}>
-                  <MiniTicket
-                    label={i === 0 ? "Today" : `${d.weekday} ${d.day}`}
-                    strong={i === 0}
-                    closingCents={run.closings[i]!}
-                    state={state}
-                    shortByCents={run.shortBy[i]!}
-                    stamp={isShortDay ? (state === "short" ? "short" : state === "tight" ? "tight" : "covered") : null}
-                    narrow
-                  />
-                  {/* Thursday saved: the money drops into its ticket. */}
-                  {isShortDay && saved
-                    ? [0, 1, 2].map((n) => <span key={`${changed}-${n}`} aria-hidden className="note-drop" style={{ animationDelay: `${n * 130}ms`, left: `${18 + n * 16}%` }} />)
-                    : null}
-                </li>
-              );
-            })}
-          </ol>
-
-          <div className="mt-5 min-h-[150px]" aria-live="polite">
-            {fix ? (
-              <div key={fix.id} className="h-slip-in grid gap-4 rounded-[18px] bg-white p-4 text-[var(--h-ink)] sm:grid-cols-[auto_minmax(0,1fr)] sm:items-start sm:p-5">
-                <span aria-hidden className={`h-ref h-ref-${fix.decision} mt-1 ml-1 hidden sm:block`} />
-                <div>
-                  <p className="flex flex-wrap items-center gap-2 text-[16px] font-semibold">
-                    <span aria-hidden className={`h-ref h-ref-${fix.decision} inline-block !h-[24px] !w-[17px] sm:hidden`} />
-                    Safety check: {DECISION_WORD[fix.decision]}
-                    {fix.ruleNumber ? <span className="h-tag">Rule {fix.ruleNumber}</span> : null}
-                    {fix.simulated ? <span className="h-tag h-tag-sim">Simulated</span> : null}
-                  </p>
-                  <p className="mt-1 text-[15px] leading-6 text-[var(--h-strong)]">{fix.reason}</p>
-                  <p className="mt-3 text-[15px] leading-6">
-                    <strong className="font-semibold">{fix.title}.</strong> {fix.detail}
-                  </p>
-                  <p className="mt-3 text-[15px] font-semibold">
-                    <span className="h-stamp inline-block">
-                      {short.label}: <DayWord state={sState} shortByCents={run.shortBy[shortIndex]!} />, {formatDollars(run.closings[shortIndex]!)} at the end
-                      of the day.
-                    </span>
-                  </p>
-                </div>
+        <div className="mt-5 min-h-[150px]" aria-live="polite">
+          {fix ? (
+            <div key={fix.id} className="h-slip-in h-card grid gap-4 p-4 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-start sm:p-5">
+              <span aria-hidden className={`h-ref h-ref-${fix.decision} mt-1 ml-1 hidden sm:block`} />
+              <div>
+                <p className="flex flex-wrap items-center gap-2 text-[16px] font-bold">
+                  <span aria-hidden className={`h-ref h-ref-${fix.decision} inline-block !h-[24px] !w-[17px] sm:hidden`} />
+                  Safety check: {DECISION_WORD[fix.decision]}
+                  {fix.ruleNumber ? <span className="h-tag">Rule {fix.ruleNumber}</span> : null}
+                  {fix.simulated ? <span className="h-tag">Simulated</span> : null}
+                </p>
+                <p className="mt-1 text-[15px] leading-6 text-[var(--h-strong)]">{fix.reason}</p>
+                <p className="mt-3 text-[15px] leading-6 font-semibold">{fix.title}.</p>
+                <p className="mt-3 text-[15px] font-bold">
+                  <span className="h-stamp inline-block">
+                    {short.label}: <DayWord state={sState} shortByCents={run.shortBy[shortIndex]!} />, {formatDollars(run.closings[shortIndex]!)} at the end of the day.
+                  </span>
+                </p>
               </div>
-            ) : (
-              <p className="pt-1 text-[15px] leading-6 text-white/75">
-                As it is, {short.label} ends at {formatDollars(base.closings[shortIndex]!)}, under the{" "}
-                {formatDollars(base.closings[shortIndex]! + base.shortBy[shortIndex]!)} safety cushion. Nothing moves until Penny taps.
-              </p>
-            )}
-          </div>
+            </div>
+          ) : (
+            <p className="pt-1 text-[15.5px] leading-6 text-[var(--h-muted)]">
+              Pick a fix above. Nothing moves until Penny taps.
+            </p>
+          )}
         </div>
       </div>
     </div>

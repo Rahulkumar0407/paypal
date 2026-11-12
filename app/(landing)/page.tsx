@@ -11,8 +11,9 @@ export const metadata: Metadata = {
 
 /**
  * The landing page: one long page in tabs (Problem, What it does, Features, Tech, Next up, GitHub, Try it now), with a
- * spotlight on the section you're reading. Every number comes from the real forecast engine and every decision from the
- * real Guard rules (lib/landing), on the SIMULATED Dunder Mifflin & Co. sample shop. No database. The app is at /app.
+ * spotlight on the section you're reading, in the illustrated look of the v2 page. Every number comes from the real
+ * forecast engine and every decision from the real Guard rules (lib/landing), on the SIMULATED Dunder Mifflin & Co.
+ * sample shop. No database.
  */
 export default function LandingPage() {
   const story = buildLandingStory();

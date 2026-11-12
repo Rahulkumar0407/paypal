@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 export const TABS = [
@@ -20,9 +21,9 @@ const READING_LINE = 0.4;
 const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /**
- * The landing page's tabs: one dark pill, like the dock in the app. As you scroll, a white spotlight slides to the
- * section you're reading, a thin line shows how far down the page you are, and the page dims every other section
- * (`data-spot` on .home, `data-on` on the lit section). Clicking a tab glides to its section.
+ * The landing page's header: the wordmark, the seven tabs and the demo button. As you scroll, a navy spotlight slides
+ * to the tab of the section you're reading, a thin blue line shows how far down the page you are, and the page dims
+ * every other section (`data-spot` on .home, `data-on` on the lit section). Clicking a tab glides to its section.
  */
 export function HomeTabs() {
   const [active, setActive] = useState<TabId | null>(null);
@@ -31,7 +32,6 @@ export function HomeTabs() {
   const spot = useRef<HTMLSpanElement>(null);
   const tabs = useRef<Partial<Record<TabId, HTMLAnchorElement | null>>>({});
 
-  // Which section is being read, and how far through it.
   useEffect(() => {
     const home = document.querySelector(".home");
     home?.setAttribute("data-spot", "");
@@ -47,10 +47,9 @@ export function HomeTabs() {
       const room = document.documentElement.scrollHeight - window.innerHeight;
       // The last section is short of the reading line at the very bottom of the page: light it anyway.
       if (window.scrollY >= room - 4) current = TABS.at(-1)!.id;
-      const through = room > 0 ? Math.min(1, Math.max(0, window.scrollY / room)) : 0;
       for (const t of TABS) document.getElementById(t.id)?.toggleAttribute("data-on", t.id === current);
       setActive(current);
-      setProgress(through);
+      setProgress(room > 0 ? Math.min(1, Math.max(0, window.scrollY / room)) : 0);
     };
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update);
@@ -67,7 +66,7 @@ export function HomeTabs() {
     };
   }, []);
 
-  // The spotlight slides under the active tab; on a phone the bar scrolls so the active tab stays in view.
+  // The spotlight slides under the active tab; when the tabs scroll sideways, the active one stays in view.
   useLayoutEffect(() => {
     const place = () => {
       const el = active ? tabs.current[active] : null;
@@ -82,8 +81,7 @@ export function HomeTabs() {
       s.style.width = `${el.offsetWidth}px`;
       s.setAttribute("data-on", "");
       s.toggleAttribute("data-cta", active === "try");
-      const left = el.offsetLeft - (t.clientWidth - el.offsetWidth) / 2;
-      if (t.scrollWidth > t.clientWidth) t.scrollTo({ left, behavior: reducedMotion() ? "auto" : "smooth" });
+      if (t.scrollWidth > t.clientWidth) t.scrollTo({ left: el.offsetLeft - (t.clientWidth - el.offsetWidth) / 2, behavior: reducedMotion() ? "auto" : "smooth" });
     };
     place();
     const ro = new ResizeObserver(place);
@@ -100,31 +98,38 @@ export function HomeTabs() {
   };
 
   return (
-    <nav aria-label="On this page" className="h-tabs">
-      <a href="#top" onClick={go("top")} className="h-tabs-home h-wordmark" aria-label="tmrw, back to the top">
-        <span>tm</span>
-        <span>rw</span>
-      </a>
-      <div ref={track} className="h-tabs-track">
-        <span ref={spot} aria-hidden className="h-tabs-spot" />
-        {TABS.map((t) => (
-          <a
-            key={t.id}
-            ref={(el) => {
-              tabs.current[t.id] = el;
-            }}
-            href={`#${t.id}`}
-            onClick={go(t.id)}
-            aria-current={active === t.id ? "true" : undefined}
-            className={`h-tab inline-flex items-center ${"cta" in t ? "h-tab-cta" : ""}`}
-          >
-            {t.label}
-          </a>
-        ))}
+    <header className="h-header">
+      <div className="mx-auto grid max-w-[1280px] grid-cols-[auto_1fr_auto] items-center gap-x-4 gap-y-2 px-4 py-2.5 sm:px-6 lg:grid-cols-[auto_minmax(0,1fr)_auto]">
+        <a href="#top" onClick={go("top")} className="h-wordmark col-start-1 row-start-1 text-[28px]" aria-label="tmrw, back to the top">
+          <span className="tm">tm</span>
+          <span className="rw">rw</span>
+        </a>
+        <nav aria-label="On this page" className="col-span-3 col-start-1 row-start-2 min-w-0 lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:justify-self-center">
+          <div ref={track} className="h-tabs-track">
+            <span ref={spot} aria-hidden className="h-tabs-spot" />
+            {TABS.map((t) => (
+              <a
+                key={t.id}
+                ref={(el) => {
+                  tabs.current[t.id] = el;
+                }}
+                href={`#${t.id}`}
+                onClick={go(t.id)}
+                aria-current={active === t.id ? "true" : undefined}
+                className="h-tab"
+              >
+                {t.label}
+              </a>
+            ))}
+          </div>
+        </nav>
+        <Link href="/demo" className="h-btn h-btn-primary h-btn-sm col-start-3 row-start-1 justify-self-end">
+          Try the demo
+        </Link>
       </div>
       <span aria-hidden className="h-tabs-progress">
         <span style={{ transform: `scaleX(${progress})` }} />
       </span>
-    </nav>
+    </header>
   );
 }

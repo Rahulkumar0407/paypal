@@ -240,14 +240,14 @@ function reminderReceipts(today: IsoDate, orders: ReturnType<typeof storyOrders>
     cases.push({
       proposal: reminder(today, owed, 1),
       ctx: { ...NO_ORDER, order: orderFacts(owed), paypal: { kind: "NO_PAYPAL_ORDER" }, remindersLast48h: 0, forecast: { kind: "NOT_NEEDED" } },
-      caption: () => `A ${formatDollars(owed.totalCents)} reminder to ${owed.customerName}. They agreed to be contacted, but it's over $100, so Penny taps OK first.`,
+      caption: () => `${owed.customerName} said yes to reminders, but ${formatDollars(owed.totalCents)} is over $100. Penny taps OK first.`,
     });
   }
   if (noContact) {
     cases.push({
       proposal: reminder(today, noContact, 1),
       ctx: { ...NO_ORDER, order: orderFacts(noContact), paypal: { kind: "NO_PAYPAL_ORDER" }, remindersLast48h: 0, forecast: { kind: "NOT_NEEDED" } },
-      caption: () => `${noContact.customerName} left ${formatDollars(noContact.totalCents)} unpaid but never said tmrw could get in touch. No reminder.`,
+      caption: () => `${noContact.customerName} never agreed to be contacted. No reminder.`,
     });
   }
   if (owed) {
@@ -261,7 +261,7 @@ function reminderReceipts(today: IsoDate, orders: ReturnType<typeof storyOrders>
         remindersLast48h: 1,
         forecast: { kind: "NOT_NEEDED" },
       },
-      caption: () => `A second reminder after ${owed.customerName} already paid. PayPal says it's captured, so it never goes.`,
+      caption: () => `${owed.customerName} already paid. A second reminder never goes.`,
     });
   }
   return cases.map(({ proposal, ctx, caption }, i) => {

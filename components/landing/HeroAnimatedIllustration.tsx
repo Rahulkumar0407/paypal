@@ -20,6 +20,10 @@ interface HeroAnimatedIllustrationProps {
   onSelectShortDay?: () => void;
   className?: string;
   priority?: boolean;
+  /** Where the short-day callout jumps to. */
+  href?: string;
+  /** The calendar patch, red circle and glow. They were placed for an earlier version of the artwork; off hides them. */
+  calendarEffects?: boolean;
 }
 
 function subscribeReducedMotion(callback: () => void) {
@@ -46,7 +50,7 @@ function getReducedMotionServerSnapshot() {
  * 100% anatomical, stylistic, and textural fidelity.
  * 
  * Animation Timeline:
- * - 0.0s – 0.7s: Scene establishment (calm morning at Loop Audio, stillness).
+ * - 0.0s – 0.7s: Scene establishment (a calm morning at the shop, stillness).
  * - 0.7s – 1.5s: Natural human moment (subtle respiratory rhythm, seated rest).
  * - 1.5s – 2.0s: Character acting (handcrafted natural 240ms human eye blink).
  * - 2.0s – 3.1s: The future is revealed (focal emphasis on desk calendar,
@@ -59,6 +63,8 @@ export function HeroAnimatedIllustration({
   onSelectShortDay,
   className = "",
   priority = true,
+  href = "#the-problem",
+  calendarEffects = true,
 }: HeroAnimatedIllustrationProps) {
   const prefersReduced = useSyncExternalStore(
     subscribeReducedMotion,
@@ -70,7 +76,7 @@ export function HeroAnimatedIllustration({
     <div
       className={`hero-cinematic-stage relative w-full aspect-[1376/768] overflow-hidden select-none ${className}`}
       role="img"
-      aria-label="Loop Audio shopkeeper resting at the counter as the shop calendar shows bills due on Thursday 12 November."
+      aria-label="The shopkeeper hands a customer her order while the shop calendar shows bills due on Thursday 12 November."
     >
       {/* ── LAYER 1: Master Artwork with Subtle Respiration ── */}
       <div
@@ -80,7 +86,7 @@ export function HeroAnimatedIllustration({
       >
         <Image
           src="/landing/scene_hero_custom.jpg"
-          alt="Loop Audio shopkeeper resting at counter"
+          alt="The shopkeeper at her counter"
           fill
           priority={priority}
           loading="eager"
@@ -126,7 +132,7 @@ export function HeroAnimatedIllustration({
         )}
 
         {/* ── LAYER 3: Clean Calendar Paper Patch (Pre-Reveal: 0.0s – 2.0s) ── */}
-        {!prefersReduced && (
+        {!prefersReduced && calendarEffects && (
           <div
             className="hero-clean-cal-patch absolute pointer-events-none"
             style={{
@@ -148,7 +154,7 @@ export function HeroAnimatedIllustration({
         )}
 
         {/* ── LAYER 4: Dynamic Crimson Marker Animation (2.0s – 2.7s) ── */}
-        {!prefersReduced && (
+        {!prefersReduced && calendarEffects && (
           <svg
             viewBox="0 0 1376 768"
             className="absolute inset-0 w-full h-full pointer-events-none z-10"
@@ -179,7 +185,7 @@ export function HeroAnimatedIllustration({
         )}
 
         {/* ── LAYER 5: Ambient Warmth & Focal Light on Calendar (2.0s+) ── */}
-        {!prefersReduced && (
+        {!prefersReduced && calendarEffects && (
           <div
             className="hero-calendar-focal-glow absolute pointer-events-none rounded-full"
             style={{
@@ -206,7 +212,7 @@ export function HeroAnimatedIllustration({
           }}
         >
           <a
-            href="#the-problem"
+            href={href}
             onClick={onSelectShortDay}
             className="group inline-flex items-center gap-2.5 bg-white/95 hover:bg-white text-[#001435] text-xs sm:text-sm font-extrabold px-4 py-2.5 sm:px-5 sm:py-3 rounded-full border border-[#CBD5E1] shadow-[0_12px_28px_-6px_rgba(0,20,53,0.18)] hover:border-[#DC2626] transition-all duration-200 hover:scale-[1.03] active:scale-[0.98] backdrop-blur-xs"
             aria-label={`Jump to forecast risk for ${firstShortDay.label}: ${formatShortfall(firstShortDay.shortByCents)} below reserve`}

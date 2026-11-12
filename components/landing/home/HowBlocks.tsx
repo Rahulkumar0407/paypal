@@ -78,7 +78,7 @@ export function HowBlocks({ story }: { story: LandingStory }) {
           <span className="how-num">3</span>
           <p className="mt-5 text-[13px] font-bold tracking-[0.14em] uppercase">Steer</p>
           <h3 className="h-display mt-2 text-[1.9rem] lg:text-[2.1rem]">It helps fix it, safely.</h3>
-          <p className="mt-4 text-[16.5px] leading-7">Pip suggests fixes. 9 fixed rules check each one. Money only moves when Penny taps.</p>
+          <p className="mt-4 text-[16.5px] leading-7">Pip suggests. 9 rules check. Penny taps.</p>
           <div className="mt-auto pt-8">
             <ol aria-label="9 safety rules, all checked" className="flex gap-1.5">
               {Array.from({ length: 9 }, (_, i) => (

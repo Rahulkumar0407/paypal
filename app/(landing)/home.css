@@ -1,38 +1,36 @@
 /*
- * The landing page (/): one long page in tabs, in tmrw's look (design/tmrw-handoff/SPEC.md section 7): the painted
- * station and train at the two ends, calm Apple-style cards in between, PayPal's two blues for the brand, and colour
- * only where it means something (in / out, covered / tight / short, the Guard's decisions), always with a word.
- * Motion shows something happening; prefers-reduced-motion shows the final state.
+ * The landing page (/): one long page in tabs, in the look of Rahul's v2 page (app/v2): ivory and white bands, heavy
+ * navy headlines, PayPal blue, and the shopkeeper illustrations in public/landing. Colour only where it means
+ * something (in / out, covered / tight / short, the Guard's decisions), always with a word. Motion shows something
+ * happening; prefers-reduced-motion shows the final state.
  */
 
 .home {
-  --h-ink: #1d1d1f;
-  --h-muted: #6e6e73;
-  --h-strong: #3a3a3c;
-  --h-bg: #f5f5f7;
-  --h-line: rgb(0 0 0 / 0.08);
-  --h-blue: #0071e3;
+  --h-ink: #001435;
+  --h-muted: #52627a;
+  --h-strong: #334155;
+  --h-ivory: #f7f3e9;
+  --h-line: #e2e8f0;
+  --h-blue: #0070e0;
+  --h-blue-deep: #004f9f;
   --h-navy: #003087;
   --h-sky: #009cde;
-  --h-night: #0e1a2b;
-  --h-in: #1e7f3c;
-  --h-in-dot: #34c759;
-  --h-out: #c4161c;
-  --h-out-dot: #ff3b30;
-  --h-amber: #ffb340;
-  --h-pill: rgb(22 22 24 / 0.92);
-  --h-card-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 18px rgb(0 0 0 / 0.05);
+  --h-in: #157f3c;
+  --h-in-dot: #22a55b;
+  --h-out: #b4232f;
+  --h-out-dot: #e5484d;
+  --h-amber: #f2a93b;
   --h-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-  background: var(--h-bg);
+  background: #fff;
   color: var(--h-ink);
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", var(--font-inter), "Inter", sans-serif;
-  letter-spacing: -0.01em;
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  overflow-x: clip;
 }
 .home ::selection {
-  background: rgb(0 113 227 / 0.2);
+  background: rgb(0 112 224 / 0.2);
 }
 
-/* --- Type ----------------------------------------------------------------------------------------- */
+/* --- Type ------------------------------------------------------------------------------------------ */
 .h-wordmark {
   font-family: var(--font-jakarta), "Plus Jakarta Sans", sans-serif;
   font-style: italic;
@@ -40,72 +38,91 @@
   letter-spacing: -0.03em;
   line-height: 1;
 }
+.h-wordmark .tm {
+  color: var(--h-navy);
+}
+.h-wordmark .rw {
+  color: var(--h-sky);
+}
 .h-display {
-  font-family: var(--font-jakarta), "Plus Jakarta Sans", sans-serif;
-  font-weight: 800;
+  font-weight: 900;
   letter-spacing: -0.035em;
-  line-height: 1.02;
+  line-height: 1.04;
   text-wrap: balance;
 }
 .h-eyebrow {
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--h-blue);
+  color: var(--h-muted);
 }
 .h-lead {
-  font-size: 19px;
-  line-height: 1.55;
-  color: var(--h-strong);
+  font-size: 18px;
+  line-height: 1.6;
+  font-weight: 500;
+  color: var(--h-muted);
   text-wrap: pretty;
 }
 .h-num {
   font-variant-numeric: tabular-nums;
 }
 
-/* --- Buttons ------------------------------------------------------------------------------------- */
+/* --- Buttons: v2's pressable blue key ---------------------------------------------------------------- */
 .h-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-height: 48px;
-  padding: 0 24px;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 28px;
   border-radius: 999px;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 800;
   white-space: nowrap;
   transition:
-    transform 160ms var(--h-ease),
-    background-color 160ms,
-    box-shadow 160ms;
-}
-.h-btn:active {
-  transform: scale(0.97);
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
 }
 .h-btn-primary {
   background: var(--h-blue);
   color: #fff;
-  box-shadow: 0 8px 20px -8px rgb(0 113 227 / 0.7);
+  box-shadow: 0 5px 0 var(--h-blue-deep);
 }
 .h-btn-primary:hover {
-  background: #0062c4;
+  background: #005bb8;
+  transform: translateY(-2px);
+  box-shadow: 0 7px 0 var(--h-blue-deep);
+}
+.h-btn-primary:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--h-blue-deep);
 }
 .h-btn-ghost {
-  background: rgb(0 0 0 / 0.06);
+  background: #fff;
   color: var(--h-ink);
+  box-shadow:
+    inset 0 0 0 1.5px var(--h-line),
+    0 5px 0 #d6dde7;
 }
 .h-btn-ghost:hover {
-  background: rgb(0 0 0 / 0.1);
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 0 0 1.5px #cbd5e1,
+    0 7px 0 #d6dde7;
 }
-.h-btn-glass {
-  background: rgb(255 255 255 / 0.16);
-  color: #fff;
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.35);
+.h-btn-ghost:active {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 0 0 1.5px #cbd5e1,
+    0 2px 0 #d6dde7;
 }
-.h-btn-glass:hover {
-  background: rgb(255 255 255 / 0.26);
+.h-btn-sm {
+  min-height: 40px;
+  padding: 0 18px;
+  font-size: 14px;
+  box-shadow: 0 4px 0 var(--h-blue-deep);
 }
 .home a:focus-visible,
 .home button:focus-visible {
@@ -113,17 +130,18 @@
   outline-offset: 3px;
 }
 
-/* --- Cards --------------------------------------------------------------------------------------- */
+/* --- Cards, tags, dots ------------------------------------------------------------------------------- */
 .h-card {
-  border-radius: 22px;
+  border-radius: 24px;
   background: #fff;
-  box-shadow: var(--h-card-shadow);
+  box-shadow:
+    0 0 0 1px var(--h-line),
+    0 18px 40px -24px rgb(0 20 53 / 0.25);
 }
-.h-glass {
-  background: rgb(255 255 255 / 0.84);
-  backdrop-filter: blur(18px) saturate(1.4);
-  -webkit-backdrop-filter: blur(18px) saturate(1.4);
-  box-shadow: 0 30px 80px rgb(0 0 0 / 0.25);
+.h-art {
+  border-radius: 28px;
+  overflow: hidden;
+  background: #fff;
 }
 .h-tag {
   display: inline-flex;
@@ -133,13 +151,9 @@
   padding: 0 10px;
   border-radius: 999px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
-  background: rgb(0 0 0 / 0.06);
-  color: var(--h-strong);
-}
-.h-tag-sim {
-  background: rgb(0 0 0 / 0.06);
+  background: #f1f5f9;
   color: var(--h-strong);
 }
 .h-dot {
@@ -159,53 +173,25 @@
   background: var(--h-out-dot);
 }
 
-/* --- The tab bar: the dock's dark pill, with a white "spotlight" that slides to the section you're reading --- */
-.h-tabs {
-  position: fixed;
+/* --- The header: wordmark, the tabs with their sliding spotlight, the demo button ---------------------- */
+.h-header {
+  position: sticky;
   z-index: 60;
-  top: max(10px, env(safe-area-inset-top));
-  left: 50%;
-  translate: -50% 0;
-  width: max-content;
-  max-width: calc(100% - 24px);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px;
-  border-radius: 999px;
-  background: var(--h-pill);
-  backdrop-filter: blur(16px) saturate(1.4);
-  -webkit-backdrop-filter: blur(16px) saturate(1.4);
-  box-shadow: 0 10px 30px rgb(0 0 0 / 0.3);
-}
-.h-tabs-home {
-  flex-shrink: 0;
-  padding: 0 12px 0 14px;
-  color: #fff;
-  font-size: 24px;
-}
-.h-tabs-home span:first-child {
-  color: #8fb3ff;
-}
-.h-tabs-home span:last-child {
-  color: var(--h-sky);
+  top: 0;
+  background: rgb(255 255 255 / 0.92);
+  backdrop-filter: blur(14px) saturate(1.4);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  box-shadow: 0 1px 0 #f1f5f9;
 }
 .h-tabs-track {
   position: relative;
-  flex: 1;
-  min-width: 0;
   display: flex;
   gap: 2px;
+  padding: 4px;
+  border-radius: 999px;
+  background: #f1f5f9;
   overflow-x: auto;
   scrollbar-width: none;
-  scroll-behavior: smooth;
-}
-/* On a phone the tabs scroll sideways: fade the far edge so it's clear there are more. */
-@media (max-width: 899px) {
-  .h-tabs-track {
-    -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 84%, transparent);
-    mask-image: linear-gradient(to right, transparent, #000 6%, #000 84%, transparent);
-  }
 }
 .h-tabs-track::-webkit-scrollbar {
   display: none;
@@ -213,39 +199,33 @@
 .h-tab {
   position: relative;
   z-index: 1;
+  display: inline-flex;
+  align-items: center;
   flex-shrink: 0;
-  height: 38px;
+  height: 34px;
   padding: 0 14px;
   border-radius: 999px;
-  font-size: 14.5px;
-  font-weight: 600;
-  color: rgb(255 255 255 / 0.72);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--h-muted);
   white-space: nowrap;
   transition: color 300ms;
 }
 .h-tab:hover {
-  color: #fff;
-}
-.h-tab[aria-current="true"] {
   color: var(--h-ink);
 }
-.h-tab-cta {
+.h-tab[aria-current="true"] {
   color: #fff;
-  background: var(--h-blue);
-}
-.h-tab-cta[aria-current="true"] {
-  color: #fff;
-  background: transparent;
 }
 .h-tabs-spot {
   position: absolute;
   z-index: 0;
-  top: 0;
+  top: 4px;
   left: 0;
-  height: 38px;
+  height: 34px;
   border-radius: 999px;
-  background: #fff;
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.12), 0 0 0 4px rgb(255 255 255 / 0.12);
+  background: var(--h-ink);
+  box-shadow: 0 6px 14px -6px rgb(0 20 53 / 0.6);
   opacity: 0;
   transition:
     transform 520ms var(--h-ease),
@@ -259,28 +239,38 @@
 .h-tabs-spot[data-cta] {
   background: var(--h-blue);
 }
-/* How far down the page you are: a thin line under the bar. */
 .h-tabs-progress {
   position: absolute;
-  left: 28px;
-  right: 28px;
+  left: 0;
+  right: 0;
   bottom: -1px;
   height: 2px;
-  border-radius: 2px;
-  background: rgb(255 255 255 / 0.12);
-  overflow: hidden;
 }
 .h-tabs-progress > span {
   display: block;
   height: 100%;
-  background: var(--h-sky);
+  background: var(--h-blue);
   transform-origin: 0 50%;
 }
+@media (max-width: 1023px) {
+  .h-tabs-track {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 4%, #000 88%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 4%, #000 88%, transparent);
+  }
+}
 
-/* The spotlight on the page: the section you're reading is lit, the ones around it dim (content only). */
+/* --- Sections: ivory and white bands; the one you're reading is lit, the others dim (content only) ------ */
 .h-sec {
   position: relative;
-  scroll-margin-top: 0;
+  scroll-margin-top: 64px;
+}
+@media (max-width: 1023px) {
+  .h-sec {
+    scroll-margin-top: 104px;
+  }
+}
+.h-ivory {
+  background: var(--h-ivory);
 }
 .h-sec-in {
   transition:
@@ -288,35 +278,35 @@
     filter 700ms var(--h-ease);
 }
 .home[data-spot] .h-sec:not([data-on]) .h-sec-in {
-  opacity: 0.32;
-  filter: saturate(0.3);
+  opacity: 0.4;
+  filter: saturate(0.35);
 }
 
-/* --- Reveal: rises once when it first comes into view ---------------------------------------------- */
+/* Rises once when it first comes into view. */
 .h-reveal {
   opacity: 0;
-  transform: translateY(18px);
+  transform: translateY(22px);
 }
 [data-inview] .h-reveal,
 .h-reveal[data-inview] {
-  animation: h-rise 700ms var(--h-ease) both;
+  animation: h-rise 760ms var(--h-ease) both;
 }
 [data-inview] .h-reveal-2 {
-  animation-delay: 120ms;
+  animation-delay: 110ms;
 }
 [data-inview] .h-reveal-3 {
-  animation-delay: 240ms;
+  animation-delay: 220ms;
 }
 [data-inview] .h-reveal-4 {
-  animation-delay: 360ms;
+  animation-delay: 330ms;
 }
 [data-inview] .h-reveal-5 {
-  animation-delay: 480ms;
+  animation-delay: 440ms;
 }
 @keyframes h-rise {
   from {
     opacity: 0;
-    transform: translateY(18px);
+    transform: translateY(22px);
   }
   to {
     opacity: 1;
@@ -324,418 +314,222 @@
   }
 }
 
-/* --- Hero: the station painting, the login card's glass, today's real forecast --------------------- */
-.h-hero {
-  position: relative;
-  min-height: max(640px, 100svh);
-  overflow: hidden;
-  background: var(--h-night);
-  color: #fff;
-}
-.h-paint {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-}
-.h-paint img {
-  object-fit: cover;
-}
-.h-drift img {
-  animation: h-drift 26s ease-in-out infinite alternate;
-}
-@keyframes h-drift {
-  from {
-    transform: none;
-  }
-  to {
-    transform: scale(1.045) translate(-0.6%, -0.4%);
-  }
-}
-.h-hero-shade {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(to bottom, rgb(0 0 0 / 0.28), rgb(0 0 0 / 0) 26%),
-    linear-gradient(to top, rgb(0 0 0 / 0.5), rgb(0 0 0 / 0) 34%);
-}
-.h-lamp {
-  position: absolute;
-  left: 25.5%;
-  top: 9%;
-  width: 140px;
-  height: 140px;
-  translate: -50% -50%;
-  border-radius: 999px;
-  background: radial-gradient(circle, rgb(255 236 190 / 0.55), transparent 65%);
-  animation: h-lamp 4s ease-in-out infinite;
-  pointer-events: none;
-}
-@keyframes h-lamp {
-  50% {
-    opacity: 0.55;
-  }
-}
-.h-hero-card {
-  border-radius: 28px;
-  color: var(--h-ink);
-  animation: h-rise 900ms var(--h-ease) 150ms both;
-}
-.h-forecast-pill {
-  border-radius: 20px;
-  background: var(--h-pill);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 10px 30px rgb(0 0 0 / 0.3);
-  animation: h-rise 900ms var(--h-ease) 700ms both;
-}
-.h-scroll-hint {
-  text-shadow: 0 1px 6px rgb(0 0 0 / 0.6);
-}
-.h-scroll-hint svg {
-  animation: h-bob 1.8s ease-in-out infinite;
-}
-@keyframes h-bob {
-  50% {
-    transform: translateY(6px);
+/* The illustrations drift a little as the page scrolls past them (browsers with scroll-driven animations). */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .h-parallax {
+      animation: h-parallax linear both;
+      animation-timeline: view();
+      animation-range: cover;
+    }
+    @keyframes h-parallax {
+      from {
+        transform: translateY(14px) scale(1.06);
+      }
+      to {
+        transform: translateY(-14px) scale(1.06);
+      }
+    }
   }
 }
 
-/* --- Problem: night on the platform ---------------------------------------------------------------- */
-.h-night {
-  background: var(--h-night);
-  color: #fff;
+/* --- Hero ------------------------------------------------------------------------------------------- */
+/* The hero fills the first screen under the header, so the next section starts below the fold. */
+.h-hero {
+  display: flex;
+  align-items: center;
+  min-height: calc(100svh - 62px);
 }
-.h-night .h-eyebrow {
-  color: #7cc4ff;
+@media (max-width: 1023px) {
+  .h-hero {
+    min-height: calc(100svh - 106px);
+  }
 }
-.h-night .h-lead {
-  color: rgb(255 255 255 / 0.82);
+.h-marker {
+  background-image: linear-gradient(transparent 60%, rgb(229 72 77 / 0.32) 60%, rgb(229 72 77 / 0.32) 92%, transparent 92%);
+  background-repeat: no-repeat;
+  background-size: 0% 100%;
+  animation: h-marker 800ms var(--h-ease) 2.05s forwards;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
-.h-night-paint {
+@keyframes h-marker {
+  to {
+    background-size: 100% 100%;
+  }
+}
+/* The opening: each piece waits for its turn (--d, set inline), so the hero plays as one sequence. */
+.h-header {
+  animation: h-drop 600ms var(--h-ease) both;
+}
+@keyframes h-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.h-in {
+  animation: h-rise 760ms var(--h-ease) var(--d, 0ms) both;
+}
+.h-word {
+  display: inline-block;
+  animation: h-word 900ms cubic-bezier(0.2, 0.9, 0.2, 1) var(--d, 0ms) both;
+}
+@keyframes h-word {
+  from {
+    opacity: 0;
+    transform: translateY(0.5em) rotate(3deg);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+.h-pop {
+  animation: h-pop-key 620ms cubic-bezier(0.3, 1.5, 0.5, 1) var(--d, 0ms) both;
+}
+@keyframes h-pop-key {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.86);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* The illustration opens out from its middle, then v2's own sequence plays inside it. */
+.h-hero-art {
+  animation: h-art-in 1150ms cubic-bezier(0.2, 0.8, 0.2, 1) 250ms both;
+}
+@keyframes h-art-in {
+  from {
+    opacity: 0;
+    clip-path: inset(12% 10% 12% 10% round 28px);
+    transform: translateY(26px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 round 28px);
+    transform: none;
+  }
+}
+/* The next two weeks: one bar a day; the short day thumps in last. */
+.h-tick {
+  flex: 1;
+  height: 26px;
+  border-radius: 4px;
+  transform: scaleY(0);
+  transform-origin: 50% 100%;
+  animation: h-tick 420ms var(--h-ease) var(--d, 0ms) both;
+}
+@keyframes h-tick {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+.h-tick-short {
+  height: 34px;
+  animation: h-thump 640ms var(--h-ease) var(--d, 0ms) both;
+}
+@keyframes h-thump {
+  0% {
+    transform: translateY(-40px) scale(1.3, 0);
+  }
+  55% {
+    transform: translateY(0) scale(1.15, 1.25);
+  }
+  75% {
+    transform: scale(0.95, 0.9);
+  }
+  100% {
+    transform: none;
+  }
+}
+.h-verdict {
+  animation: h-stamp 480ms var(--h-ease) var(--d, 0ms) both;
+}
+
+/* --- Problem: bills drop onto the desk ------------------------------------------------------------- */
+.h-bill {
   position: absolute;
-  inset: 0 0 auto;
-  height: 70%;
-  overflow: hidden;
-  opacity: 0.55;
-  -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent);
-  mask-image: linear-gradient(to bottom, #000 30%, transparent);
+  z-index: 2;
+  width: min(42%, 200px);
+  padding: 10px 13px;
+  border-radius: 16px;
+  background: #fffdfb;
+  box-shadow:
+    0 0 0 1px #cbd5e1,
+    0 16px 32px -8px rgb(0 0 0 / 0.18);
+  opacity: 0;
+}
+@media (max-width: 639px) {
+  .h-bill {
+    width: 30%;
+    padding: 6px 9px;
+    border-radius: 10px;
+  }
 }
 .h-place {
   border-radius: 18px;
-  background: rgb(255 255 255 / 0.07);
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+  background: #fff;
+  box-shadow: 0 0 0 1px var(--h-line);
 }
 .h-place-n {
-  font-family: var(--font-jakarta), sans-serif;
-  font-weight: 800;
-  color: rgb(255 255 255 / 0.4);
-}
-
-/* --- What it does ------------------------------------------------------------------------------- */
-.h-step-n {
-  font-family: var(--font-jakarta), sans-serif;
-  font-weight: 800;
-  font-size: 15px;
-  color: var(--h-blue);
+  font-weight: 900;
+  color: #b8c2d0;
 }
 .h-row + .h-row {
   border-top: 1px solid var(--h-line);
+}
+
+/* The tickets: the first landing page's tear-off stubs, on a navy board. */
+.home .till-board {
+  background: var(--h-ink);
+  box-shadow: 0 24px 50px -28px rgb(0 20 53 / 0.7);
+}
+
+/* --- What it does: the three colour blocks --------------------------------------------------------- */
+.home .how-block {
+  min-height: 460px;
+  border-radius: 28px;
+}
+.home .how-ink {
+  background: var(--h-ink);
+}
+.home .how-red {
+  background: var(--h-out-dot);
+  color: #1a0507;
+}
+.home .how-green {
+  background: #1e9e5e;
+  color: #04170d;
+}
+.home .how-num {
+  font-family: var(--font-inter), sans-serif;
+  font-weight: 900;
 }
 .h-focus {
   font-family: var(--font-jakarta), sans-serif;
   font-style: italic;
   font-weight: 700;
 }
-.h-pip {
-  border-radius: 18px 18px 18px 6px;
-  background: var(--h-bg);
-}
-.h-dashed {
-  border: 1.5px dashed rgb(0 113 227 / 0.45);
-  background: rgb(0 113 227 / 0.04);
-}
-
-/* --- Features: the fix picker -------------------------------------------------------------------- */
-.h-seg {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 5px;
-  border-radius: 18px;
-  background: rgb(0 0 0 / 0.06);
-}
-.h-seg button {
-  min-height: 42px;
-  padding: 0 16px;
-  border-radius: 13px;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--h-strong);
-  transition:
-    background-color 200ms,
-    box-shadow 200ms,
-    color 200ms;
-}
-.h-seg button:hover {
-  color: var(--h-ink);
-}
-.h-seg button[aria-pressed="true"] {
-  background: #fff;
-  color: var(--h-ink);
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
-}
-/* The Guard's verdict: a small tilted referee's card, with its word beside it. */
-.h-ref {
-  flex-shrink: 0;
-  width: 30px;
-  height: 42px;
-  border-radius: 4px;
-  rotate: -11deg;
-  box-shadow: 0 6px 12px -4px rgb(0 0 0 / 0.35);
-}
-.h-ref-APPROVE {
-  background: var(--h-in-dot);
-}
-.h-ref-ESCALATE {
-  background: var(--h-amber);
-}
-.h-ref-BLOCK {
-  background: var(--h-out-dot);
-}
-.h-slip-in {
-  animation: h-slip 520ms var(--h-ease) both;
-}
-.h-slip-in .h-ref {
-  animation: h-ref-raise 600ms var(--h-ease) both;
-}
-@keyframes h-slip {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-@keyframes h-ref-raise {
-  from {
-    transform: translateY(22px) rotate(20deg);
-  }
-  to {
-    transform: none;
-  }
-}
-.h-stamp {
-  animation: h-stamp 460ms var(--h-ease) both;
-}
-@keyframes h-stamp {
-  0% {
-    opacity: 0;
-    transform: scale(1.8);
-  }
-  60% {
-    opacity: 1;
-    transform: scale(0.94);
-  }
-  100% {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-/* --- Features: money comes back ------------------------------------------------------------------ */
-.h-message {
-  border-radius: 22px;
-  background: #fff;
-  box-shadow: 0 20px 50px -18px rgb(0 0 0 / 0.3);
-  transition: transform 400ms var(--h-ease);
-}
-.h-message[data-paid] {
-  transform: rotate(-1deg);
-}
-.h-paypal-btn {
-  background: #0070e0;
-  color: #fff;
-}
-.h-paypal-btn:hover {
-  background: #005ec0;
-}
-.h-paid {
-  animation: h-stamp 460ms var(--h-ease) both;
-}
-.h-bar {
-  position: relative;
-  height: 14px;
-  border-radius: 999px;
-  background: rgb(0 0 0 / 0.07);
-  overflow: hidden;
-}
-.h-bar > span {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-}
-.h-bar-ready {
-  left: 0;
-  border-radius: 999px 0 0 999px;
-  background: var(--h-in);
-}
-.h-bar-new {
-  background: var(--h-in-dot);
-  transition: width 900ms var(--h-ease) 700ms;
-}
-.h-fly {
-  position: absolute;
-  width: 34px;
-  height: 20px;
-  border-radius: 4px;
-  background: var(--h-in-dot);
-  box-shadow: inset 0 0 0 2px rgb(255 255 255 / 0.5);
-  pointer-events: none;
-  animation: h-fly 900ms cubic-bezier(0.5, 0, 0.3, 1) both;
-}
-@keyframes h-fly {
-  from {
-    opacity: 1;
-    transform: translate(0, 0) rotate(-8deg);
-  }
-  to {
-    opacity: 0;
-    transform: translate(var(--fx, 260px), var(--fy, 40px)) rotate(12deg);
-  }
-}
-
-/* --- Tech: the flow -------------------------------------------------------------------------------- */
-.h-flow-step {
-  position: relative;
-  border-radius: 16px;
-  background: #fff;
-  box-shadow: var(--h-card-shadow);
-}
-.h-flow-ai {
-  box-shadow: inset 0 0 0 1.5px rgb(0 0 0 / 0.08);
-  background: var(--h-bg);
-}
-.h-flow-guard {
-  background: var(--h-ink);
-  color: #fff;
-}
-.h-flow-arrow {
-  color: var(--h-muted);
-}
-
-/* --- Next up: a departures board ----------------------------------------------------------------- */
-.h-board {
-  border-radius: 22px;
-  background: #15181d;
-  color: #f2f2f2;
-  box-shadow:
-    inset 0 0 0 1px rgb(255 255 255 / 0.06),
-    0 24px 60px -24px rgb(0 0 0 / 0.5);
-}
-.h-board-head {
-  color: rgb(255 255 255 / 0.55);
-}
-.h-board-row + .h-board-row {
-  border-top: 1px solid rgb(255 255 255 / 0.08);
-}
-.h-board-flap {
-  display: inline-block;
-  min-width: 2.4em;
-  padding: 3px 6px;
-  border-radius: 6px;
-  background: #23272e;
-  box-shadow: inset 0 -1px 0 rgb(0 0 0 / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.06);
-  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
-  font-weight: 700;
-  text-align: center;
-}
-.h-board-status {
-  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.h-board-next {
-  color: #7cc4ff;
-}
-.h-board-later {
-  color: rgb(255 255 255 / 0.6);
-}
-[data-inview] .h-board-row {
-  animation: h-flap 600ms var(--h-ease) both;
-}
-@keyframes h-flap {
-  from {
-    opacity: 0;
-    transform: perspective(700px) rotateX(-70deg);
-    transform-origin: 50% 0;
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-/* --- GitHub ------------------------------------------------------------------------------------- */
-.h-code {
-  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
-  font-size: 0.92em;
-}
-.h-repo {
-  background: var(--h-ink);
-  color: #fff;
-}
-
-/* --- Try it now: the train is here --------------------------------------------------------------- */
-.h-train {
-  position: relative;
-  min-height: max(640px, 100svh);
-  overflow: hidden;
-  background: var(--h-night);
-}
-.h-train .h-paint {
-  -webkit-mask-image: none;
-}
-.h-train-shade {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgb(0 0 0 / 0.55), rgb(0 0 0 / 0) 45%);
-}
-
-
-/* --- Brought back from the first landing page: Penny's counter, the dealt tickets, the colour blocks ----------- */
-/* Penny's sun becomes a moon on the night platform. */
-.h-moon {
-  background: #e9e4d6;
-  box-shadow: 0 0 80px 10px rgb(233 228 214 / 0.18);
-}
-.h-night .counter {
-  box-shadow:
-    inset 0 0 0 1px rgb(255 255 255 / 0.08),
-    0 14px 22px -12px rgb(0 0 0 / 0.55);
-}
-.h-board-night {
-  box-shadow:
-    inset 0 0 0 1px rgb(255 255 255 / 0.08),
-    0 18px 30px -18px rgb(0 0 0 / 0.6);
-}
-.home .how-block {
-  min-height: 460px;
-}
-.home .how-num {
-  font-family: var(--font-jakarta), sans-serif;
-}
-
 /* Steer: the referee's card turns in amber (waiting for Penny), then turns white when she taps OK. */
 .h-steer-card {
   display: block;
   flex-shrink: 0;
   width: 34px;
   height: 46px;
-  border: 2px solid #14201b;
+  border: 2px solid #04170d;
   border-radius: 4px;
   background: var(--h-amber);
   rotate: -11deg;
@@ -800,42 +594,313 @@
   }
 }
 
-/* Save Thursday on the green felt, like the first landing page. */
-.h-felt {
-  border-radius: 28px;
-  overflow: hidden;
-  background-color: #2a5a46;
-  background-image: url("/felt.png");
-  color: #fff;
-  box-shadow:
-    inset 0 0 0 1px rgb(255 255 255 / 0.06),
-    0 30px 60px -30px rgb(0 0 0 / 0.5);
+/* The magnifier: v2's day rail, two weeks so every day keeps its word. */
+.home .v2-lens-reading {
+  min-width: 0;
 }
-.h-felt .h-eyebrow {
-  color: #bfe8d0;
+
+/* --- Features ---------------------------------------------------------------------------------------- */
+.h-seg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 5px;
+  border-radius: 18px;
+  background: #eef2f6;
 }
-.h-seg-dark {
-  background: rgb(0 0 0 / 0.28);
+.h-seg button {
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 13px;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--h-muted);
+  transition:
+    background-color 200ms,
+    box-shadow 200ms,
+    color 200ms;
 }
-.h-seg-dark button {
-  color: rgb(255 255 255 / 0.82);
-}
-.h-seg-dark button:hover {
-  color: #fff;
-}
-.h-seg-dark button[aria-pressed="true"] {
-  background: #fff;
+.h-seg button:hover {
   color: var(--h-ink);
 }
-/* Penny beside her words on a phone, so the tickets stay in view while you choose. */
-.h-penny .bubble {
-  position: relative;
-  top: auto;
-  left: auto;
-  max-width: none;
+.h-seg button[aria-pressed="true"] {
+  background: #fff;
+  color: var(--h-ink);
+  box-shadow:
+    0 1px 3px rgb(0 0 0 / 0.12),
+    0 0 0 1px var(--h-line);
 }
-.h-penny .counter {
-  margin-top: -34px;
+/* Penny's two faces: worried while the day is short, relaxed once it's saved. They cross-fade. */
+.h-mood {
+  transition:
+    opacity 700ms var(--h-ease),
+    transform 900ms var(--h-ease);
+}
+.h-mood[data-hidden] {
+  opacity: 0;
+  transform: scale(1.03);
+}
+.h-say {
+  position: absolute;
+  z-index: 3;
+  right: 3%;
+  top: 4%;
+  max-width: 46%;
+  padding: 10px 14px;
+  border-radius: 18px 18px 4px 18px;
+  background: #fff;
+  box-shadow:
+    0 0 0 1.5px var(--h-ink),
+    0 12px 24px -10px rgb(0 20 53 / 0.35);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--h-ink);
+  transform-origin: bottom right;
+  animation: h-pop 420ms var(--h-ease) both;
+}
+@keyframes h-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.h-covered-stamp {
+  position: absolute;
+  z-index: 3;
+  right: 5%;
+  bottom: 9%;
+  padding: 7px 14px;
+  border: 3px solid var(--h-in);
+  border-radius: 10px;
+  background: rgb(255 255 255 / 0.94);
+  color: var(--h-in);
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  rotate: -6deg;
+}
+/* The Guard's verdict: a small tilted referee's card, with its word beside it. */
+.h-ref {
+  flex-shrink: 0;
+  width: 30px;
+  height: 42px;
+  border-radius: 4px;
+  rotate: -11deg;
+  box-shadow: 0 6px 12px -4px rgb(0 0 0 / 0.35);
+}
+.h-ref-APPROVE {
+  background: var(--h-in-dot);
+}
+.h-ref-ESCALATE {
+  background: var(--h-amber);
+}
+.h-ref-BLOCK {
+  background: var(--h-out-dot);
+}
+.h-slip-in {
+  animation: h-slip 520ms var(--h-ease) both;
+}
+.h-slip-in .h-ref {
+  animation: h-ref-raise 600ms var(--h-ease) both;
+}
+@keyframes h-slip {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes h-ref-raise {
+  from {
+    transform: translateY(22px) rotate(20deg);
+  }
+  to {
+    transform: none;
+  }
+}
+.h-stamp {
+  animation: h-stamp 460ms var(--h-ease) both;
+}
+@keyframes h-stamp {
+  0% {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.94);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Money comes back: the reminder, the PayPal button, the ready bar. */
+.h-message {
+  border-radius: 22px;
+  background: #fff;
+  box-shadow:
+    0 0 0 1px var(--h-line),
+    0 20px 50px -18px rgb(0 20 53 / 0.3);
+  transition: transform 400ms var(--h-ease);
+}
+.h-message[data-paid] {
+  transform: rotate(-1deg);
+}
+.h-paypal-btn {
+  background: #0070e0;
+  color: #fff;
+  box-shadow: 0 5px 0 var(--h-blue-deep);
+}
+.h-paypal-btn:hover {
+  background: #005bb8;
+}
+.h-paid {
+  animation: h-stamp 460ms var(--h-ease) both;
+}
+.h-bar {
+  position: relative;
+  height: 14px;
+  border-radius: 999px;
+  background: #eef2f6;
+  overflow: hidden;
+}
+.h-bar > span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+.h-bar-ready {
+  left: 0;
+  border-radius: 999px 0 0 999px;
+  background: var(--h-in);
+}
+.h-bar-new {
+  background: var(--h-in-dot);
+  transition: width 900ms var(--h-ease) 700ms;
+}
+
+/* The guard's signs: the chosen one glows. */
+.h-glow {
+  position: absolute;
+  width: 9%;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  translate: -50% -50%;
+  pointer-events: none;
+  animation: h-glow 1.6s ease-out infinite;
+}
+@keyframes h-glow {
+  0% {
+    box-shadow: 0 0 0 0 var(--glow);
+    opacity: 1;
+  }
+  100% {
+    box-shadow: 0 0 0 26px transparent;
+    opacity: 0.4;
+  }
+}
+.h-receipt-swap {
+  animation: h-print 700ms cubic-bezier(0.3, 0.7, 0.3, 1) both;
+}
+@keyframes h-print {
+  from {
+    clip-path: inset(0 0 100% 0);
+    transform: translateY(-24px);
+  }
+  to {
+    clip-path: inset(0 -40px -40px -40px);
+    transform: none;
+  }
+}
+
+/* --- Tech, Next up, GitHub --------------------------------------------------------------------------- */
+.h-step-n {
+  font-weight: 900;
+  font-size: 15px;
+  color: var(--h-blue);
+}
+.h-flow-step {
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 0 0 1px var(--h-line);
+}
+.h-flow-ai {
+  background: #f8fafc;
+  box-shadow: inset 0 0 0 1.5px #cbd5e1;
+}
+.h-flow-guard {
+  background: var(--h-ink);
+  color: #fff;
+}
+.h-board {
+  border-radius: 24px;
+  background: var(--h-ink);
+  color: #f2f2f2;
+  box-shadow: 0 24px 60px -24px rgb(0 20 53 / 0.6);
+}
+.h-board-head {
+  color: rgb(255 255 255 / 0.55);
+}
+.h-board-row + .h-board-row {
+  border-top: 1px solid rgb(255 255 255 / 0.1);
+}
+.h-board-flap {
+  display: inline-block;
+  min-width: 2.4em;
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: #0b2550;
+  box-shadow:
+    inset 0 -1px 0 rgb(0 0 0 / 0.6),
+    inset 0 1px 0 rgb(255 255 255 / 0.08);
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-weight: 700;
+  text-align: center;
+}
+.h-board-status {
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.h-board-next {
+  color: #7cc4ff;
+}
+.h-board-later {
+  color: rgb(255 255 255 / 0.6);
+}
+.h-board-row {
+  opacity: 0;
+}
+[data-inview] .h-board-row {
+  animation: h-flap 600ms var(--h-ease) both;
+}
+@keyframes h-flap {
+  from {
+    opacity: 0;
+    transform: perspective(700px) rotateX(-70deg);
+    transform-origin: 50% 0;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.h-code {
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-size: 0.92em;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -847,19 +912,25 @@
     animation-delay: 0ms !important;
     transition-duration: 1ms !important;
   }
+  .h-reveal,
+  .h-board-row,
+  .h-bill {
+    opacity: 1;
+    transform: none;
+  }
+  .h-word {
+    filter: none;
+  }
+  .h-marker {
+    background-size: 100% 100%;
+  }
   .h-steer-wait {
     display: none;
   }
   .h-steer-card {
     background: #fff;
   }
-  .h-drift img,
-  .h-lamp,
-  .h-scroll-hint svg {
+  .h-glow {
     animation: none !important;
-  }
-  .h-reveal {
-    opacity: 1;
-    transform: none;
   }
 }
